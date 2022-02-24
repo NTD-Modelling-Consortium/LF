@@ -22,7 +22,7 @@ measure <- "WC" # output measure, WC : worm count
 elim <- "MF" # check if elimination was achieved before 2030
 ######## for one IU #######
 # read in files
-data_files <- read_files(scenario, coverage, non_compliance,
+data_files <- read_files_def_cf(scenario, coverage, cf_coverage = "65", non_compliance,
                          IU_order, measure)
 
 # calculate relevant measuyre of impact (median at 2030)
