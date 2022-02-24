@@ -282,7 +282,7 @@ make_blob_plot <- function(res_list, labels){
   mean_diff <- unlist(lapply(res_list, find_mean_difference))
   mean_prob <- unlist(lapply(res_list, find_mean_elim_prob))
   
-  plot(NA, NA, ylab = "Mean prob. of elimination", xlab = "Difference in worm count",
+  plot(NA, NA, ylab = "Mean prob. of elimination", xlab = "Difference",
        pch = 16, cex = sqrt(mean(res_M1[,"costs"]))/2, col = "deepskyblue3",
        xlim = c(min(mean_diff), max(mean_diff)),
        ylim = c(min(mean_prob), max(mean_prob)))
