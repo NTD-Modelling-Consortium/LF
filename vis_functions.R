@@ -125,3 +125,136 @@ calculate_costs <- function(summary_res, cost_scenario, cost_development, cost_c
   
   return(costs)
 }
+
+
+
+
+#' calculate probability of elimination of LF in an IU between 2020 and 2030
+#'
+#' @param data_files_elim : file containing mf data, from which we will calculate the proportion 
+#' of simulations which reach elimination between 2020 and 2030
+#'
+#' @return elim_mat : a matrix with proportion of simulations reaching elimination. 2 entries, one for cf and one for scenario
+#' @export
+#'
+#' @examples calculate_probability_of_elimination(data_files_elim)
+calculate_probability_of_elimination <- function(data_files_elim){
+  k = which(data_files_elim$data_scenario$`Init cond` > 0.01) # only want to consider simulations where we begin with a >1% mf prevalence
+  # check if there are any occasions between 2020 and 2030 where the mf prev is <1%. 
+  # If there are any, then we would class that simulation as having reached elimination
+  col_start = which(colnames(data_files_elim$data_cf)=='Jan-2020')
+  col_end = which(colnames(data_files_elim$data_cf)=='Jan-2031')
+  scen_m = data_files_elim$data_scenario[k,col_start:col_end] # get the data we want to look at
+  cf_m = data_files_elim$data_cf[k,col_start:col_end] # get the data we want to look at
+  elim_mat = data.frame(matrix(0, 1, 2)) # set up matrix to hold probs
+  colnames(elim_mat) = c("cf_elim", "scen_elim")
+  elim_mat[1] = sum(apply(X = cf_m, MARGIN = 1, FUN = check_sim_elimination)) / nrow(cf_m)# calculate the proportion of simulations which go below 1%
+  elim_mat[2] = sum(apply(X = scen_m, MARGIN = 1, FUN = check_sim_elimination)) / nrow(scen_m)# calculate the proportion of simulations which go below 1%
+  return(elim_mat)
+}
+
+
+#' function to check which simulations, held in a matrix with each simulation on a row, have reach elimination
+#'
+#' @param x : matrix holding simulation data
+#'
+#' @return 
+#' @export
+#'
+#' @examples 
+check_sim_elimination <- function(x){
+  any(x < 0.01)
+}
+
+
+
+
+
+
+
+calculate_blob_data <- function(scenario, # scenario name
+                                coverage, # coverage percentage
+                                cf_coverage, # coverage for cf
+                                non_compliance,  # non-compliance parameter, equivalent to 0.2
+                                IU_order,# IU order number
+                                measure, # output measure, WC : worm count
+                                elim ,
+                                mean_IU_pop ,
+                                cost_scenario,
+                                cost_development,
+                                cost_cf, 
+                                no_IUs){
+
+  IUs = read.csv("runIU.csv")
+  IUs_vec <- which(IUs$V1 == 1)
+  #no_IUs <- length(IUs_vec)
+  
+  # empty matrix to store results
+  res <- matrix(ncol = 5, nrow = no_IUs)
+  colnames(res) <- c("IU_order", "difference", "elim_prob_cf",  "elim_prob_scen", "costs")
+  # cf_res <- matrix(ncol = 5, nrow = no_IUs)
+  # colnames(cf_res) <- c("IU_order", "num_worms", "elim_prob", "num_MDAs", "costs")
+  # scen_res <- matrix(ncol = 5, nrow = no_IUs)
+  # colnames(scen_res) <- c("IU_order", "num_worms", "elim_prob", "num_MDAs",  "costs")
+  # 
+  for(i in 1:no_IUs){
+    random_population = max(0, rnorm(n = 1,mean = mean_IU_pop, sd = mean_IU_pop/3)) + 5000 # choose some random population size for the IU
+    
+    data_files <- read_files_def_cf(scenario, coverage, cf_coverage, non_compliance,
+                                    
+                             IU_order = IUs_vec[i], measure)
+    
+    data_files_elim <- read_files_def_cf(scenario, coverage,cf_coverage,  non_compliance,
+                                  IU_order = IUs_vec[i], elim)
+    
+    # calculate probability of elimination for cf and scen
+    elim_prob = calculate_probability_of_elimination(data_files_elim)
+    # calculate relevant measure of impact (median at 2030)
+    summary_res <- extract_medians(data_files)
+    
+    # calculate relevant costs
+    costs <- calculate_costs(summary_res, cost_scenario, cost_development, cost_cf)
+    
+    diff_measures <- random_population * summary_res$cf - random_population * summary_res$scenario
+    # just store difference in measure
+    res[i, ] <- c(IUs_vec[i], diff_measures[1], elim_prob$cf_elim, elim_prob$scen_elim, costs)
+    # cf_res[i, ] <- c(IUs_vec[i], summary_res$cf[1]* random_population, elim_prob$cf_elim, summary_res$cf[2], summary_res$cf[2] * cost_cf)
+    # scen_res[i, ] <- c(IUs_vec[i], summary_res$scenario[1]* random_population, elim_prob$scen_elim, 
+    #                    summary_res$scenario[2], 
+    #                    cost_development +summary_res$scenario[2] * cost_scenario)
+  }
+
+  return(res)
+  
+
+}
+
+
+#' read_files
+#' reads in scenario and partner counter-factual file
+#'
+#' @param scenario : NC, M1, M2 etc
+#' @param coverage : coverage percentage
+#' @param non_compliance : non-compliance parameter, 02 equivalent to 0.2
+#' @param IU_order : IU order number
+#' @param measure : output measure, WC : worm count, MF : mf prev, IC : ict prev
+#' @param cf_coverage : the coverage level for the  cf
+#'
+#' @examples
+read_files_def_cf <- function(scenario, coverage, 
+                       cf_coverage = "65", 
+                       non_compliance,
+                       IU_order, measure){
+  # scenario file
+  data_scenario <- read_scenario(scenario, coverage, non_compliance,
+                                 IU_order, measure)
+  
+  # counter-factual partner file (scenario : NC)
+  data_cf <- read_scenario(scenario = "NC", cf_coverage, non_compliance,
+                           IU_order, measure)
+  
+  return(list(data_scenario = data_scenario, data_cf = data_cf))
+}
+
+
+
