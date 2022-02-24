@@ -3,10 +3,9 @@ setwd("~/Documents/GitHub/")
 setwd("/Users/matthewgraham/Dropbox/LFProjCode")
 
 
-mean_IU_pop = 500000000 / 4653
-cost_scenario = 15
-cost_development = 1000
-cost_cf = 10
+mean_IU_pop <- 500000000 / 4653
+cost_development <- 1000
+cost_cf <- 10
 # assumes there is an output folder in github repo
 
 # dummy visualisations need to illustrate impact versus cost
@@ -41,7 +40,7 @@ sum(diff_measures)
 costs <- calculate_costs(summary_res, cost_scenario = 15, cost_development = 1000, cost_cf = 10)
 
 ######## across all IUs #######
-IUs = read.csv("runIU.csv")
+IUs <- read.csv("runIU.csv")
 IUs_vec <- which(IUs$V1 == 1)
 no_IUs <- length(IUs_vec)
 
@@ -58,7 +57,7 @@ res_M1 <- calculate_blob_data(scenario = "M1", # scenario name
                              measure = "WC", # output measure, WC : worm count
                              elim = "MF",
                              mean_IU_pop ,
-                             cost_scenario,
+                             cost_scenario = cost_cf * 8/6.5,
                              cost_development,
                              cost_cf, no_IUs =  40, 
                              which_years)
@@ -71,7 +70,7 @@ res_M2 <- calculate_blob_data(scenario = "M2", # scenario name
                              measure = "WC", # output measure, WC : worm count
                              elim = "MF",
                              mean_IU_pop ,
-                             cost_scenario,
+                             cost_scenario = cost_cf * 8/6.5,
                              cost_development,
                              cost_cf, no_IUs =  40,
                              which_years)
