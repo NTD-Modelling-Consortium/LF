@@ -53,29 +53,6 @@ read_scenario <- function(scenario, coverage, non_compliance,
 }
 
 
-#' read_files
-#' reads in scenario and partner counter-factual file
-#'
-#' @param scenario : NC, M1, M2 etc
-#' @param coverage : coverage percentage
-#' @param non_compliance : non-compliance parameter, 02 equivalent to 0.2
-#' @param IU_order : IU order number
-#' @param measure : output measure, WC : worm count, MF : mf prev, IC : ict prev
-#'
-#'
-#' @examples
-read_files <- function(scenario, coverage, non_compliance,
-                       IU_order, measure){
-  # scenario file
-  data_scenario <- read_scenario(scenario, coverage, non_compliance,
-                                 IU_order, measure)
-  
-  # counter-factual partner file (scenario : NC)
-  data_cf <- read_scenario(scenario = "NC", coverage, non_compliance,
-                           IU_order, measure)
-  
-  return(list(data_scenario = data_scenario, data_cf = data_cf))
-}
 
 #' extract_medians 
 #'
@@ -230,7 +207,7 @@ calculate_blob_data <- function(scenario, # scenario name
 }
 
 
-#' read_files
+#' read_files_def_cf
 #' reads in scenario and partner counter-factual file
 #'
 #' @param scenario : NC, M1, M2 etc
