@@ -77,6 +77,7 @@ extract_medians <- function(data_files, which_years = "Jan-2030"){
   
   res <- matrix(c(scenario_summary[1,], cf_summary[1,]), byrow = F, ncol = 2)
   colnames(res) <- c("scenario", "cf")
+  rownames(res) <- c( "No_MDA", which_years)
   
   return(summary_res = as.data.frame(res))
 }
@@ -147,8 +148,6 @@ check_sim_elimination <- function(x){
 
 
 
-
-
 calculate_blob_data <- function(scenario, # scenario name
                                 coverage, # coverage percentage
                                 cf_coverage, # coverage for cf
@@ -190,9 +189,10 @@ calculate_blob_data <- function(scenario, # scenario name
     # calculate relevant costs
     costs <- calculate_costs(summary_res, cost_scenario, cost_development, cost_cf)
     
-    diff_measures <- random_population * summary_res$cf - random_population * summary_res$scenario
+    diff_measures <- random_population * summary_res["Jan-2030","cf"] - random_population * summary_res["Jan-2030","scenario"]
+    
     # just store difference in measure
-    res[i, ] <- c(IUs_vec[i], diff_measures[1], elim_prob$cf_elim, elim_prob$scen_elim, costs)
+    res[i, ] <- c(IUs_vec[i], diff_measures, elim_prob$cf_elim, elim_prob$scen_elim, costs)
     # cf_res[i, ] <- c(IUs_vec[i], summary_res$cf[1]* random_population, elim_prob$cf_elim, summary_res$cf[2], summary_res$cf[2] * cost_cf)
     # scen_res[i, ] <- c(IUs_vec[i], summary_res$scenario[1]* random_population, elim_prob$scen_elim, 
     #                    summary_res$scenario[2], 
@@ -201,7 +201,6 @@ calculate_blob_data <- function(scenario, # scenario name
 
   return(res)
   
-
 }
 
 
@@ -231,5 +230,59 @@ read_files_def_cf <- function(scenario, coverage,
   return(list(data_scenario = data_scenario, data_cf = data_cf))
 }
 
+#' add_blobs
+#' add blobs to existing plot
+#' @param res 
+#' @param label 
+#'
+#' @return 
+#'
+#' @examples add_points(res_M2, "M2")
+add_blobs <- function(res, label){
+  points(mean(res[,"difference"]), mean(res[,"elim_prob_scen"]),
+         pch = 16, cex = sqrt(mean(res[,"costs"]))/2, col = "deepskyblue3")
+  text(mean(res[,"difference"]), mean(res[,"elim_prob_scen"]), labels = label) 
+}
 
 
+#' find_mean_difference
+#' returns the mean difference, used to calculate xlim
+#' @param x 
+#'
+#'
+#' @examples lapply(res_list, find_mean_difference)
+find_mean_difference <- function(x){
+  mean(x[,"difference"])
+} 
+
+#' find_mean_elim_prob
+#' returns the mean elim prob, used to calculate ylim
+#' @param x 
+#'
+#'
+#' @examples  lapply(res_list, find_mean_elim_prob)
+find_mean_elim_prob <- function(x){
+  mean(x[,"elim_prob_scen"])
+}
+
+#' make_blob_plot
+#'
+#' @param res_list 
+#' @param labels 
+#'
+#'
+#' @examples make_blob_plot(res_list, labels)
+make_blob_plot <- function(res_list, labels){
+  
+  mean_diff <- unlist(lapply(res_list, find_mean_difference))
+  mean_prob <- unlist(lapply(res_list, find_mean_elim_prob))
+  
+  plot(NA, NA, ylab = "Mean prob. of elimination", xlab = "Difference in worm count",
+       pch = 16, cex = sqrt(mean(res_M1[,"costs"]))/2, col = "deepskyblue3",
+       xlim = c(min(mean_diff), max(mean_diff)),
+       ylim = c(min(mean_prob), max(mean_prob)))
+  
+  for(i in 1:length(res_list)){
+    add_blobs(res_list[[i]], labels[i])
+  }
+}
