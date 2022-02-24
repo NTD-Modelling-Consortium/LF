@@ -61,7 +61,7 @@ read_scenario <- function(scenario, coverage, non_compliance,
 #' @return summary_res : median measure and number of MDAs
 #'
 #' @examples extract_medians(data_files)
-extract_medians <- function(data_files, which_years = "Jan-2030"){
+extract_medians <- function(data_files, which_years){
   # extract needed columns from scenario and counter-factual (cf)
   measure_2030 <- data_files$data_scenario[ , c( "No_MDA", which_years)]
   measure_2030_cf <- data_files$data_cf[ , c("No_MDA", which_years)]
@@ -96,8 +96,8 @@ extract_medians <- function(data_files, which_years = "Jan-2030"){
 calculate_costs <- function(summary_res, cost_scenario, cost_development, cost_cf){
 
   # extract median number mdas
-  no_mdas_scenario <- summary_res$scenario[1]
-  no_mdas_cf <- summary_res$cf[1]
+  no_mdas_scenario <- summary_res["No_MDA", "scenario"]
+  no_mdas_cf <- summary_res["No_MDA", "cf"]
   
   costs <- (no_mdas_scenario*cost_scenario + cost_development) -  no_mdas_cf*cost_cf
   
@@ -159,7 +159,8 @@ calculate_blob_data <- function(scenario, # scenario name
                                 cost_scenario,
                                 cost_development,
                                 cost_cf, 
-                                no_IUs){
+                                no_IUs,
+                                which_years){
 
   IUs = read.csv("runIU.csv")
   IUs_vec <- which(IUs$V1 == 1)
@@ -173,7 +174,7 @@ calculate_blob_data <- function(scenario, # scenario name
   # colnames(scen_res) <- c("IU_order", "num_worms", "elim_prob", "num_MDAs",  "costs")
   # 
   for(i in 1:no_IUs){
-    random_population = max(0, rnorm(n = 1,mean = mean_IU_pop, sd = mean_IU_pop/3)) + 5000 # choose some random population size for the IU
+    random_population <- max(0, rnorm(n = 1,mean = mean_IU_pop, sd = mean_IU_pop/3)) + 5000 # choose some random population size for the IU
     
     data_files <- read_files_def_cf(scenario, coverage, cf_coverage, non_compliance,
                              IU_order = IUs_vec[i], measure)
@@ -183,14 +184,18 @@ calculate_blob_data <- function(scenario, # scenario name
     
     # calculate probability of elimination for cf and scen
     elim_prob = calculate_probability_of_elimination(data_files_elim)
-    # calculate relevant measure of impact (median at 2030)
-    summary_res <- extract_medians(data_files)
+    
+    # calculate relevant measure of impact 
+    summary_res <- extract_medians(data_files, which_years)
     
     # calculate relevant costs
     costs <- calculate_costs(summary_res, cost_scenario, cost_development, cost_cf)
     
-    diff_measures <- random_population * summary_res["Jan-2030","cf"] - random_population * summary_res["Jan-2030","scenario"]
+    diff_measures <- random_population * summary_res[which_years, "cf"] - random_population * summary_res[which_years,"scenario"]
     
+    if(length(which_years > 1)) diff_measures <- sum(diff_measures)
+
+
     # just store difference in measure
     res[i, ] <- c(IUs_vec[i], diff_measures, elim_prob$cf_elim, elim_prob$scen_elim, costs)
     # cf_res[i, ] <- c(IUs_vec[i], summary_res$cf[1]* random_population, elim_prob$cf_elim, summary_res$cf[2], summary_res$cf[2] * cost_cf)

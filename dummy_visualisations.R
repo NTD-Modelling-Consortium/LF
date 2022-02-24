@@ -26,13 +26,16 @@ data_files <- read_files_def_cf(scenario, coverage, cf_coverage = "65", non_comp
                          IU_order, measure)
 
 # calculate relevant measuyre of impact (median at 2030)
-which_years <- c("Jan-2020","Jan-2021","Jan-2022","Jan-2023","Jan-2024","Jan-2025","Jan-2026",
-                 "Jan-2027","Jan-2028","Jan-2029","Jan-2030")
-
-summary_res <- extract_medians(data_files, which_years = "Jan-2030")
+which_years <- c("Jan-2021","Jan-2022","Jan-2023","Jan-2024","Jan-2025","Jan-2026",
+                 "Jan-2027","Jan-2028","Jan-2029","Jan-2030","Jan-2031")
+#which_years <- "Jan-2031"
+summary_res <- extract_medians(data_files, which_years)
 
 # what is the difference in WC and number of MDA rounds
-diff_measures <- summary_res$cf - summary_res$scenario
+random_population <- max(0, rnorm(n = 1,mean = mean_IU_pop, sd = mean_IU_pop/3)) + 5000 # choose some random population size for the IU
+diff_measures <- random_population * summary_res[which_years,"cf"] - random_population * summary_res[which_years,"scenario"]
+sum(diff_measures)
+
 
 # calculate relevant costs
 costs <- calculate_costs(summary_res, cost_scenario = 15, cost_development = 1000, cost_cf = 10)
@@ -42,6 +45,9 @@ IUs = read.csv("runIU.csv")
 IUs_vec <- which(IUs$V1 == 1)
 no_IUs <- length(IUs_vec)
 
+#which_years <- "Jan-2031"
+which_years <- c("Jan-2021","Jan-2022","Jan-2023","Jan-2024","Jan-2025","Jan-2026",
+                 "Jan-2027","Jan-2028","Jan-2029","Jan-2030","Jan-2031")
 ######## compare other scenarios #######
 
 res_M1 <- calculate_blob_data(scenario = "M1", # scenario name
@@ -54,7 +60,8 @@ res_M1 <- calculate_blob_data(scenario = "M1", # scenario name
                              mean_IU_pop ,
                              cost_scenario,
                              cost_development,
-                             cost_cf, no_IUs =  40)
+                             cost_cf, no_IUs =  40, 
+                             which_years)
 
 res_M2 <- calculate_blob_data(scenario = "M2", # scenario name
                              coverage = "65", # coverage percentage
@@ -66,7 +73,8 @@ res_M2 <- calculate_blob_data(scenario = "M2", # scenario name
                              mean_IU_pop ,
                              cost_scenario,
                              cost_development,
-                             cost_cf, no_IUs =  40)
+                             cost_cf, no_IUs =  40,
+                             which_years)
 
 
 res_NC2 <- calculate_blob_data(scenario = "NC", # scenario name
@@ -80,10 +88,8 @@ res_NC2 <- calculate_blob_data(scenario = "NC", # scenario name
                               cost_scenario = cost_cf * 8/6.5,
                               cost_development = 0,
                               cost_cf, 
-                              no_IUs =  40)
-
-
-
+                              no_IUs =  40,
+                              which_years)
 # plot 
 res_list <- list(res_NC2, res_M1, res_M2)
 labels <- c("1", "2", "3") # what to label blobs in same order as res_list
