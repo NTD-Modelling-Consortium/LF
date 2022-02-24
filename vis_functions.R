@@ -61,10 +61,10 @@ read_scenario <- function(scenario, coverage, non_compliance,
 #' @return summary_res : median measure and number of MDAs
 #'
 #' @examples extract_medians(data_files)
-extract_medians <- function(data_files){
+extract_medians <- function(data_files, which_years = "Jan-2030"){
   # extract needed columns from scenario and counter-factual (cf)
-  measure_2030 <- data_files$data_scenario[ , c("Jan-2030", "No_MDA")]
-  measure_2030_cf <- data_files$data_cf[ , c("Jan-2030", "No_MDA")]
+  measure_2030 <- data_files$data_scenario[ , c( "No_MDA", which_years)]
+  measure_2030_cf <- data_files$data_cf[ , c("No_MDA", which_years)]
   
   # calculate summary measures across simulations
   # median worm count and median number of MDA rounds
@@ -95,8 +95,8 @@ extract_medians <- function(data_files){
 calculate_costs <- function(summary_res, cost_scenario, cost_development, cost_cf){
 
   # extract median number mdas
-  no_mdas_scenario <- summary_res$scenario[2]
-  no_mdas_cf <- summary_res$cf[2]
+  no_mdas_scenario <- summary_res$scenario[1]
+  no_mdas_cf <- summary_res$cf[1]
   
   costs <- (no_mdas_scenario*cost_scenario + cost_development) -  no_mdas_cf*cost_cf
   
@@ -164,7 +164,6 @@ calculate_blob_data <- function(scenario, # scenario name
 
   IUs = read.csv("runIU.csv")
   IUs_vec <- which(IUs$V1 == 1)
-  #no_IUs <- length(IUs_vec)
   
   # empty matrix to store results
   res <- matrix(ncol = 5, nrow = no_IUs)
@@ -178,7 +177,6 @@ calculate_blob_data <- function(scenario, # scenario name
     random_population = max(0, rnorm(n = 1,mean = mean_IU_pop, sd = mean_IU_pop/3)) + 5000 # choose some random population size for the IU
     
     data_files <- read_files_def_cf(scenario, coverage, cf_coverage, non_compliance,
-                                    
                              IU_order = IUs_vec[i], measure)
     
     data_files_elim <- read_files_def_cf(scenario, coverage,cf_coverage,  non_compliance,

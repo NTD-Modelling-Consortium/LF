@@ -26,7 +26,10 @@ data_files <- read_files_def_cf(scenario, coverage, cf_coverage = "65", non_comp
                          IU_order, measure)
 
 # calculate relevant measuyre of impact (median at 2030)
-summary_res <- extract_medians(data_files)
+which_years <- c("Jan-2020","Jan-2021","Jan-2022","Jan-2023","Jan-2024","Jan-2025","Jan-2026",
+                 "Jan-2027","Jan-2028","Jan-2029","Jan-2030")
+
+summary_res <- extract_medians(data_files, which_years)
 
 # what is the difference in WC and number of MDA rounds
 diff_measures <- summary_res$cf - summary_res$scenario
