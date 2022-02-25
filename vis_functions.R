@@ -16,15 +16,18 @@ parse_transfil_output <- function(filename){
   colnames(df) <- cnames
   colnames(df)[1] <- "Population"
   ncols <- length(cnames)
-  colnames(df)[ncols+1] <- "No_MDA"
-  colnames(df)[ncols+2] <- "No_surveys"
+  colnames(df)[ncols+1] <- "Total_MDA"
+  colnames(df)[ncols+2] <- "post2020MDA"
+  colnames(df)[ncols+3] <- "No_Pre_TAS_surveys"
+  colnames(df)[ncols+4] <- "No_TAS_surveys"
+  colnames(df)[ncols+5] <- "t_TAS_surveys"
   
   
   for (i in 14:n){
     
     line <- strsplit(rawdata[i],"\t")[[1]]
     line <- line[-c(1,3:7)]
-  
+    
     df[nrow(df) + 1,] <- as.numeric(line)
     
   } 
@@ -63,8 +66,8 @@ read_scenario <- function(scenario, coverage, non_compliance,
 #' @examples extract_medians(data_files)
 extract_medians <- function(data_files, which_years){
   # extract needed columns from scenario and counter-factual (cf)
-  measure_2030 <- data_files$data_scenario[ , c( "No_MDA", which_years)]
-  measure_2030_cf <- data_files$data_cf[ , c("No_MDA", which_years)]
+  measure_2030 <- data_files$data_scenario[ , c( "post2020MDA", which_years)]
+  measure_2030_cf <- data_files$data_cf[ , c("post2020MDA", which_years)]
   
   # calculate summary measures across simulations
   # median worm count and median number of MDA rounds
@@ -73,11 +76,11 @@ extract_medians <- function(data_files, which_years){
                             probs=c(0.5, 0.025, 0.975))
   # counter-factual
   cf_summary <- apply(measure_2030_cf, 2, quantile,
-                               probs=c(0.5, 0.025, 0.975))
+                      probs=c(0.5, 0.025, 0.975))
   
   res <- matrix(c(scenario_summary[1,], cf_summary[1,]), byrow = F, ncol = 2)
   colnames(res) <- c("scenario", "cf")
-  rownames(res) <- c( "No_MDA", which_years)
+  rownames(res) <- c( "post2020MDA", which_years)
   
   return(summary_res = as.data.frame(res))
 }
@@ -94,10 +97,10 @@ extract_medians <- function(data_files, which_years){
 #'
 #' @examples calculate_costs(summary_res, cost_scenario = 15, cost_development = 1000, cost_cf = 10)
 calculate_costs <- function(summary_res, cost_scenario, cost_development, cost_cf){
-
+  
   # extract median number mdas
-  no_mdas_scenario <- summary_res["No_MDA", "scenario"]
-  no_mdas_cf <- summary_res["No_MDA", "cf"]
+  no_mdas_scenario <- summary_res["post2020MDA", "scenario"]
+  no_mdas_cf <- summary_res["post2020MDA", "cf"]
   
   costs <- (no_mdas_scenario*cost_scenario + cost_development) -  no_mdas_cf*cost_cf
   
@@ -152,7 +155,6 @@ calculate_blob_data <- function(scenario, # scenario name
                                 coverage, # coverage percentage
                                 cf_coverage, # coverage for cf
                                 non_compliance,  # non-compliance parameter, equivalent to 0.2
-                                IU_order,# IU order number
                                 measure, # output measure, WC : worm count
                                 elim ,
                                 mean_IU_pop ,
@@ -160,10 +162,11 @@ calculate_blob_data <- function(scenario, # scenario name
                                 cost_development,
                                 cost_cf, 
                                 no_IUs,
-                                which_years){
-
+                                which_years,
+                                runIU){
+  
   IUs = read.csv("runIU.csv")
-  IUs_vec <- which(IUs$V1 == 1)
+  IUs_vec <- which(IUs$IUID == 1)
   
   # empty matrix to store results
   res <- matrix(ncol = 5, nrow = no_IUs)
@@ -174,13 +177,13 @@ calculate_blob_data <- function(scenario, # scenario name
   # colnames(scen_res) <- c("IU_order", "num_worms", "elim_prob", "num_MDAs",  "costs")
   # 
   for(i in 1:no_IUs){
-    random_population <- max(0, rnorm(n = 1,mean = mean_IU_pop, sd = mean_IU_pop/3)) + 5000 # choose some random population size for the IU
+    population <- IUs$pop[IUs_vec[i]] # choose some random population size for the IU
     
     data_files <- read_files_def_cf(scenario, coverage, cf_coverage, non_compliance,
-                             IU_order = IUs_vec[i], measure)
+                                    IU_order = IUs_vec[i], measure)
     
     data_files_elim <- read_files_def_cf(scenario, coverage,cf_coverage,  non_compliance,
-                                  IU_order = IUs_vec[i], elim)
+                                         IU_order = IUs_vec[i], elim)
     
     # calculate probability of elimination for cf and scen
     elim_prob = calculate_probability_of_elimination(data_files_elim)
@@ -191,11 +194,11 @@ calculate_blob_data <- function(scenario, # scenario name
     # calculate relevant costs
     costs <- calculate_costs(summary_res, cost_scenario, cost_development, cost_cf)
     
-    diff_measures <- random_population * summary_res[which_years, "cf"] - random_population * summary_res[which_years,"scenario"]
+    diff_measures <- population * summary_res[which_years, "cf"] - population * summary_res[which_years,"scenario"]
     
     if(length(which_years > 1)) diff_measures <- sum(diff_measures)
-
-
+    
+    
     # just store difference in measure
     res[i, ] <- c(IUs_vec[i], diff_measures, elim_prob$cf_elim, elim_prob$scen_elim, costs)
     # cf_res[i, ] <- c(IUs_vec[i], summary_res$cf[1]* random_population, elim_prob$cf_elim, summary_res$cf[2], summary_res$cf[2] * cost_cf)
@@ -203,7 +206,7 @@ calculate_blob_data <- function(scenario, # scenario name
     #                    summary_res$scenario[2], 
     #                    cost_development +summary_res$scenario[2] * cost_scenario)
   }
-
+  
   return(res)
   
 }
@@ -221,9 +224,9 @@ calculate_blob_data <- function(scenario, # scenario name
 #'
 #' @examples
 read_files_def_cf <- function(scenario, coverage, 
-                       cf_coverage = "65", 
-                       non_compliance,
-                       IU_order, measure){
+                              cf_coverage = "65", 
+                              non_compliance,
+                              IU_order, measure){
   # scenario file
   data_scenario <- read_scenario(scenario, coverage, non_compliance,
                                  IU_order, measure)
@@ -245,7 +248,7 @@ read_files_def_cf <- function(scenario, coverage,
 #' @examples add_points(res_M2, "M2")
 add_blobs <- function(res, label){
   points(mean(res[,"difference"]), mean(res[,"elim_prob_scen"]),
-         pch = 16, cex = sqrt(mean(res[,"costs"]))/2, col = "deepskyblue3")
+         pch = 16, cex = sqrt(mean(res[,"costs"]))/2, col = rgb(0/255,154/255,205/255, 0.8))
   text(mean(res[,"difference"]), mean(res[,"elim_prob_scen"]), labels = label) 
 }
 
@@ -283,9 +286,10 @@ make_blob_plot <- function(res_list, labels){
   mean_prob <- unlist(lapply(res_list, find_mean_elim_prob))
   
   plot(NA, NA, ylab = "Mean prob. of elimination", xlab = "Difference",
-       pch = 16, cex = sqrt(mean(res_M1[,"costs"]))/2, col = "deepskyblue3",
-       xlim = c(min(mean_diff), max(mean_diff)),
-       ylim = c(min(mean_prob), max(mean_prob)))
+       pch = 16, cex = sqrt(mean(res_M1[,"costs"]))/2, col = rgb(0/255,154/255,205/255, 0.8),
+       xlim = c(0, 1.05*max(mean_diff)),
+       ylim = c(0, 1.075*max(mean_prob)),
+       bty = 'n')
   
   for(i in 1:length(res_list)){
     add_blobs(res_list[[i]], labels[i])
