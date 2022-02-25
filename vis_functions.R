@@ -91,18 +91,20 @@ extract_medians <- function(data_files, which_years){
 #' @param summary_res : the summary file to use for number of mdas 
 #' @param cost_scenario : cost per MDA round in given scenario
 #' @param cost_development : cost of development
-#' @param cost_cf :c ost per MDA round in counterfactual
+#' @param cost_cf : cost per MDA round in counterfactual
+#' @param population : population size of IU
+
 #'
 #' @return costs : cost difference of scenario versus counter-factual 
 #'
 #' @examples calculate_costs(summary_res, cost_scenario = 15, cost_development = 1000, cost_cf = 10)
-calculate_costs <- function(summary_res, cost_scenario, cost_development, cost_cf){
+calculate_costs <- function(summary_res, cost_scenario, cost_development, cost_cf, population){
   
   # extract median number mdas
   no_mdas_scenario <- summary_res["post2020MDA", "scenario"]
   no_mdas_cf <- summary_res["post2020MDA", "cf"]
   
-  costs <- (no_mdas_scenario*cost_scenario + cost_development) -  no_mdas_cf*cost_cf
+  costs <- (no_mdas_scenario*cost_scenario*population + cost_development) -  no_mdas_cf*cost_cf*population
   
   return(costs)
 }
@@ -162,8 +164,7 @@ calculate_blob_data <- function(scenario, # scenario name
                                 cost_development,
                                 cost_cf, 
                                 no_IUs,
-                                which_years,
-                                runIU){
+                                which_years){
   
   IUs = read.csv("runIU.csv")
   IUs_vec <- which(IUs$IUID == 1)
@@ -192,7 +193,7 @@ calculate_blob_data <- function(scenario, # scenario name
     summary_res <- extract_medians(data_files, which_years)
     
     # calculate relevant costs
-    costs <- calculate_costs(summary_res, cost_scenario, cost_development, cost_cf)
+    costs <- calculate_costs(summary_res, cost_scenario, cost_development, cost_cf, population)
     
     diff_measures <- population * summary_res[which_years, "cf"] - population * summary_res[which_years,"scenario"]
     
@@ -273,6 +274,18 @@ find_mean_elim_prob <- function(x){
   mean(x[,"elim_prob_scen"])
 }
 
+
+#' find_mean_cost
+#' returns the mean elim prob, used to calculate ylim
+#' @param x 
+#'
+#'
+#' @examples  lapply(res_list, find_mean_cost)
+find_mean_cost <- function(x){
+  mean(x[,"costs"])
+}
+
+
 #' make_blob_plot
 #'
 #' @param res_list 
@@ -284,14 +297,17 @@ make_blob_plot <- function(res_list, labels){
   
   mean_diff <- unlist(lapply(res_list, find_mean_difference))
   mean_prob <- unlist(lapply(res_list, find_mean_elim_prob))
+  mean_cost <- unlist(lapply(res_list, find_mean_cost))
+  
+  pos_costs <- mean_cost+abs(min(mean_cost)) # make all costs positive
+  cex_vec <- (pos_costs)/max(pos_costs)*20 # cex is relative to max mean cost
   
   plot(NA, NA, ylab = "Mean prob. of elimination", xlab = "Difference",
-       pch = 16, cex = sqrt(mean(res_M1[,"costs"]))/2, col = rgb(0/255,154/255,205/255, 0.8),
        xlim = c(0, 1.05*max(mean_diff)),
        ylim = c(0, 1.075*max(mean_prob)),
        bty = 'n')
   
   for(i in 1:length(res_list)){
-    add_blobs(res_list[[i]], labels[i])
+    add_blobs(res_list[[i]], labels[i], cex_vec[i])
   }
 }
