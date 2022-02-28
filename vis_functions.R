@@ -20,7 +20,7 @@ parse_transfil_output <- function(filename){
   colnames(df)[ncols+2] <- "post2020MDA"
   colnames(df)[ncols+3] <- "No_Pre_TAS_surveys"
   colnames(df)[ncols+4] <- "No_TAS_surveys"
-  colnames(df)[ncols+5] <- "t_TAS_surveys"
+  colnames(df)[ncols+5] <- "t_TAS_pass"
   
   
   for (i in 14:n){
@@ -48,10 +48,21 @@ parse_transfil_output <- function(filename){
 #' @examples read_scenario(scenario = "NC", coverage = "80", non_compliance = "02", IU_order = "2", measure = "WC")
 read_scenario <- function(scenario, coverage, non_compliance,
                           IU_order, measure){
+  scenario_data = 0
   simulation_name <- paste("0_Endgame", scenario, coverage, non_compliance,
                            IU_order, measure, sep = "_")
-  filename <- paste0(simulation_name, ".txt")
-  scenario_data <- parse_transfil_output(paste("output",filename, sep = "/"))
+  filename <- paste0("output/",simulation_name, ".txt")
+  
+  info = file.info(filename)
+  if(!is.na(info$size)){
+    if(info$size > 10000){
+      scenario_data <- parse_transfil_output(paste(filename, sep = "/"))
+    }
+    
+  }
+  
+  
+  
   return(scenario_data)
 }
 
@@ -66,8 +77,8 @@ read_scenario <- function(scenario, coverage, non_compliance,
 #' @examples extract_medians(data_files)
 extract_medians <- function(data_files, which_years){
   # extract needed columns from scenario and counter-factual (cf)
-  measure_2030 <- data_files$data_scenario[ , c( "post2020MDA", which_years)]
-  measure_2030_cf <- data_files$data_cf[ , c("post2020MDA", which_years)]
+  measure_2030 <- data_files$data_scenario[ , c( "post2020MDA","No_Pre_TAS_surveys", "No_TAS_surveys", which_years)]
+  measure_2030_cf <- data_files$data_cf[ , c("post2020MDA", "No_Pre_TAS_surveys", "No_TAS_surveys", which_years)]
   
   # calculate summary measures across simulations
   # median worm count and median number of MDA rounds
@@ -80,7 +91,7 @@ extract_medians <- function(data_files, which_years){
   
   res <- matrix(c(scenario_summary[1,], cf_summary[1,]), byrow = F, ncol = 2)
   colnames(res) <- c("scenario", "cf")
-  rownames(res) <- c( "post2020MDA", which_years)
+  rownames(res) <- c( "post2020MDA","No_Pre_TAS_surveys", "No_TAS_surveys", which_years)
   
   return(summary_res = as.data.frame(res))
 }
@@ -98,13 +109,20 @@ extract_medians <- function(data_files, which_years){
 #' @return costs : cost difference of scenario versus counter-factual 
 #'
 #' @examples calculate_costs(summary_res, cost_scenario = 15, cost_development = 1000, cost_cf = 10)
-calculate_costs <- function(summary_res, cost_scenario, cost_development, cost_cf, population){
+calculate_costs <- function(summary_res, cost_scenario, cost_development, cost_cf, 
+                            preTAS_survey_cost,
+                            TAS_survey_cost, population){
   
   # extract median number mdas
   no_mdas_scenario <- summary_res["post2020MDA", "scenario"]
   no_mdas_cf <- summary_res["post2020MDA", "cf"]
+  no_pre_tas_scenario <- summary_res["No_Pre_TAS_surveys", "scenario"]
+  no_pre_tas_cf <- summary_res["No_Pre_TAS_surveys", "cf"]
+  no_tas_scenario <- summary_res["No_TAS_surveys", "scenario"]
+  no_tas_cf <- summary_res["No_TAS_surveys", "cf"]
   
-  costs <- (no_mdas_scenario*cost_scenario*population + cost_development) -  no_mdas_cf*cost_cf*population
+  costs <- (no_mdas_scenario*cost_scenario*population + cost_development + preTAS_survey_cost * no_pre_tas_scenario + TAS_survey_cost * no_tas_scenario) #-  
+    #(no_mdas_cf*cost_cf*population + preTAS_survey_cost * no_pre_tas_cf + TAS_survey_cost * no_tas_cf)
   
   return(costs)
 }
@@ -125,14 +143,18 @@ calculate_probability_of_elimination <- function(data_files_elim){
   k = which(data_files_elim$data_scenario$`Init cond` > 0.01) # only want to consider simulations where we begin with a >1% mf prevalence
   # check if there are any occasions between 2020 and 2030 where the mf prev is <1%. 
   # If there are any, then we would class that simulation as having reached elimination
-  col_start = which(colnames(data_files_elim$data_cf)=='Jan-2020')
-  col_end = which(colnames(data_files_elim$data_cf)=='Jan-2031')
-  scen_m = data_files_elim$data_scenario[k,col_start:col_end] # get the data we want to look at
-  cf_m = data_files_elim$data_cf[k,col_start:col_end] # get the data we want to look at
+  
+  scen_m = data_files_elim$data_scenario[k,"t_TAS_pass"] # get the data we want to look at
+  cf_m = data_files_elim$data_cf[k,"t_TAS_pass"] # get the data we want to look at
   elim_mat = data.frame(matrix(0, 1, 2)) # set up matrix to hold probs
+  
   colnames(elim_mat) = c("cf_elim", "scen_elim")
-  elim_mat[1] = sum(apply(X = cf_m, MARGIN = 1, FUN = check_sim_elimination)) / nrow(cf_m)# calculate the proportion of simulations which go below 1%
-  elim_mat[2] = sum(apply(X = scen_m, MARGIN = 1, FUN = check_sim_elimination)) / nrow(scen_m)# calculate the proportion of simulations which go below 1%
+
+  # elim_mat[1] = sum(apply(X = cf_m, MARGIN = 1, FUN = check_sim_elimination)) / nrow(cf_m)# calculate the proportion of simulations which go below 1%
+  # elim_mat[2] = sum(apply(X = scen_m, MARGIN = 1, FUN = check_sim_elimination)) / nrow(scen_m)# calculate the proportion of simulations which go below 1%
+  
+  elim_mat[1] = length(which(cf_m > 0))/length(cf_m) # calculate the proportion of simulations which go below 1%
+  elim_mat[2] = length(which(scen_m > 0))/length(scen_m) # calculate the proportion of simulations which go below 1%
   return(elim_mat)
 }
 
@@ -159,12 +181,13 @@ calculate_blob_data <- function(scenario, # scenario name
                                 non_compliance,  # non-compliance parameter, equivalent to 0.2
                                 measure, # output measure, WC : worm count
                                 elim ,
-                                mean_IU_pop ,
                                 cost_scenario,
                                 cost_development,
                                 cost_cf, 
                                 no_IUs,
-                                which_years){
+                                which_years,
+                                preTAS_survey_cost ,
+                                TAS_survey_cost){
   
   IUs = read.csv("runIU.csv")
   IUs_vec <- which(IUs$IUID == 1)
@@ -185,29 +208,35 @@ calculate_blob_data <- function(scenario, # scenario name
     
     data_files_elim <- read_files_def_cf(scenario, coverage,cf_coverage,  non_compliance,
                                          IU_order = IUs_vec[i], elim)
+    if(data_files$data_scenario != 0 ){
+      # calculate probability of elimination for cf and scen
+      elim_prob = calculate_probability_of_elimination(data_files_elim)
+      
+      # calculate relevant measure of impact 
+      summary_res <- extract_medians(data_files, which_years)
+      
+      # calculate relevant costs
+      costs <- calculate_costs(summary_res, cost_scenario, cost_development, cost_cf, preTAS_survey_cost ,
+                               TAS_survey_cost, population)
+      
+      diff_measures <- population * summary_res[which_years, "cf"] - population * summary_res[which_years,"scenario"] 
+      
+      
+      if(length(which_years > 1)) diff_measures <- sum(diff_measures)
+      
+      
+      # just store difference in measure
+      res[i, ] <- c(IUs_vec[i], diff_measures, elim_prob$cf_elim, elim_prob$scen_elim, costs)
+      # cf_res[i, ] <- c(IUs_vec[i], summary_res$cf[1]* random_population, elim_prob$cf_elim, summary_res$cf[2], summary_res$cf[2] * cost_cf)
+      # scen_res[i, ] <- c(IUs_vec[i], summary_res$scenario[1]* random_population, elim_prob$scen_elim, 
+    }
     
-    # calculate probability of elimination for cf and scen
-    elim_prob = calculate_probability_of_elimination(data_files_elim)
-    
-    # calculate relevant measure of impact 
-    summary_res <- extract_medians(data_files, which_years)
-    
-    # calculate relevant costs
-    costs <- calculate_costs(summary_res, cost_scenario, cost_development, cost_cf, population)
-    
-    diff_measures <- population * summary_res[which_years, "cf"] - population * summary_res[which_years,"scenario"]
-    
-    if(length(which_years > 1)) diff_measures <- sum(diff_measures)
-    
-    
-    # just store difference in measure
-    res[i, ] <- c(IUs_vec[i], diff_measures, elim_prob$cf_elim, elim_prob$scen_elim, costs)
-    # cf_res[i, ] <- c(IUs_vec[i], summary_res$cf[1]* random_population, elim_prob$cf_elim, summary_res$cf[2], summary_res$cf[2] * cost_cf)
-    # scen_res[i, ] <- c(IUs_vec[i], summary_res$scenario[1]* random_population, elim_prob$scen_elim, 
     #                    summary_res$scenario[2], 
     #                    cost_development +summary_res$scenario[2] * cost_scenario)
+    
   }
-  
+  x = which(!is.na(res[,1]))
+  res = res[x, ]
   return(res)
   
 }
@@ -247,9 +276,9 @@ read_files_def_cf <- function(scenario, coverage,
 #' @return 
 #'
 #' @examples add_points(res_M2, "M2")
-add_blobs <- function(res, label){
+add_blobs <- function(res, label, cex_i){
   points(mean(res[,"difference"]), mean(res[,"elim_prob_scen"]),
-         pch = 16, cex = sqrt(mean(res[,"costs"]))/2, col = rgb(0/255,154/255,205/255, 0.8))
+         pch = 16, cex = cex_i, col = rgb(0/255,154/255,205/255, 0.6))
   text(mean(res[,"difference"]), mean(res[,"elim_prob_scen"]), labels = label) 
 }
 
@@ -302,10 +331,10 @@ make_blob_plot <- function(res_list, labels){
   pos_costs <- mean_cost+abs(min(mean_cost)) # make all costs positive
   cex_vec <- (pos_costs)/max(pos_costs)*20 # cex is relative to max mean cost
   
-  plot(NA, NA, ylab = "Mean prob. of elimination", xlab = "Difference",
-       xlim = c(0, 1.05*max(mean_diff)),
-       ylim = c(0, 1.075*max(mean_prob)),
-       bty = 'n')
+  plot(NA, NA, ylab = "Mean prob. of elimination by 2030", xlab = "Extra DALYs averted",
+       xlim = c(-100, 1.05*max(mean_diff)),
+       ylim = c(0, 1.15*max(mean_prob)),
+       bty = 'n', cex.axis = 1.5, cex.lab = 1.5)
   
   for(i in 1:length(res_list)){
     add_blobs(res_list[[i]], labels[i], cex_vec[i])
