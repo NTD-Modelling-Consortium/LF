@@ -173,7 +173,24 @@ check_sim_elimination <- function(x){
 
 
 
+calculate_number_infected_over_time <- function(d, population){
+  c1 = which(colnames(d) == "Jan-2020")
+  c2 = which(colnames(d) == "Jan-2030")
+  prevs = d[, c1:c2]
+  number_infected = colMeans(population * prevs)
+  return(number_infected)
+}
 
+calculate_number_IUs_stopped_MDA <- function(d){
+  years = (20:30)*12
+  stop_time = d$t_TAS_pass
+  prop_stopped = matrix(length(years), 1)
+  for(i in 1:length(years)){
+    prop_stopped[i] = length(which(stop_time <= years[i]))/length(stop_time)
+  }
+  
+  return(prop_stopped)
+}
 
 calculate_blob_data <- function(scenario, # scenario name
                                 coverage, # coverage percentage
@@ -195,6 +212,8 @@ calculate_blob_data <- function(scenario, # scenario name
   
   # empty matrix to store results
   res <- matrix(ncol = 5, nrow = no_IUs)
+  num_infections_over_time <- matrix(ncol = 11, nrow = no_IUs)
+  prop_IUs_Finished_MDA <- matrix(ncol = 11, nrow = no_IUs)
   colnames(res) <- c("IU_order", "difference", "elim_prob_cf",  "elim_prob_scen", "costs")
   # cf_res <- matrix(ncol = 5, nrow = no_IUs)
   # colnames(cf_res) <- c("IU_order", "num_worms", "elim_prob", "num_MDAs", "costs")
@@ -228,17 +247,16 @@ calculate_blob_data <- function(scenario, # scenario name
       
       # just store difference in measure
       res[i, ] <- c(IUs_vec[i], diff_measures, elim_prob$cf_elim, elim_prob$scen_elim, costs)
-      # cf_res[i, ] <- c(IUs_vec[i], summary_res$cf[1]* random_population, elim_prob$cf_elim, summary_res$cf[2], summary_res$cf[2] * cost_cf)
-      # scen_res[i, ] <- c(IUs_vec[i], summary_res$scenario[1]* random_population, elim_prob$scen_elim, 
+  
+      num_infections_over_time[i, ] = calculate_number_infected_over_time(data_files$data_scenario, population)
+      prop_IUs_Finished_MDA[i, ] = calculate_number_IUs_stopped_MDA(data_files$data_scenario)
     }
     
-    #                    summary_res$scenario[2], 
-    #                    cost_development +summary_res$scenario[2] * cost_scenario)
-    
+   
   }
   x = which(!is.na(res[,1]))
   res = res[x, ]
-  return(res)
+  return(list(res = res, num_infections_over_time = num_infections_over_time, prop_IUs_Finished_MDA = prop_IUs_Finished_MDA))
   
 }
 
@@ -358,6 +376,34 @@ make_blob_plot <- function(res_list, labels){
 }
 
 
+
+
+#' make_blob_plot
+#'
+#' @param res_list 
+#' @param labels 
+#'
+#'
+#' @examples make_blob_plot(res_list, labels)
+make_number_infections_plot <- function(r, labels){
+  
+  mean_infections <- lapply(r, colMeans)
+  max_infections = 0
+  for(i in 1:length(r)){
+    max_infections = max(max_infections, max(mean_infections[[i]]))
+  }
+  pal <- colorRampPalette(c("red", "purple"))
+  cols = pal(length(r))
+  plot(2020:2030,mean_infections[[1]], ylab = "number of infections", xlab = "year", 
+       bty = 'n', type = 'b', lwd = 2, pch =16, ylim = c(0,max_infections),
+       cex.axis = 1.5, cex.lab = 1.5, col = cols[1])
+  for(i in 2:length(r)){
+    lines(2020:2030, mean_infections[[i]], lwd = 2, col = cols[i])
+    points(2020:2030, mean_infections[[i]], pch = 16, col = cols[i])
+  }
+}
+
+
 #' make_blob_plot
 #'
 #' @param res_list 
@@ -428,3 +474,6 @@ calculate_nmeb <- function(lambda_DALY, lambda_EOT, res_list){
   
   return(100 * lambda_EOT*(mean_prob-mean_prob[1]) + lambda_DALY*mean_diff - (mean_cost - mean_cost[1])) # return the nmeb of each strategy
 }
+
+
+
