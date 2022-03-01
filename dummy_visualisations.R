@@ -144,18 +144,25 @@ res_3d <- calculate_blob_data(scenario = "M2", # scenario name
 
 # plot 
 res_list <- list(res_0$res, res_1$res, res_2$res, res_3a$res, res_3b$res, res_3c$res, res_3d$res)
+
+# number of infected people between 2020 and 2030 for all scenarios
 num_infs <- list(res_0$num_infections_over_time, res_1$num_infections_over_time, res_2$num_infections_over_time, 
                  res_3a$num_infections_over_time, res_3b$num_infections_over_time,
                  res_3c$num_infections_over_time, res_3d$num_infections_over_time)
+# proportion of IUs stopped MDA between 2020 and 2030 for all scenarios
 IUs_stopped <- list(res_0$prop_IUs_Finished_MDA, res_1$prop_IUs_Finished_MDA, 
                     res_2$prop_IUs_Finished_MDA, res_3a$prop_IUs_Finished_MDA, 
                     res_3b$prop_IUs_Finished_MDA, res_3c$prop_IUs_Finished_MDA,
                     res_3d$prop_IUs_Finished_MDA)
 labels <- c("0", "1", "2", "3a", "3b", "3c", "3d") # what to label blobs in same order as res_list
 
+# original blob plot
 make_blob_plot(res_list, labels)
 
+# blob plot with net monetary elimination benefit colouring
 make_blob_plot_v2(res_list, labels, lambda_DALY = 10, lambda_EOT = 1)
 
-make_number_infections_plot(num_infs , labels)
-make_number_infections_plot(IUs_stopped , labels)
+# plot mean number of infections over time for each scenario
+make_time_plots(num_infs , labels, "number of infections")
+# plot mean number of IUs stopped MDA over time for each scenario
+make_time_plots(IUs_stopped , labels, "proportion of IUs stopped MDA")
