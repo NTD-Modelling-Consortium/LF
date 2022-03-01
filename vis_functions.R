@@ -153,8 +153,8 @@ calculate_probability_of_elimination <- function(data_files_elim){
   # elim_mat[1] = sum(apply(X = cf_m, MARGIN = 1, FUN = check_sim_elimination)) / nrow(cf_m)# calculate the proportion of simulations which go below 1%
   # elim_mat[2] = sum(apply(X = scen_m, MARGIN = 1, FUN = check_sim_elimination)) / nrow(scen_m)# calculate the proportion of simulations which go below 1%
   
-  elim_mat[1] = length(which(cf_m > 0))/length(cf_m) # calculate the proportion of simulations which go below 1%
-  elim_mat[2] = length(which(scen_m > 0))/length(scen_m) # calculate the proportion of simulations which go below 1%
+  elim_mat[1] = length(which((cf_m > 0) & (cf_m < 371)))/length(cf_m) # calculate the proportion of simulations which go below 1%
+  elim_mat[2] = length(which((scen_m > 0) & (scen_m < 371)))/length(scen_m) # calculate the proportion of simulations which go below 1%
   return(elim_mat)
 }
 
@@ -179,6 +179,7 @@ calculate_blob_data <- function(scenario, # scenario name
                                 coverage, # coverage percentage
                                 cf_coverage, # coverage for cf
                                 non_compliance,  # non-compliance parameter, equivalent to 0.2
+                                cf_non_compliance , # # non-compliance parameter for cf
                                 measure, # output measure, WC : worm count
                                 elim ,
                                 cost_scenario,
@@ -203,12 +204,12 @@ calculate_blob_data <- function(scenario, # scenario name
   for(i in 1:no_IUs){
     population <- IUs$pop[IUs_vec[i]] # choose some random population size for the IU
     
-    data_files <- read_files_def_cf(scenario, coverage, cf_coverage, non_compliance,
+    data_files <- read_files_def_cf(scenario, coverage, cf_coverage, cf_non_compliance, non_compliance, 
                                     IU_order = IUs_vec[i], measure)
     
-    data_files_elim <- read_files_def_cf(scenario, coverage,cf_coverage,  non_compliance,
+    data_files_elim <- read_files_def_cf(scenario, coverage,cf_coverage,cf_non_compliance,  non_compliance,
                                          IU_order = IUs_vec[i], elim)
-    if(data_files$data_scenario != 0 ){
+    if(length(data_files$data_scenario) > 1 ){
       # calculate probability of elimination for cf and scen
       elim_prob = calculate_probability_of_elimination(data_files_elim)
       
@@ -255,6 +256,7 @@ calculate_blob_data <- function(scenario, # scenario name
 #' @examples
 read_files_def_cf <- function(scenario, coverage, 
                               cf_coverage = "65", 
+                              cf_non_compliance, 
                               non_compliance,
                               IU_order, measure){
   # scenario file
@@ -262,7 +264,7 @@ read_files_def_cf <- function(scenario, coverage,
                                  IU_order, measure)
   
   # counter-factual partner file (scenario : NC)
-  data_cf <- read_scenario(scenario = "NC", cf_coverage, non_compliance,
+  data_cf <- read_scenario(scenario = "NC", cf_coverage, cf_non_compliance,
                            IU_order, measure)
   
   return(list(data_scenario = data_scenario, data_cf = data_cf))
@@ -276,10 +278,24 @@ read_files_def_cf <- function(scenario, coverage,
 #' @return 
 #'
 #' @examples add_points(res_M2, "M2")
-add_blobs <- function(res, label, cex_i){
-  points(mean(res[,"difference"]), mean(res[,"elim_prob_scen"]),
+add_blobs <- function(res, label, cex_i, subtract_cost= 0 ){
+  points(mean(res[,"difference"]), mean(res[,"costs"])- subtract_cost,
          pch = 16, cex = cex_i, col = rgb(0/255,154/255,205/255, 0.6))
-  text(mean(res[,"difference"]), mean(res[,"elim_prob_scen"]), labels = label) 
+  text(mean(res[,"difference"]), mean(res[,"costs"])- subtract_cost, labels = label) 
+}
+
+
+#' add blobs to existing plot
+#' @param res 
+#' @param label 
+#'
+#' @return 
+#'
+#' @examples add_points(res_M2, "M2")
+add_blobs_v2 <- function(res, label, col_i, subtract_cost= 0 ){
+  points(mean(res[,"difference"]), mean(res[,"costs"])- subtract_cost,
+         pch = 16, cex = 10, col = rgb(col_i[1]/255, col_i[2]/255, col_i[3]/255, 0.6))
+  text(mean(res[,"difference"]), mean(res[,"costs"])- subtract_cost, labels = label) 
 }
 
 
@@ -331,12 +347,84 @@ make_blob_plot <- function(res_list, labels){
   pos_costs <- mean_cost+abs(min(mean_cost)) # make all costs positive
   cex_vec <- (pos_costs)/max(pos_costs)*20 # cex is relative to max mean cost
   
-  plot(NA, NA, ylab = "Mean prob. of elimination by 2030", xlab = "Extra DALYs averted",
+  plot(NA, NA, ylab = "Additional cost until 2030", xlab = "Extra DALYs averted",
        xlim = c(-100, 1.05*max(mean_diff)),
-       ylim = c(0, 1.15*max(mean_prob)),
+       ylim = c(1.5*(min(mean_cost)-mean_cost[1]), 1.15*(max(mean_cost)-mean_cost[1])),
        bty = 'n', cex.axis = 1.5, cex.lab = 1.5)
   
   for(i in 1:length(res_list)){
-    add_blobs(res_list[[i]], labels[i], cex_vec[i])
+    add_blobs(res_list[[i]], labels[i], cex_vec[i], subtract_cost = mean_cost[1])
   }
+}
+
+
+#' make_blob_plot
+#'
+#' @param res_list 
+#' @param labels 
+#'
+#'
+#' @examples make_blob_plot(res_list, labels)
+make_blob_plot_v2 <- function(res_list, labels, lambda_DALY, lambda_EOT){
+  
+  mean_diff <- unlist(lapply(res_list, find_mean_difference))
+  mean_prob <- unlist(lapply(res_list, find_mean_elim_prob))
+  mean_cost <- unlist(lapply(res_list, find_mean_cost))
+  
+  pos_costs <- mean_cost+abs(min(mean_cost)) # make all costs positive
+  pal <- colorRamp(c("red", "blue")) # make a colour palette
+  nmeb = calculate_nmeb(lambda_DALY, lambda_EOT, res_list)
+  if(any( nmeb < 0)){
+    nmeb = nmeb - min(nmeb)
+  }
+  nmeb_col = nmeb/max(nmeb)
+  col_vec <- pal(nmeb_col) # cex is relative to max mean cost
+  
+  plot(NA, NA, ylab = "Additional cost until 2030", xlab = "Extra DALYs averted",
+       xlim = c(-100, 1.05*max(mean_diff)),
+       ylim = c(1.5*(min(mean_cost)-mean_cost[1]), 1.15*(max(mean_cost)-mean_cost[1])),
+       bty = 'n', cex.axis = 1.5, cex.lab = 1.5)
+  points(-999999999, 1,
+         pch = 16, cex = 1)
+  for(i in 1:length(res_list)){
+    add_blobs_v2(res_list[[i]], labels[i], col_vec[i,], subtract_cost = mean_cost[1])
+  }
+}
+
+
+
+
+#' calculate net-monetary benefit from economic evaluation paper
+#'
+#' @param lambda_DALY : maximum price willing to pay to avert one DALY
+#' @param res_list : combined data set of different strategies
+#'
+#' @return net monetary benefit of each strategy
+#' @export
+#'
+#' @examples calculate_nmb(10, res_list)
+calculate_nmb <- function(lambda_DALY, res_list){
+  mean_diff <- unlist(lapply(res_list, find_mean_difference)) # calculate mean difference in DALYs averted by each strategy
+  mean_cost <- unlist(lapply(res_list, find_mean_cost)) # calculate mean cost of each strategy
+  
+  return(lambda_DALY*mean_diff - (mean_cost - mean_cost[1])) # return the nmb of each strategy
+}
+
+
+#' calculate net-monetary and elimination benefit from economic evaluation paper
+#'
+#' @param lambda_DALY : maximum price willing to pay to avert one DALY
+#' @param lambda_EOT : maximum price willing to pay for additional 1% increase in probability of elimination
+#' @param res_list : combined data set of different strategies
+#'
+#' @return net monetary and elimination benefit of each strategy
+#' @export
+#'
+#' @examples calculate_nmeb(10, 5, res_list)
+calculate_nmeb <- function(lambda_DALY, lambda_EOT, res_list){
+  mean_diff <- unlist(lapply(res_list, find_mean_difference)) # calculate mean difference in DALYs averted by each strategy
+  mean_prob <- unlist(lapply(res_list, find_mean_elim_prob)) # calculate mean probability of elimination for each strategy
+  mean_cost <- unlist(lapply(res_list, find_mean_cost)) # calculate mean cost of each strategy
+  
+  return(100 * lambda_EOT*(mean_prob-mean_prob[1]) + lambda_DALY*mean_diff - (mean_cost - mean_cost[1])) # return the nmeb of each strategy
 }
