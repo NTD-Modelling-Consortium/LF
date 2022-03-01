@@ -44,7 +44,7 @@ costs <- calculate_costs(summary_res, cost_scenario = 15, cost_development = 100
 IUs <- read.csv("runIU.csv")
 IUs_vec <- which(IUs$IUID == 1)
 no_IUs <- length(IUs_vec)
-no_IUs = 50
+no_IUs = 10
 #which_years <- "Jan-2031"
 which_years <- c("Jan-2021","Jan-2022","Jan-2023","Jan-2024","Jan-2025","Jan-2026",
                  "Jan-2027","Jan-2028","Jan-2029","Jan-2030","Jan-2031")
@@ -53,6 +53,14 @@ which_years <- c("Jan-2021","Jan-2022","Jan-2023","Jan-2024","Jan-2025","Jan-202
 ######## compare other scenarios #######
 
 which_measure <- "MF"
+
+# moved IU file here to reduce repeated calls to read in the file
+IUs <- read.csv("runIU.csv")
+which_IUs <- which(IUs$IUID == 1)
+IUs_vec <- sample(which_IUs, 50)
+
+IUs_vec <- c(4129, 3279, 3917)
+
 
 res_0 <- calculate_blob_data(scenario = "NC", # scenario name
                              coverage = "65", # coverage percentage
@@ -67,7 +75,8 @@ res_0 <- calculate_blob_data(scenario = "NC", # scenario name
                              no_IUs = no_IUs,
                              which_years = which_years,
                              preTAS_survey_cost ,
-                             TAS_survey_cost )
+                             TAS_survey_cost,
+                             IUs_vec)
 
 
 res_1 <- calculate_blob_data(scenario = "NC", # scenario name
@@ -83,7 +92,8 @@ res_1 <- calculate_blob_data(scenario = "NC", # scenario name
                              no_IUs = no_IUs,
                              which_years = which_years,
                              preTAS_survey_cost ,
-                             TAS_survey_cost )
+                             TAS_survey_cost,
+                             IUs_vec)
 
 
 res_2 <- calculate_blob_data(scenario = "NC", # scenario name
@@ -99,7 +109,8 @@ res_2 <- calculate_blob_data(scenario = "NC", # scenario name
                              no_IUs = no_IUs,
                              which_years,
                              preTAS_survey_cost,
-                             TAS_survey_cost)
+                             TAS_survey_cost,
+                             IUs_vec)
 
 
 res_3a <- calculate_blob_data(scenario = "M1", # scenario name
@@ -114,7 +125,8 @@ res_3a <- calculate_blob_data(scenario = "M1", # scenario name
                               cost_cf, no_IUs = no_IUs, 
                               which_years,
                               preTAS_survey_cost,
-                              TAS_survey_cost)
+                              TAS_survey_cost,
+                              IUs_vec)
 
 res_3b <- calculate_blob_data(scenario = "M1", # scenario name
                               coverage = "80", # coverage percentage
@@ -128,7 +140,8 @@ res_3b <- calculate_blob_data(scenario = "M1", # scenario name
                               cost_cf, no_IUs = no_IUs, 
                               which_years,
                               preTAS_survey_cost,
-                              TAS_survey_cost)
+                              TAS_survey_cost,
+                              IUs_vec)
 
 res_3c <- calculate_blob_data(scenario = "M2", # scenario name
                               coverage = "65", # coverage percentage
@@ -142,7 +155,8 @@ res_3c <- calculate_blob_data(scenario = "M2", # scenario name
                               cost_cf, no_IUs = no_IUs,
                               which_years,
                               preTAS_survey_cost,
-                              TAS_survey_cost)
+                              TAS_survey_cost,
+                              IUs_vec)
 
 res_3d <- calculate_blob_data(scenario = "M2", # scenario name
                               coverage = "80", # coverage percentage
@@ -156,7 +170,8 @@ res_3d <- calculate_blob_data(scenario = "M2", # scenario name
                               cost_cf, no_IUs = no_IUs,
                               which_years,
                               preTAS_survey_cost,
-                              TAS_survey_cost)
+                              TAS_survey_cost,
+                              IUs_vec)
 
 # plot 
 res_list <- list(res_0$res, res_1$res, res_2$res, res_3a$res, res_3b$res, res_3c$res, res_3d$res)
@@ -177,7 +192,6 @@ labels <- c("0", "1", "2", "3a", "3b", "3c", "3d") # what to label blobs in same
 make_time_plots(num_infs , labels, "number of infections")
 # plot mean number of IUs stopped MDA over time for each scenario
 make_time_plots(IUs_stopped , labels, "proportion of IUs stopped MDA")
-
 
 # original blob plot
 make_blob_plot(res_list, labels)

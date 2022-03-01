@@ -205,10 +205,10 @@ calculate_blob_data <- function(scenario, # scenario name
                                 no_IUs,
                                 which_years,
                                 preTAS_survey_cost ,
-                                TAS_survey_cost){
-  
-  IUs = read.csv("runIU.csv")
-  IUs_vec <- which(IUs$IUID == 1)
+                                TAS_survey_cost,
+                                IUs_vec){
+
+  no_IUs <- length(IUs_vec)
   
   # empty matrix to store results
   res <- matrix(ncol = 5, nrow = no_IUs)
