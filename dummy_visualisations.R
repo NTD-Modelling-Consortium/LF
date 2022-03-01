@@ -2,7 +2,7 @@ setwd("/Users/matthewgraham/Dropbox/LFProjCode")
 source("vis_functions.R")
 
 #setwd("~/Documents/GitHub/") 
-cost_development <- 0
+cost_development <- 5000
 cost_cf <- 0.01
 cost_scenario <- 0.02
 preTAS_survey_cost = 5
@@ -28,7 +28,7 @@ which_years <- c("Jan-2021","Jan-2022","Jan-2023","Jan-2024","Jan-2025","Jan-202
 IUs <- read.csv("runIU.csv")
 IUs_vec <- which(IUs$IUID == 1)
 no_IUs <- length(IUs_vec)
-no_IUs = 250
+no_IUs = 50
 #which_years <- "Jan-2031"
 which_years <- c("Jan-2021","Jan-2022","Jan-2023","Jan-2024","Jan-2025","Jan-2026",
                  "Jan-2027","Jan-2028","Jan-2029","Jan-2030","Jan-2031")
@@ -143,10 +143,19 @@ res_3d <- calculate_blob_data(scenario = "M2", # scenario name
                               TAS_survey_cost)
 
 # plot 
-res_list <- list(res_0, res_1, res_2, res_3a, res_3b, res_3c, res_3d)
+res_list <- list(res_0$res, res_1$res, res_2$res, res_3a$res, res_3b$res, res_3c$res, res_3d$res)
+num_infs <- list(res_0$num_infections_over_time, res_1$num_infections_over_time, res_2$num_infections_over_time, 
+                 res_3a$num_infections_over_time, res_3b$num_infections_over_time,
+                 res_3c$num_infections_over_time, res_3d$num_infections_over_time)
+IUs_stopped <- list(res_0$prop_IUs_Finished_MDA, res_1$prop_IUs_Finished_MDA, 
+                    res_2$prop_IUs_Finished_MDA, res_3a$prop_IUs_Finished_MDA, 
+                    res_3b$prop_IUs_Finished_MDA, res_3c$prop_IUs_Finished_MDA,
+                    res_3d$prop_IUs_Finished_MDA)
 labels <- c("0", "1", "2", "3a", "3b", "3c", "3d") # what to label blobs in same order as res_list
 
 make_blob_plot(res_list, labels)
 
-make_blob_plot_v2(res_list, labels, lambda_DALY = 10, lambda_EOT = 10)
+make_blob_plot_v2(res_list, labels, lambda_DALY = 10, lambda_EOT = 1)
 
+make_number_infections_plot(num_infs , labels)
+make_number_infections_plot(IUs_stopped , labels)
