@@ -153,8 +153,8 @@ calculate_probability_of_elimination <- function(data_files_elim){
   # elim_mat[1] = sum(apply(X = cf_m, MARGIN = 1, FUN = check_sim_elimination)) / nrow(cf_m)# calculate the proportion of simulations which go below 1%
   # elim_mat[2] = sum(apply(X = scen_m, MARGIN = 1, FUN = check_sim_elimination)) / nrow(scen_m)# calculate the proportion of simulations which go below 1%
   
-  elim_mat[1] = length(which((cf_m > 0) & (cf_m < 371)))/length(cf_m) # calculate the proportion of simulations which go below 1%
-  elim_mat[2] = length(which((scen_m > 0) & (scen_m < 371)))/length(scen_m) # calculate the proportion of simulations which go below 1%
+  elim_mat[1] = length(which((cf_m > 0) & (cf_m < 371)))/length(cf_m) # calculate the proportion of simulations which passed TAS survey before 2030
+  elim_mat[2] = length(which((scen_m > 0) & (scen_m < 371)))/length(scen_m) # calculate the proportion of simulations which passed TAS survey before 2030
   return(elim_mat)
 }
 
@@ -290,12 +290,15 @@ read_files_def_cf <- function(scenario, coverage,
 
 #' add_blobs
 #' add blobs to existing plot
-#' @param res 
-#' @param label 
+#'
+#' @param res : results for one scenario
+#' @param label : label for scenario
+#' @param cex_i : size of blob for scenario
+#' @param subtract_cost : cost to subtract from cost of scenario (cost of original scenario)
 #'
 #' @return 
 #'
-#' @examples add_points(res_M2, "M2")
+#' @examples add_points(res_M2, "M2", 3, 10)
 add_blobs <- function(res, label, cex_i, subtract_cost= 0 ){
   points(mean(res[,"difference"]), mean(res[,"costs"])- subtract_cost,
          pch = 16, cex = cex_i, col = rgb(0/255,154/255,205/255, 0.6))
@@ -304,8 +307,11 @@ add_blobs <- function(res, label, cex_i, subtract_cost= 0 ){
 
 
 #' add blobs to existing plot
-#' @param res 
-#' @param label 
+#'
+#' @param res : results for one scenario
+#' @param label : label for scenario
+#' @param col_i : colour of blob, defined by net monetary and elimination benefit
+#' @param subtract_cost : cost to subtract from cost of scenario (cost of original scenario)
 #'
 #' @return 
 #'
@@ -367,7 +373,8 @@ make_blob_plot <- function(res_list, labels){
   
   plot(NA, NA, ylab = "Additional cost until 2030", xlab = "Extra DALYs averted",
        xlim = c(-100, 1.05*max(mean_diff)),
-       ylim = c(1.5*(min(mean_cost)-mean_cost[1]), 1.15*(max(mean_cost)-mean_cost[1])),
+       ylim = c(1.5*(min(mean_cost)-mean_cost[1]), # subtract cost of strategy 0 to get extra cost per scenario
+                1.15*(max(mean_cost)-mean_cost[1])),
        bty = 'n', cex.axis = 1.5, cex.lab = 1.5)
   
   for(i in 1:length(res_list)){
@@ -378,14 +385,16 @@ make_blob_plot <- function(res_list, labels){
 
 
 
-#' make_blob_plot
+#' make plots of how one variable changes over time for each scenario
 #'
-#' @param res_list 
-#' @param labels 
+
 #'
+#' @param r : results to plot
+#' @param labels : labels for scenarios
+#' @param y_label : label for the y-axis, as this will change depending on what is being plotted
 #'
 #' @examples make_blob_plot(res_list, labels)
-make_number_infections_plot <- function(r, labels){
+make_time_plots <- function(r, labels, y_label){
   
   mean_infections <- lapply(r, colMeans)
   max_infections = 0
@@ -394,7 +403,7 @@ make_number_infections_plot <- function(r, labels){
   }
   pal <- colorRampPalette(c("red", "purple"))
   cols = pal(length(r))
-  plot(2020:2030,mean_infections[[1]], ylab = "number of infections", xlab = "year", 
+  plot(2020:2030,mean_infections[[1]], ylab = y_label, xlab = "year", 
        bty = 'n', type = 'b', lwd = 2, pch =16, ylim = c(0,max_infections),
        cex.axis = 1.5, cex.lab = 1.5, col = cols[1])
   for(i in 2:length(r)){
@@ -404,11 +413,13 @@ make_number_infections_plot <- function(r, labels){
 }
 
 
-#' make_blob_plot
-#'
+#' make_blob_plot_v2 : all blobs are the same size and the colour of each blob is defined
+#' by net monetary and elimination benefit calculation
 #' @param res_list 
 #' @param labels 
 #'
+#' @param lambda_DALY : amount of money we are willing to spend to avert one DALY
+#' @param lambda_EOT : amount of money we are willing to spend to increase probability of elimination by 1%
 #'
 #' @examples make_blob_plot(res_list, labels)
 make_blob_plot_v2 <- function(res_list, labels, lambda_DALY, lambda_EOT){
@@ -419,7 +430,7 @@ make_blob_plot_v2 <- function(res_list, labels, lambda_DALY, lambda_EOT){
   
   pos_costs <- mean_cost+abs(min(mean_cost)) # make all costs positive
   pal <- colorRamp(c("red", "blue")) # make a colour palette
-  nmeb = calculate_nmeb(lambda_DALY, lambda_EOT, res_list)
+  nmeb = calculate_nmeb(lambda_DALY, lambda_EOT, res_list) # calculate net monetary and elimination benefit
   if(any( nmeb < 0)){
     nmeb = nmeb - min(nmeb)
   }
