@@ -409,7 +409,7 @@ make_time_plots <- function(r, labels, y_label){
     lines(2020:2030, mean_infections[[i]], lwd = 2, col = cols[i])
     points(2020:2030, mean_infections[[i]], pch = 16, col = cols[i])
   }
-  legend("topright", bty = "n", col = cols, legend = labels, lwd = 3, ncol = 2, pch = 16)
+  legend("bottomleft", bty = "n", col = cols, legend = labels, lwd = 3, ncol = 2, pch = 16)
 }
 
 
