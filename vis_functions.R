@@ -401,8 +401,7 @@ make_time_plots <- function(r, labels, y_label){
   for(i in 1:length(r)){
     max_infections = max(max_infections, max(mean_infections[[i]]))
   }
-  pal <- colorRampPalette(c("red", "purple"))
-  cols = pal(length(r))
+  cols <- hcl.colors(length(r), palette = "ag_Sunset")
   plot(2020:2030,mean_infections[[1]], ylab = y_label, xlab = "year", 
        bty = 'n', type = 'b', lwd = 2, pch =16, ylim = c(0,max_infections),
        cex.axis = 1.5, cex.lab = 1.5, col = cols[1])
@@ -410,6 +409,7 @@ make_time_plots <- function(r, labels, y_label){
     lines(2020:2030, mean_infections[[i]], lwd = 2, col = cols[i])
     points(2020:2030, mean_infections[[i]], pch = 16, col = cols[i])
   }
+  legend("topright", bty = "n", col = cols, legend = labels, lwd = 3, ncol = 2, pch = 16)
 }
 
 
