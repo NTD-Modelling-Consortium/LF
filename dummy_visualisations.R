@@ -1,7 +1,6 @@
-setwd("/Users/matthewgraham/Dropbox/LFProjCode")
+#setwd("/Users/matthewgraham/Dropbox/LFProjCode")
 setwd("~/Documents/GitHub/") 
 source("vis_functions.R")
-
 
 cost_development <- 5000
 cost_cf <- 0.01
@@ -22,6 +21,10 @@ IU_order <- "2" # IU order number
 measure <- "WC" # output measure, WC : worm count
 elim <- "MF" # check if elimination was achieved before 2030
 
+# moved IU file here to reduce repeated calls to read in the file
+IUs <- read.csv("runIU.csv")
+IUs_vec <- which(IUs$IUID == 1)
+
 ######## for one IU #######
 #### testing code DO NOT DELETE
 which_years <- c("Jan-2021","Jan-2022","Jan-2023","Jan-2024","Jan-2025","Jan-2026",
@@ -29,38 +32,29 @@ which_years <- c("Jan-2021","Jan-2022","Jan-2023","Jan-2024","Jan-2025","Jan-202
 
 
 data_files <- read_files_def_cf(scenario, coverage, cf_non_compliance = "03", cf_coverage = "65", non_compliance,
-                                IU_order = 14, measure)
+                                IU_order = IUs_vec[1], measure)
 
-# calculate relevant measuyre of impact (median at 2030)
-summary_res <- extract_medians(data_files, which_years)
+data_files_elim <- read_files_def_cf(scenario, coverage, cf_non_compliance = "03", cf_coverage = "65", non_compliance,
+                                     IU_order = IUs_vec[1], elim)
 
-# what is the difference in WC and number of MDA rounds
-diff_measures <- summary_res$cf - summary_res$scenario
-
-# calculate relevant costs
-costs <- calculate_costs(summary_res, cost_scenario = 15, cost_development = 1000, cost_cf = 10, population = 1000)
+##### does not run 
+elim_prob = calculate_probability_of_elimination(data_files_elim)
+# issue is that data_files_elim$data_cf is 0
 
 ######## across all IUs #######
 IUs <- read.csv("runIU.csv")
-IUs_vec <- which(IUs$IUID == 1)
-no_IUs <- length(IUs_vec)
-no_IUs = 10
+which_IUs <- which(IUs$IUID == 1)
+# sub sample of IUs
+IUs_vec <- sample(which_IUs, 50)
+#IUs_vec <- c(8, 13, 44, 60, 70) # IUs for testing
+
 #which_years <- "Jan-2031"
 which_years <- c("Jan-2021","Jan-2022","Jan-2023","Jan-2024","Jan-2025","Jan-2026",
                  "Jan-2027","Jan-2028","Jan-2029","Jan-2030","Jan-2031")
 
-
 ######## compare other scenarios #######
 
 which_measure <- "MF"
-
-# moved IU file here to reduce repeated calls to read in the file
-IUs <- read.csv("runIU.csv")
-which_IUs <- which(IUs$IUID == 1)
-IUs_vec <- sample(which_IUs, 50)
-
-IUs_vec <- c(4129, 3279, 3917)
-
 
 res_0 <- calculate_blob_data(scenario = "NC", # scenario name
                              coverage = "65", # coverage percentage
@@ -72,7 +66,6 @@ res_0 <- calculate_blob_data(scenario = "NC", # scenario name
                              cost_scenario = cost_cf,
                              cost_development = 0,
                              cost_cf, 
-                             no_IUs = no_IUs,
                              which_years = which_years,
                              preTAS_survey_cost ,
                              TAS_survey_cost,
@@ -89,7 +82,6 @@ res_1 <- calculate_blob_data(scenario = "NC", # scenario name
                              cost_scenario = cost_cf,
                              cost_development = 0,
                              cost_cf, 
-                             no_IUs = no_IUs,
                              which_years = which_years,
                              preTAS_survey_cost ,
                              TAS_survey_cost,
@@ -106,7 +98,6 @@ res_2 <- calculate_blob_data(scenario = "NC", # scenario name
                              cost_scenario = cost_cf * 80/65,
                              cost_development = 0,
                              cost_cf, 
-                             no_IUs = no_IUs,
                              which_years,
                              preTAS_survey_cost,
                              TAS_survey_cost,
@@ -122,7 +113,7 @@ res_3a <- calculate_blob_data(scenario = "M1", # scenario name
                               elim = "MF",
                               cost_scenario = cost_scenario,
                               cost_development,
-                              cost_cf, no_IUs = no_IUs, 
+                              cost_cf,
                               which_years,
                               preTAS_survey_cost,
                               TAS_survey_cost,
@@ -137,7 +128,7 @@ res_3b <- calculate_blob_data(scenario = "M1", # scenario name
                               elim = "MF",
                               cost_scenario = cost_scenario,
                               cost_development,
-                              cost_cf, no_IUs = no_IUs, 
+                              cost_cf, 
                               which_years,
                               preTAS_survey_cost,
                               TAS_survey_cost,
@@ -152,7 +143,7 @@ res_3c <- calculate_blob_data(scenario = "M2", # scenario name
                               elim = "MF",
                               cost_scenario = cost_scenario,
                               cost_development,
-                              cost_cf, no_IUs = no_IUs,
+                              cost_cf,
                               which_years,
                               preTAS_survey_cost,
                               TAS_survey_cost,
@@ -167,7 +158,7 @@ res_3d <- calculate_blob_data(scenario = "M2", # scenario name
                               elim = "MF",
                               cost_scenario = cost_scenario,
                               cost_development,
-                              cost_cf, no_IUs = no_IUs,
+                              cost_cf,
                               which_years,
                               preTAS_survey_cost,
                               TAS_survey_cost,

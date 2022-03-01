@@ -202,7 +202,6 @@ calculate_blob_data <- function(scenario, # scenario name
                                 cost_scenario,
                                 cost_development,
                                 cost_cf, 
-                                no_IUs,
                                 which_years,
                                 preTAS_survey_cost ,
                                 TAS_survey_cost,
