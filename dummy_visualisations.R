@@ -316,11 +316,11 @@ res_3d_cloud <- calculate_cloud_data(scenario = "M2", # scenario name
                                      nsims)
 
 
-res_list <- list(res_0_cloud, res_1_cloud, res_2_cloud,
+res_list_cloud <- list(res_0_cloud, res_1_cloud, res_2_cloud,
                  res_3a_cloud, res_3b_cloud, res_3c_cloud,res_3c_cloud)
 
 
 labels <- c("0", "1", "2", "3a", "3b", "3c", "3d") # what to label blobs in same order as res_list
 cols <- c(hcl.colors(length(labels), palette = "ag_Sunset", alpha = 0.6))
-make_cloud_plot(res_list, labels, cols)
+make_cloud_plot(res_list_cloud, labels, cols, cex_fixed = FALSE)
 
