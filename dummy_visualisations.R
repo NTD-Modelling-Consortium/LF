@@ -195,3 +195,131 @@ abline(h = cost_development, lty = "dashed", col = "gray")
 make_blob_plot_v2(res_list, labels, lambda_DALY = 10, lambda_EOT = 1)
 abline(h = cost_development, lty = "dashed", col = "gray")
 
+
+IUs_vec <- sample(which_IUs, 500)
+IUs_vec = which_IUs[1:50]
+nsims <- 20
+# make a cloud plot
+res_0_cloud <- calculate_cloud_data(scenario = "NC", # scenario name
+                                    coverage = "65", # coverage percentage
+                                    cf_coverage = "65",# coverage for cf
+                                    non_compliance = "03",  # non-compliance parameter, equivalent to 0.3
+                                    cf_non_compliance = "03", # # non-compliance parameter for cf
+                                    measure = which_measure, # output measure, WC : worm count
+                                    elim = "MF",
+                                    cost_scenario = cost_cf,
+                                    cost_development = 0,
+                                    cost_cf, 
+                                    which_years = which_years,
+                                    preTAS_survey_cost ,
+                                    TAS_survey_cost,
+                                    IUs_vec,
+                                    nsims)
+
+
+res_1_cloud <- calculate_cloud_data(scenario = "NC", # scenario name
+                                    coverage = "65", # coverage percentage
+                                    cf_coverage = "65",# coverage for cf
+                                    non_compliance = "02",  # non-compliance parameter, equivalent to 0.2
+                                    cf_non_compliance = "03", # # non-compliance parameter for cf
+                                    measure = which_measure, # output measure, WC : worm count
+                                    elim = "MF",
+                                    cost_scenario = cost_cf,
+                                    cost_development = 0,
+                                    cost_cf, 
+                                    which_years = which_years,
+                                    preTAS_survey_cost ,
+                                    TAS_survey_cost,
+                                    IUs_vec,
+                                    nsims)
+
+
+res_2_cloud <- calculate_cloud_data(scenario = "NC", # scenario name
+                                    coverage = "80", # coverage percentage
+                                    cf_coverage = "65",# coverage for cf
+                                    non_compliance = "02",  # non-compliance parameter, equivalent to 0.2
+                                    cf_non_compliance = "03", # # non-compliance parameter for cf
+                                    measure = which_measure, # output measure, WC : worm count
+                                    elim = "MF",
+                                    cost_scenario = cost_cf * 80/65,
+                                    cost_development = 0,
+                                    cost_cf, 
+                                    which_years,
+                                    preTAS_survey_cost,
+                                    TAS_survey_cost,
+                                    IUs_vec,
+                                    nsims)
+
+res_3a_cloud <- calculate_cloud_data(scenario = "M1", # scenario name
+                                     coverage = "65", # coverage percentage
+                                     cf_coverage = "65",# coverage for cf
+                                     non_compliance = "02",  # non-compliance parameter, equivalent to 0.2
+                                     cf_non_compliance = "03", # # non-compliance parameter for cf
+                                     measure = which_measure, # output measure, WC : worm count
+                                     elim = "MF",
+                                     cost_scenario = cost_scenario,
+                                     cost_development,
+                                     cost_cf,
+                                     which_years,
+                                     preTAS_survey_cost,
+                                     TAS_survey_cost,
+                                     IUs_vec,
+                                     nsims)
+
+res_3b_cloud <- calculate_cloud_data(scenario = "M1", # scenario name
+                                     coverage = "80", # coverage percentage
+                                     cf_coverage = "65",# coverage for cf
+                                     non_compliance = "02",  # non-compliance parameter, equivalent to 0.2
+                                     cf_non_compliance = "03", # # non-compliance parameter for cf
+                                     measure = which_measure, # output measure, WC : worm count
+                                     elim = "MF",
+                                     cost_scenario = cost_scenario,
+                                     cost_development,
+                                     cost_cf, 
+                                     which_years,
+                                     preTAS_survey_cost,
+                                     TAS_survey_cost,
+                                     IUs_vec,
+                                     nsims)
+
+res_3c_cloud <- calculate_cloud_data(scenario = "M2", # scenario name
+                                     coverage = "65", # coverage percentage
+                                     cf_coverage = "65",# coverage for cf
+                                     non_compliance = "02",  # non-compliance parameter, equivalent to 0.2
+                                     cf_non_compliance = "03", # # non-compliance parameter for cf
+                                     measure = which_measure, # output measure, WC : worm count
+                                     elim = "MF",
+                                     cost_scenario = cost_scenario,
+                                     cost_development,
+                                     cost_cf,
+                                     which_years,
+                                     preTAS_survey_cost,
+                                     TAS_survey_cost,
+                                     IUs_vec,
+                                     nsims)
+
+res_3d_cloud <- calculate_cloud_data(scenario = "M2", # scenario name
+                                     coverage = "80", # coverage percentage
+                                     cf_coverage = "65",# coverage for cf
+                                     non_compliance = "02",  # non-compliance parameter, equivalent to 0.2
+                                     cf_non_compliance = "03", # # non-compliance parameter for cf
+                                     measure = which_measure, # output measure, WC : worm count
+                                     elim = "MF",
+                                     cost_scenario = cost_scenario,
+                                     cost_development,
+                                     cost_cf,
+                                     which_years,
+                                     preTAS_survey_cost,
+                                     TAS_survey_cost,
+                                     IUs_vec,
+                                     nsims)
+
+
+res_list <- list(res_0_cloud, res_1_cloud, res_2_cloud,
+                 res_3a_cloud, res_3b_cloud, res_3c_cloud,res_3c_cloud)
+
+
+labels <- c("0", "1", "2", "3a", "3b", "3c", "3d") # what to label blobs in same order as res_list
+cols <- c(hcl.colors(length(labels), palette = "ag_Sunset", alpha = 0.6))
+make_cloud_plot(res_list, labels, cols)
+
