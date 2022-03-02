@@ -67,6 +67,24 @@ read_scenario <- function(scenario, coverage, non_compliance,
 }
 
 
+# extract a simulation instead of a median
+extract_simulation <- function(data_files, which_years, j){
+  # extract needed columns from scenario and counter-factual (cf)
+  measure_2030 <- data_files$data_scenario[ , c( "post2020MDA","No_Pre_TAS_surveys", "No_TAS_surveys", which_years)]
+  measure_2030_cf <- data_files$data_cf[ , c("post2020MDA", "No_Pre_TAS_surveys", "No_TAS_surveys", which_years)]
+  
+  # scenario
+  scenario_summary <- as.numeric(measure_2030[j,])
+  # counter-factual
+  cf_summary <- as.numeric(measure_2030_cf[j,])
+  
+  res <- matrix(c(scenario_summary, cf_summary), byrow = F, ncol = 2)
+  colnames(res) <- c("scenario", "cf")
+  rownames(res) <- c( "post2020MDA","No_Pre_TAS_surveys", "No_TAS_surveys", which_years)
+  
+  return(summary_res = as.data.frame(res))
+}
+
 
 #' extract_medians 
 #'
