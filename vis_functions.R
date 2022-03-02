@@ -122,7 +122,7 @@ calculate_costs <- function(summary_res, cost_scenario, cost_development, cost_c
   no_tas_cf <- summary_res["No_TAS_surveys", "cf"]
   
   costs <- (no_mdas_scenario*cost_scenario*population + cost_development + preTAS_survey_cost * no_pre_tas_scenario + TAS_survey_cost * no_tas_scenario) #-  
-    #(no_mdas_cf*cost_cf*population + preTAS_survey_cost * no_pre_tas_cf + TAS_survey_cost * no_tas_cf)
+  #(no_mdas_cf*cost_cf*population + preTAS_survey_cost * no_pre_tas_cf + TAS_survey_cost * no_tas_cf)
   
   return(costs)
 }
@@ -149,7 +149,7 @@ calculate_probability_of_elimination <- function(data_files_elim){
   elim_mat = data.frame(matrix(0, 1, 2)) # set up matrix to hold probs
   
   colnames(elim_mat) = c("cf_elim", "scen_elim")
-
+  
   # elim_mat[1] = sum(apply(X = cf_m, MARGIN = 1, FUN = check_sim_elimination)) / nrow(cf_m)# calculate the proportion of simulations which go below 1%
   # elim_mat[2] = sum(apply(X = scen_m, MARGIN = 1, FUN = check_sim_elimination)) / nrow(scen_m)# calculate the proportion of simulations which go below 1%
   
@@ -206,7 +206,7 @@ calculate_blob_data <- function(scenario, # scenario name
                                 preTAS_survey_cost ,
                                 TAS_survey_cost,
                                 IUs_vec){
-
+  
   no_IUs <- length(IUs_vec)
   
   # empty matrix to store results
@@ -246,15 +246,17 @@ calculate_blob_data <- function(scenario, # scenario name
       
       # just store difference in measure
       res[i, ] <- c(IUs_vec[i], diff_measures, elim_prob$cf_elim, elim_prob$scen_elim, costs)
-  
+      
       num_infections_over_time[i, ] = calculate_number_infected_over_time(data_files$data_scenario, population)
       prop_IUs_Finished_MDA[i, ] = calculate_number_IUs_stopped_MDA(data_files$data_scenario)
     }
     
-   
+    
   }
   x = which(!is.na(res[,1]))
   res = res[x, ]
+  num_infections_over_time =  num_infections_over_time[x, ]
+  prop_IUs_Finished_MDA = prop_IUs_Finished_MDA[x, ]
   return(list(res = res, num_infections_over_time = num_infections_over_time, prop_IUs_Finished_MDA = prop_IUs_Finished_MDA))
   
 }
@@ -285,6 +287,29 @@ read_files_def_cf <- function(scenario, coverage,
                            IU_order, measure)
   
   return(list(data_scenario = data_scenario, data_cf = data_cf))
+}
+
+
+
+
+#' read_file - read one simulation file in
+#' reads in scenario  file
+#'
+#' @param scenario : NC, M1, M2 etc
+#' @param coverage : coverage percentage
+#' @param non_compliance : non-compliance parameter, 02 equivalent to 0.2
+#' @param IU_order : IU order number
+#' @param measure : output measure, WC : worm count, MF : mf prev, IC : ict prev
+#'
+#' @examples
+read_file <- function(scenario, coverage, 
+                      non_compliance,
+                      IU_order, measure){
+  # scenario file
+  data_scenario <- read_scenario(scenario, coverage, non_compliance,
+                                 IU_order, measure)
+  
+  return(data_scenario)
 }
 
 #' add_blobs
