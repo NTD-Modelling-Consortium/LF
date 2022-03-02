@@ -671,4 +671,22 @@ calculate_nmeb <- function(lambda_DALY, lambda_EOT, res_list){
 }
 
 
+# add cloud part for nmeb plot
+add_cloud_part_nmeb <- function(res_j, label, col, subtract_cost= 0, max_cost,
+                                lambda_DALY, lambda_EOT, res_0){
+  cex_i <- res_j["costs"]/max_cost*10
+  nmeb_sim <-calculate_nmeb_simulation(lambda_DALY, lambda_EOT, res_j, res_0)
+  #### use nmeb sim to determine colour ####
+  #### but this needs to be realtive to other nmeb AND within scenario ####
+  points(res_j["difference"], res_j["costs"]- subtract_cost,
+         pch = 16, cex = cex_i, col = col)
+}
+
+# calculate nmeb per simulation
+calculate_nmeb_simulation <- function(lambda_DALY, lambda_EOT, res, res_0){
+  return(100 * lambda_EOT*(res$elim_prob_scen -elim_prob_cf ) + lambda_DALY*res$difference - (res$costs - res_$costs)) # return the nmeb of each strategy
+}
+
+
+
 
