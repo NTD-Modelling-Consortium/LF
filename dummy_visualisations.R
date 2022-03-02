@@ -188,7 +188,8 @@ make_time_plots(num_infs , labels, "number of infections")
 make_time_plots(IUs_stopped , labels, "proportion of IUs stopped MDA")
 
 # original blob plot
-make_blob_plot(res_list, labels)
+cols <- c(hcl.colors(length(labels), palette = "ag_Sunset", alpha = 0.6))
+make_blob_plot(res_list, labels, cols)
 abline(h = cost_development, lty = "dashed", col = "gray")
 
 # blob plot with net monetary elimination benefit colouring

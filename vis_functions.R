@@ -437,9 +437,9 @@ read_file <- function(scenario, coverage,
 #' @return 
 #'
 #' @examples add_points(res_M2, "M2", 3, 10)
-add_blobs <- function(res, label, cex_i, subtract_cost= 0 ){
+add_blobs <- function(res, label, cex_i, subtract_cost= 0 , col){
   points(mean(res[,"difference"]), mean(res[,"costs"])- subtract_cost,
-         pch = 16, cex = cex_i, col = rgb(0/255,154/255,205/255, 0.6))
+         pch = 16, cex = cex_i, col = col)
   text(mean(res[,"difference"]), mean(res[,"costs"])- subtract_cost, labels = label) 
 }
 
@@ -500,7 +500,7 @@ find_mean_cost <- function(x){
 #'
 #'
 #' @examples make_blob_plot(res_list, labels)
-make_blob_plot <- function(res_list, labels){
+make_blob_plot <- function(res_list, labels, cols){
   
   mean_diff <- unlist(lapply(res_list, find_mean_difference))
   mean_prob <- unlist(lapply(res_list, find_mean_elim_prob))
@@ -516,7 +516,7 @@ make_blob_plot <- function(res_list, labels){
        bty = 'n', cex.axis = 1.5, cex.lab = 1.5)
   
   for(i in 1:length(res_list)){
-    add_blobs(res_list[[i]], labels[i], cex_vec[i], subtract_cost = mean_cost[1])
+    add_blobs(res_list[[i]], labels[i], cex_vec[i], subtract_cost = mean_cost[1], col = cols[i])
   }
 }
 
@@ -588,7 +588,7 @@ make_blob_plot_v2 <- function(res_list, labels, lambda_DALY, lambda_EOT){
 
 
 
-make_cloud_plot <- function(res_list, labels, cols){
+make_cloud_plot <- function(res_list, labels, cols, cex_fixed = TRUE){
   
   mean_diff <- unlist(lapply(res_list, find_mean_difference))
   mean_prob <- unlist(lapply(res_list, find_mean_elim_prob))
@@ -605,26 +605,30 @@ make_cloud_plot <- function(res_list, labels, cols){
   
   for(i in 1:length(res_list)){
     add_cloud(res_list[[i]], labels[i], cols[i], subtract_cost= mean_cost[1], 
-              max_cost = max(pos_costs),res_0 = res_list[[1]])
+              max_cost = max(pos_costs),res_0 = res_list[[1]], cex_fixed)
   }
   
-  legend("topleft", bty = "n", col = cols, legend = labels, ncol = 2, pch = 16, cex = 1)
+  legend("topleft", bty = "n", col = cols, legend = labels, ncol = 2, pch = 16, cex = 1.5)
   
 }
 
 
-add_cloud <- function(res, label, col, subtract_cost, max_cost, res_0){
+add_cloud <- function(res, label, col, subtract_cost, max_cost, res_0, cex_fixed){
   nsims <- dim(res)[1]
   
   #add cloud part for each simulation
   for(j in 1:nsims){
     # subtract the corresponding cost from scenario 0 for each simulation
-    add_cloud_part(res[j,], labels[i], col, subtract_cost = res_0[j,"costs"], max_cost)
+    add_cloud_part(res[j,], labels[i], col, subtract_cost = res_0[j,"costs"], max_cost, cex_fixed)
   }
 }
 
-add_cloud_part <- function(res_j, label, col, subtract_cost= 0, max_cost){
-  cex_i <- res_j["costs"]/max_cost*10
+add_cloud_part <- function(res_j, label, col, subtract_cost= 0, max_cost, cex_fixed){
+  if(cex_fixed == TRUE){
+    cex_i <- 3
+  }else{
+    cex_i <- res_j["costs"]/max_cost*10
+  }
   points(res_j["difference"], res_j["costs"]- subtract_cost,
          pch = 16, cex = cex_i, col = col)
 }
