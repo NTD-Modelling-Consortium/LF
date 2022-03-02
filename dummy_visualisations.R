@@ -20,10 +20,13 @@ non_compliance <- "02" # non-compliance parameter, equivalent to 0.2
 IU_order <- "2" # IU order number
 measure <- "WC" # output measure, WC : worm count
 elim <- "MF" # check if elimination was achieved before 2030
+cf_coverage <-"65"
+cf_non_compliance <- "03"
 
 # moved IU file here to reduce repeated calls to read in the file
 IUs <- read.csv("runIU.csv")
 IUs_vec <- which(IUs$IUID == 1)
+
 
 ######## for one IU #######
 #### testing code DO NOT DELETE
@@ -186,7 +189,9 @@ make_time_plots(IUs_stopped , labels, "proportion of IUs stopped MDA")
 
 # original blob plot
 make_blob_plot(res_list, labels)
+abline(h = cost_development, lty = "dashed", col = "gray")
 
 # blob plot with net monetary elimination benefit colouring
 make_blob_plot_v2(res_list, labels, lambda_DALY = 10, lambda_EOT = 1)
+abline(h = cost_development, lty = "dashed", col = "gray")
 

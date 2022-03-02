@@ -395,7 +395,7 @@ make_blob_plot <- function(res_list, labels){
   pos_costs <- mean_cost+abs(min(mean_cost)) # make all costs positive
   cex_vec <- (pos_costs)/max(pos_costs)*20 # cex is relative to max mean cost
   
-  plot(NA, NA, ylab = "Additional cost until 2030", xlab = "Extra DALYs averted",
+  plot(NA, NA, ylab = "Additional arbitrary costs until 2030", xlab = "Proxy for extra DALYs averted",
        xlim = c(-100, 1.05*max(mean_diff)),
        ylim = c(1.5*(min(mean_cost)-mean_cost[1]), # subtract cost of strategy 0 to get extra cost per scenario
                 1.15*(max(mean_cost)-mean_cost[1])),
@@ -461,7 +461,7 @@ make_blob_plot_v2 <- function(res_list, labels, lambda_DALY, lambda_EOT){
   nmeb_col = nmeb/max(nmeb)
   col_vec <- pal(nmeb_col) # cex is relative to max mean cost
   
-  plot(NA, NA, ylab = "Additional cost until 2030", xlab = "Extra DALYs averted",
+  plot(NA, NA, ylab = "Additional arbitrary costs until 2030", xlab = "Proxy for extra DALYs averted",
        xlim = c(-100, 1.05*max(mean_diff)),
        ylim = c(1.5*(min(mean_cost)-mean_cost[1]), 1.15*(max(mean_cost)-mean_cost[1])),
        bty = 'n', cex.axis = 1.5, cex.lab = 1.5)
