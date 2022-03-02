@@ -588,6 +588,48 @@ make_blob_plot_v2 <- function(res_list, labels, lambda_DALY, lambda_EOT){
 
 
 
+make_cloud_plot <- function(res_list, labels, cols){
+  
+  mean_diff <- unlist(lapply(res_list, find_mean_difference))
+  mean_prob <- unlist(lapply(res_list, find_mean_elim_prob))
+  mean_cost <- unlist(lapply(res_list, find_mean_cost))
+  
+  pos_costs <- mean_cost+abs(min(mean_cost)) # make all costs positive
+  #cex_vec <- (pos_costs)/max(pos_costs)*20 # cex is relative to max mean cost
+  
+  plot(NA, NA, ylab = "Additional arbitrary costs until 2030", xlab = "Proxy for extra DALYs averted",
+       xlim = c(-100, 1.05*max(mean_diff)),
+       ylim = c(1.5*(min(mean_cost)-mean_cost[1]), # subtract cost of strategy 0 to get extra cost per scenario
+                1.15*(max(mean_cost)-mean_cost[1])),
+       bty = 'n', cex.axis = 1.5, cex.lab = 1.5)
+  
+  for(i in 1:length(res_list)){
+    add_cloud(res_list[[i]], labels[i], cols[i], subtract_cost= mean_cost[1], 
+              max_cost = max(pos_costs),res_0 = res_list[[1]])
+  }
+  
+  legend("topleft", bty = "n", col = cols, legend = labels, ncol = 2, pch = 16, cex = 1)
+  
+}
+
+
+add_cloud <- function(res, label, col, subtract_cost, max_cost, res_0){
+  nsims <- dim(res)[1]
+  
+  #add cloud part for each simulation
+  for(j in 1:nsims){
+    # subtract the corresponding cost from scenario 0 for each simulation
+    add_cloud_part(res[j,], labels[i], col, subtract_cost = res_0[j,"costs"], max_cost)
+  }
+}
+
+add_cloud_part <- function(res_j, label, col, subtract_cost= 0, max_cost){
+  cex_i <- res_j["costs"]/max_cost*10
+  points(res_j["difference"], res_j["costs"]- subtract_cost,
+         pch = 16, cex = cex_i, col = col)
+}
+
+
 
 #' calculate net-monetary benefit from economic evaluation paper
 #'
