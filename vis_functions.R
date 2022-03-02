@@ -296,6 +296,85 @@ calculate_blob_data <- function(scenario, # scenario name
   
 }
 
+calculate_cloud_data <- function(scenario, # scenario name
+                                 coverage, # coverage percentage
+                                 cf_coverage, # coverage for cf
+                                 non_compliance,  # non-compliance parameter, equivalent to 0.2
+                                 cf_non_compliance , # # non-compliance parameter for cf
+                                 measure, # output measure, WC : worm count
+                                 elim ,
+                                 cost_scenario,
+                                 cost_development,
+                                 cost_cf, 
+                                 which_years,
+                                 preTAS_survey_cost ,
+                                 TAS_survey_cost,
+                                 IUs_vec,nsims){
+  
+  no_IUs <- length(IUs_vec)
+  
+  # empty matrix to store results
+  # each line is average across one simulation for all IUs
+  res_sim <- matrix(ncol = 5, nrow = nsims)
+  colnames(res_sim) <- c("sim", "difference", "elim_prob_cf",  "elim_prob_scen", "costs")
+  
+  for(j in 1:nsims){
+    
+    # empty matrix to store results
+    res <- matrix(ncol = 5, nrow = no_IUs)
+    colnames(res) <- c("IU_order", "difference", "elim_prob_cf",  "elim_prob_scen", "costs")
+    
+    #num_infections_over_time <- matrix(ncol = 11, nrow = no_IUs)
+    #prop_IUs_Finished_MDA <- matrix(ncol = 11, nrow = no_IUs)
+    
+    for(i in 1:no_IUs){
+      population <- IUs$pop[IUs_vec[i]] # choose some random population size for the IU
+      
+      data_files <- read_files_def_cf(scenario, coverage, cf_coverage, cf_non_compliance, non_compliance, 
+                                      IU_order = IUs_vec[i], measure)
+      
+      data_files_elim <- read_files_def_cf(scenario, coverage,cf_coverage,cf_non_compliance,  non_compliance,
+                                           IU_order = IUs_vec[i], elim)
+      if(length(data_files$data_scenario) > 1 ){
+        # calculate probability of elimination for cf and scen
+        elim_prob <- calculate_elimination_sim(data_files_elim, j)
+        
+        # extract simuation j 
+        res_j <- extract_simulation(data_files, which_years, j)
+        
+        # calculate relevant costs
+        costs <- calculate_costs(res_j, cost_scenario, cost_development, cost_cf, preTAS_survey_cost ,
+                                 TAS_survey_cost, population)
+        
+        diff_measures <- population * res_j[which_years, "cf"] - population * res_j[which_years,"scenario"] 
+        
+        
+        if(length(which_years > 1)) diff_measures <- sum(diff_measures)
+        
+        # just store difference in measure
+        res[i, ] <- c(IUs_vec[i], diff_measures, elim_prob$cf_elim, elim_prob$scen_elim, costs)
+        
+        # # these  do not work for one simulation currently
+        # num_infections_over_time[i, ] = calculate_number_infected_over_time(data_files$data_scenario[j], population)
+        # prop_IUs_Finished_MDA[i, ] = calculate_number_IUs_stopped_MDA(data_files$data_scenario[j])
+        
+      }
+    }
+    x = which(!is.na(res[,1]))
+    res = res[x, ]
+    # num_infections_over_time =  num_infections_over_time[x, ]
+    # prop_IUs_Finished_MDA = prop_IUs_Finished_MDA[x, ]
+    
+    # calculate average across IUs and store
+    means_j <- apply(res[,c("difference", "elim_prob_cf", "elim_prob_scen", "costs")], 2, mean)
+    
+    res_sim[j, ] <- c(j, means_j)
+  }
+  
+  return(res = res_sim)
+  
+}
+
 
 #' read_files_def_cf
 #' reads in scenario and partner counter-factual file
