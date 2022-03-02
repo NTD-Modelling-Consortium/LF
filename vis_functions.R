@@ -145,6 +145,23 @@ calculate_costs <- function(summary_res, cost_scenario, cost_development, cost_c
   return(costs)
 }
 
+# extract whether elimination occured or not 
+calculate_elimination_sim <- function(data_files_elim, j){
+  
+  elim_mat = data.frame(matrix(0, 1, 2)) # set up matrix to hold probs
+  colnames(elim_mat) = c("cf_elim", "scen_elim")
+  
+  scen_m = data_files_elim$data_scenario[j,"t_TAS_pass"] # get the data we want to look at
+  cf_m = data_files_elim$data_cf[j,"t_TAS_pass"] # get the data we want to look at
+  
+  elim_mat = data.frame(matrix(0, 1, 2)) # set up matrix to hold probs
+  colnames(elim_mat) = c("cf_elim", "scen_elim")
+  
+  
+  elim_mat[1] = as.numeric((cf_m > 0) & (cf_m < 371)) # passed TAS survey before 2030?
+  elim_mat[2] = as.numeric((scen_m > 0) & (scen_m < 371)) # passed TAS survey before 2030?
+  return(elim_mat)
+}
 
 
 
