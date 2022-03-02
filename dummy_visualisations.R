@@ -45,9 +45,9 @@ elim_prob = calculate_probability_of_elimination(data_files_elim)
 IUs <- read.csv("runIU.csv")
 which_IUs <- which(IUs$IUID == 1)
 # sub sample of IUs
-IUs_vec <- sample(which_IUs, 50)
+IUs_vec <- sample(which_IUs, 500)
 #IUs_vec <- c(8, 13, 44, 60, 70) # IUs for testing
-
+IUs_vec = which_IUs[1:5]
 #which_years <- "Jan-2031"
 which_years <- c("Jan-2021","Jan-2022","Jan-2023","Jan-2024","Jan-2025","Jan-2026",
                  "Jan-2027","Jan-2028","Jan-2029","Jan-2030","Jan-2031")
