@@ -243,7 +243,7 @@ calculate_blob_data <- function(scenario, # scenario name
                                 IUs_vec){
   
   no_IUs <- length(IUs_vec)
-  
+  IUs <- read.csv("runIU.csv")
   # empty matrix to store results
   res <- matrix(ncol = 5, nrow = no_IUs)
   num_infections_over_time <- matrix(ncol = 11, nrow = no_IUs)
@@ -493,6 +493,10 @@ find_mean_cost <- function(x){
 }
 
 
+TAS_pass_test <- function(x){
+  ifelse(((x<371) && (x>0)),1,0)
+}
+
 #' make_blob_plot
 #'
 #' @param res_list 
@@ -689,4 +693,252 @@ calculate_nmeb_simulation <- function(lambda_DALY, lambda_EOT, res, res_0){
 
 
 
+#' find whether there was true elimination in a simulation
+#'
+#' @param x : data over time period we are considering
+#'
+#' @return : TRUE or FALSE
+true_elimination <- function(x){
+  any(x == 0)
+}
 
+#' Calculate data needed for cloud data
+#' Idea of this function is to produce a daly array and a cost array both of which 
+#' are averaged over each individual simulation for the chosen IUs. 
+#' These can then be used to give the data needed for the cloud plot when compared with the baseline
+#'
+#' @param IUs_vec : IUs to do calculation for
+#' @param scenario : which scenario to generate data for
+#' @param coverage : coverage of mda
+#' @param non_compliance : compliance of mda
+#' @param cost_development : development of cost for the drug 
+#' @param cost_scenario : cost of a set of drugs for an individual
+#' @param preTAS_survey_cost : cost of the pre TAS survey
+#' @param TAS_survey_cost : cost of the TAS survey
+#'
+#' @return mean dalys and cost over each IU for simulations set 1, 2, 3,...
+#' @export
+#'
+#' @examples scen0 = calculate_dalys_and_costs_for_scenario_cloud(IUs_vec, scenario = "NC", coverage = "65", 
+#'                                                                non_compliance = "03", cost_development = 0, 
+#'                                                                cost_scenario = 0.01,
+#'                                                                preTAS_survey_cost = 5, TAS_survey_cost = 5)
+calculate_dalys_and_costs_for_scenario_cloud <- function(IUs_vec, scenario, coverage, 
+                                                         non_compliance, cost_development, cost_scenario,
+                                                         preTAS_survey_cost, TAS_survey_cost,
+                                                         which_years){
+  
+  IUs <- read.csv("runIU.csv") # read in IU file, so we have access to population data
+  no_IUs = length(IUs_vec)
+  dalys = matrix(NA, no_IUs * 200, 1) # generate array to store daly data
+  costs = matrix(NA, no_IUs * 200, 1) # generate array to store cost data
+  elims = matrix(NA, no_IUs * 200, 1) # generate array to store elim data
+  true_elims = matrix(NA, no_IUs * 200, 1) # generate array to store true elim data
+  for(i in 1:no_IUs){
+    
+    population <- IUs$pop[IUs_vec[i]] # find population size for the IU
+    
+    # read in the specified file for given scenario and IU
+    data_files <- read_file(scenario, coverage, 
+                            non_compliance,
+                            IU_order= IUs_vec[i], measure)
+    
+    
+    if(length(data_files) > 1){
+      # construct the cost for each simulation
+      data_files$cost = data_files$post2020MDA * cost_scenario * population + cost_development + 
+        data_files$No_Pre_TAS_surveys* preTAS_survey_cost + data_files$No_TAS_surveys* TAS_survey_cost
+      
+      # was there true elimination in each simulation
+      data_files$true_elimination = 1*apply(data_files[, which_years], 1, true_elimination)
+      # make proxy for dalys by year
+      data_files[, which_years] = data_files[, which_years] * population
+      if(length(rowMeans(data_files[, which_years], na.rm = T)) == 200){
+        dalys[ seq(((i-1)*200 + 1),i*200), ] = rowMeans(data_files[, which_years], na.rm = T)
+        costs[ seq(((i-1)*200 + 1),i*200), ] = data_files$cost
+        elims[ seq(((i-1)*200 + 1),i*200), ] = unlist(lapply(data_files$t_TAS_pass, TAS_pass_test))
+        true_elims[ seq(((i-1)*200 + 1),i*200), ] = data_files$true_elimination
+      }
+      
+    }
+    
+  }
+  
+  mean_daly = matrix(0, 200, 1)
+  mean_cost = matrix(0, 200, 1)
+  mean_elim = matrix(0, 200, 1)
+  mean_true_elim = matrix(0, 200, 1)
+  # take the average for cost and dalys, for simulations 1, 2, 3,...
+  for(i in 1:200){
+    mean_daly[i] = mean(dalys[seq(i, length(dalys), 200)], na.rm = T)
+    mean_cost[i] = mean(costs[seq(i, length(costs), 200)], na.rm = T)
+    mean_elim[i] = mean(elims[seq(i, length(costs), 200)], na.rm = T)
+    mean_true_elim[i] = mean(true_elims[seq(i, length(costs), 200)], na.rm = T)
+  }
+  return(list(dalys = mean_daly, costs = mean_cost, elims = mean_elim, true_elims = mean_true_elim))
+  
+}
+
+
+
+
+#' Title
+#'
+#' @param all_dalys 
+#' @param all_costs 
+#' @param labels 
+#'
+#' @return
+#' @export
+#'
+#' @examples
+plot_clouds <- function(all_dalys, all_costs, labels, draw_slopes = F){
+  plot(NA, NA, ylab = "Additional arbitrary costs until 2030", xlab = "Proxy for extra DALYs averted",
+       xlim = c(1.05*min(unlist(all_dalys)), 1.05*max(unlist(all_dalys))),
+       ylim = c(1.5*(min(unlist(all_costs))), # subtract cost of strategy 0 to get extra cost per scenario
+                1.15*(max(unlist(all_costs)))),
+       bty = 'n', cex.axis = 1.5, cex.lab = 1.5)
+  
+  cols = brewer.pal(n = length(all_dalys) , name = "Set1")
+  cols <- c(hcl.colors(length(labels), palette = "ag_Sunset", alpha = 0.6))
+  if(draw_slopes == T){
+    abline(a= c(0,0), b= 0.1, lty = 2, col = 'grey')
+    text(x=10000,y=1000,"$0.1 per daly averted", col = 'grey', cex = 1.6)
+    abline(a= c(0,0), b= 0.5, lty = 2, col = 'grey')
+    text(x=8000,y=4000,"$0.5 per daly averted", col = 'grey', cex = 1.6)
+    abline(a= c(0,0), b= 1, lty = 2, col = 'grey')
+    text(x=6000,y=6000,"$1 per daly averted",col = 'grey', cex = 1.6)
+    abline(a= c(0,0), b= 2, lty = 2, col = 'grey')
+    text(x=4000,y=8000,"$2 per daly averted", col = 'grey', cex = 1.6)
+    abline(a= c(0,0), b= 4, lty = 2, col = 'grey')
+    text(x=2500,y=10000,"$4 per daly averted", col = 'grey', cex = 1.6)
+  }
+  for(i in 1:length(all_dalys)){
+    scen_cost = all_costs[[i]]
+    scen_dalys = all_dalys[[i]]
+    #  cc = paste0(cols[i], "99")
+    for(j in 1:length(scen_cost)){
+      points(scen_dalys[j], scen_cost[j], col = cols[i], pch = 16, cex = 2)
+    }
+  }
+  legend("topleft", bty = "n", col = cols, legend = labels, lwd = 3, ncol = 2, pch = 16)
+  
+}
+
+
+
+
+#' Title
+#'
+#' @param all_dalys 
+#' @param all_costs 
+#' @param labels 
+#'
+#' @return
+#' @export
+#'
+#' @examples
+plot_blob_plot_from_all_daly_costs <- function(mean_dalys_diff, mean_cost_diff, 
+                                               labels, draw_slopes = F, 
+                                               additional_cost_dev = 0){
+  plot(NA, NA, ylab = "Additional arbitrary costs until 2030", xlab = "Proxy for extra DALYs averted",
+       xlim = c(1.05*min(mean_dalys_diff), 1.05*max(mean_dalys_diff)),
+       ylim = c(-500, # subtract cost of strategy 0 to get extra cost per scenario
+                1.15*(additional_cost_dev + max(mean_cost_diff))),
+       bty = 'n', cex.axis = 1.5, cex.lab = 1.5)
+  
+  cols = brewer.pal(n = length(mean_dalys_diff) , name = "Set1")
+  cols <- c(hcl.colors(length(labels), palette = "ag_Sunset", alpha = 0.6))
+  if(draw_slopes == T){
+    abline(a= c(0,0), b= 0.1, lty = 2, col = 'grey')
+      text(x=10000,y=1000,"$0.1 per daly averted", col = 'grey', cex = 1.6)
+    abline(a= c(0,0), b= 0.5, lty = 2, col = 'grey')
+    text(x=8000,y=4000,"$0.5 per daly averted", col = 'grey', cex = 1.6)
+    abline(a= c(0,0), b= 1, lty = 2, col = 'grey')
+    text(x=6000,y=6000,"$1 per daly averted",col = 'grey', cex = 1.6)
+    abline(a= c(0,0), b= 2, lty = 2, col = 'grey')
+    text(x=4000,y=8000,"$2 per daly averted", col = 'grey', cex = 1.6)
+    abline(a= c(0,0), b= 4, lty = 2, col = 'grey')
+    text(x=2500,y=10000,"$4 per daly averted", col = 'grey', cex = 1.6)
+  }
+  for(i in 1:length(mean_dalys_diff)){
+    scen_cost = mean_cost_diff[i]
+    scen_dalys = mean_dalys_diff[i]
+    #  cc = paste0(cols[i], "99")
+    label = labels[i]
+    if(label %in% c("3a", "3b", "3c", "3d")){
+      scen_add_cost = additional_cost_dev
+    }else{
+      scen_add_cost = 0
+    }
+    #print(scen_cost + scen_add_cost)
+    points(scen_dalys, scen_cost + scen_add_cost, col = cols[i], pch = 16, cex = 10)
+    text(scen_dalys, scen_cost+ scen_add_cost, labels = label) 
+  }
+  legend("topleft", bty = "n", col = cols, legend = labels, lwd = 3, ncol = 2, pch = 16)
+  
+}
+
+
+
+
+
+make_blob_plot_from_cloud_data <- function(mean_dalys_diff, mean_cost_diff, mean_elim_diff, 
+                                           labels, lambda_DALY, lambda_EOT, additional_cost_dev, draw_slopes = F){
+  
+
+  mean_cost_diff <- mean_cost_diff+abs(min(mean_cost_diff)) # make all costs positive
+  pal <- colorRamp(c("red", "blue")) # make a colour palette
+ 
+  for(i in 1:length(mean_dalys_diff)){
+    label = labels[i]
+    if(label %in% c("3a", "3b", "3c", "3d")){
+      mean_cost_diff[i] =  mean_cost_diff[i] + additional_cost_dev
+    }
+  }
+  nmeb = 100 * lambda_EOT*(mean_elim_diff) + lambda_DALY*mean_dalys_diff - (mean_cost_diff) 
+  if(any( nmeb < 0)){
+    nmeb = nmeb - min(nmeb)
+  }
+  nmeb_col = nmeb/max(nmeb)
+  col_vec <- pal(nmeb_col) # cex is relative to max mean cost
+  cols = matrix(0, length(mean_dalys_diff))
+  plot(NA, NA, ylab = "Additional arbitrary costs until 2030", xlab = "Proxy for extra DALYs averted",
+       xlim = c(1.05*min(mean_dalys_diff), 1.05*max(mean_dalys_diff)),
+       ylim = c(-500, # subtract cost of strategy 0 to get extra cost per scenario
+                1.15*(max(mean_cost_diff))),
+       bty = 'n', cex.axis = 1.5, cex.lab = 1.5,
+       main = bquote( lambda[DALY] == .(lambda_DALY) ~ ", " ~ lambda[EOT] == .(lambda_EOT)~ ", development cost " == .(5000+ additional_cost_dev) ))
+  points(-999999999, 1,
+         pch = 16, cex = 1)
+  if(draw_slopes == T){
+    abline(a= c(0,0), b= 0.1, lty = 2, col = 'grey')
+    text(x=10000,y=1000,"$0.1 per daly averted", col = 'grey', cex = 1.6)
+    abline(a= c(0,0), b= 0.5, lty = 2, col = 'grey')
+    text(x=8000,y=4000,"$0.5 per daly averted", col = 'grey', cex = 1.6)
+    abline(a= c(0,0), b= 1, lty = 2, col = 'grey')
+    text(x=6000,y=6000,"$1 per daly averted",col = 'grey', cex = 1.6)
+    abline(a= c(0,0), b= 2, lty = 2, col = 'grey')
+    text(x=4000,y=8000,"$2 per daly averted", col = 'grey', cex = 1.6)
+    abline(a= c(0,0), b= 4, lty = 2, col = 'grey')
+    text(x=2500,y=10000,"$4 per daly averted", col = 'grey', cex = 1.6)
+  }
+  for(i in 1:length(mean_dalys_diff)){
+    scen_cost = mean_cost_diff[i]
+    scen_dalys = mean_dalys_diff[i]
+    #  cc = paste0(cols[i], "99")
+    label = labels[i]
+    # if(label %in% c("3a", "3b", "3c", "3d")){
+    #   scen_add_cost = additional_cost_dev
+    # }else{
+    #   scen_add_cost = 0
+    # }
+    col_i = col_vec[i,]
+    cols[i] = rgb(col_i[1]/255, col_i[2]/255, col_i[3]/255, 0.6)
+    points(scen_dalys, scen_cost, col = rgb(col_i[1]/255, col_i[2]/255, col_i[3]/255, 0.6), pch = 16, cex = 10)
+    text(scen_dalys, scen_cost, labels = label) 
+  }
+  legend("topleft", title = "rank of scenarios ", bty = "n", col = cols[order(nmeb, decreasing = T)], 
+         legend = labels[order(nmeb, decreasing = T)], lwd = 3, pch = 16)
+  return(nmeb)
+}
