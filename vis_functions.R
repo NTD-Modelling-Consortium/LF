@@ -302,19 +302,14 @@ calculate_blob_data <- function(scenario, # scenario name
                                 TAS_survey_cost,
                                 IUs_vec){
   
-  no_IUs <- length(IUs_vec)
-  IUs <- read.csv("runIU.csv")
+  no_IUs <- length(IUs_vec) 
   # empty matrix to store results
   res <- matrix(ncol = 5, nrow = no_IUs)
-  num_infections_over_time <- matrix(ncol = 11, nrow = no_IUs)
-  prop_IUs_Finished_MDA <- matrix(ncol = 11, nrow = no_IUs)
   colnames(res) <- c("IU_order", "difference", "elim_prob_cf",  "elim_prob_scen", "costs")
   
-  # cf_res <- matrix(ncol = 5, nrow = no_IUs)
-  # colnames(cf_res) <- c("IU_order", "num_worms", "elim_prob", "num_MDAs", "costs")
-  # scen_res <- matrix(ncol = 5, nrow = no_IUs)
-  # colnames(scen_res) <- c("IU_order", "num_worms", "elim_prob", "num_MDAs",  "costs")
-  # 
+  num_infections_over_time <- matrix(ncol = 11, nrow = no_IUs)
+  prop_IUs_Finished_MDA <- matrix(ncol = 11, nrow = no_IUs)
+  
   for(i in 1:no_IUs){
     population <- IUs$pop[IUs_vec[i]] # choose some random population size for the IU
     
@@ -325,7 +320,7 @@ calculate_blob_data <- function(scenario, # scenario name
                                          IU_order = IUs_vec[i], elim)
     if(length(data_files$data_scenario) > 1 ){
       # calculate probability of elimination for cf and scen
-      elim_prob = calculate_probability_of_elimination(data_files_elim)
+      elim_prob <- calculate_probability_of_elimination(data_files_elim)
       
       # calculate relevant measure of impact 
       summary_res <- extract_medians(data_files, which_years)
@@ -334,25 +329,24 @@ calculate_blob_data <- function(scenario, # scenario name
       costs <- calculate_costs(summary_res, cost_scenario, cost_development, cost_cf, preTAS_survey_cost ,
                                TAS_survey_cost, population)
       
+      # calculate the difference in (proxy for) DALYs averted
       diff_measures <- population * summary_res[which_years, "cf"] - population * summary_res[which_years,"scenario"] 
       
-      
+      # are measures being calculated for more than one year? if yes, then sum
       if(length(which_years > 1)) diff_measures <- sum(diff_measures)
       
-      
-      # just store difference in measure
+      #  store all results
       res[i, ] <- c(IUs_vec[i], diff_measures, elim_prob$cf_elim, elim_prob$scen_elim, costs)
-      
-      num_infections_over_time[i, ] = calculate_number_infected_over_time(data_files$data_scenario, population)
-      prop_IUs_Finished_MDA[i, ] = calculate_number_IUs_stopped_MDA(data_files$data_scenario)
+      num_infections_over_time[i, ] <- calculate_number_infected_over_time(data_files$data_scenario, population)
+      prop_IUs_Finished_MDA[i, ] <- calculate_number_IUs_stopped_MDA(data_files$data_scenario)
     }
     
     
   }
-  x = which(!is.na(res[,1]))
-  res = res[x, ]
-  num_infections_over_time =  num_infections_over_time[x, ]
-  prop_IUs_Finished_MDA = prop_IUs_Finished_MDA[x, ]
+  x <- which(!is.na(res[,1]))
+  res <- res[x, ]
+  num_infections_over_time <-  num_infections_over_time[x, ]
+  prop_IUs_Finished_MDA <- prop_IUs_Finished_MDA[x, ]
   return(list(res = res, num_infections_over_time = num_infections_over_time, prop_IUs_Finished_MDA = prop_IUs_Finished_MDA))
   
 }

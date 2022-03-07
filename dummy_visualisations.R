@@ -40,23 +40,17 @@ data_files <- read_files_def_cf(scenario, coverage, cf_non_compliance = "03", cf
 data_files_elim <- read_files_def_cf(scenario, coverage, cf_non_compliance = "03", cf_coverage = "65", non_compliance,
                                      IU_order = IUs_vec[1], elim)
 
-##### does not run 
-elim_prob = calculate_probability_of_elimination(data_files_elim)
-# issue is that data_files_elim$data_cf is 0
-
 ######## across all IUs #######
 IUs <- read.csv("runIU.csv")
 which_IUs <- which(IUs$IUID == 1)
 # sub sample of IUs
-IUs_vec <- sample(which_IUs, 500)
-#IUs_vec <- c(8, 13, 44, 60, 70) # IUs for testing
-IUs_vec = which_IUs[1:25]
-#which_years <- "Jan-2031"
+IUs_vec  <- which_IUs[1:25]
+# which years to calculate measures for 
 which_years <- c("Jan-2021","Jan-2022","Jan-2023","Jan-2024","Jan-2025","Jan-2026",
                  "Jan-2027","Jan-2028","Jan-2029","Jan-2030","Jan-2031")
 
 ######## compare other scenarios #######
-
+# which measure (worm count, mf prevalence) do yo want to use to calculate proxy for DALYs
 which_measure <- "MF"
 
 start_times= Sys.time()
@@ -191,6 +185,7 @@ dev.off()
 png("IUS_pass_TAS.png", width = 12, height = 8, res = 300, units = "in")
 make_time_plots(IUs_stopped , labels, "proportion of IUs stopped MDA")
 dev.off()
+
 # original blob plot
 cols <- c(hcl.colors(length(labels), palette = "ag_Sunset", alpha = 0.6))
 make_blob_plot(res_list, labels, cols)
