@@ -353,7 +353,7 @@ calculate_blob_data <- function(scenario, # scenario name
 
 #' calculate_cloud_data 
 #' wrapper to loop over each simulation across all IUs
-#' 
+#'  REPLACED BY calculate_dalys_and_costs_for_scenario_cloud
 #' 
 #' @param scenario 
 #' @param coverage 
@@ -852,14 +852,14 @@ true_elimination <- function(x){
 calculate_dalys_and_costs_for_scenario_cloud <- function(IUs_vec, scenario, coverage, 
                                                          non_compliance, cost_development, cost_scenario,
                                                          preTAS_survey_cost, TAS_survey_cost,
-                                                         which_years){
+                                                         which_years, nsims = 200){
   
   IUs <- read.csv("runIU.csv") # read in IU file, so we have access to population data
   no_IUs = length(IUs_vec)
-  dalys = matrix(NA, no_IUs * 200, 1) # generate array to store daly data
-  costs = matrix(NA, no_IUs * 200, 1) # generate array to store cost data
-  elims = matrix(NA, no_IUs * 200, 1) # generate array to store elim data
-  true_elims = matrix(NA, no_IUs * 200, 1) # generate array to store true elim data
+  dalys = matrix(NA, no_IUs * nsims, 1) # generate array to store daly data
+  costs = matrix(NA, no_IUs * nsims, 1) # generate array to store cost data
+  elims = matrix(NA, no_IUs * nsims, 1) # generate array to store elim data
+  true_elims = matrix(NA, no_IUs * nsims, 1) # generate array to store true elim data
   for(i in 1:no_IUs){
     
     population <- IUs$pop[IUs_vec[i]] # find population size for the IU
@@ -879,27 +879,27 @@ calculate_dalys_and_costs_for_scenario_cloud <- function(IUs_vec, scenario, cove
       data_files$true_elimination = 1*apply(data_files[, which_years], 1, true_elimination)
       # make proxy for dalys by year
       data_files[, which_years] = data_files[, which_years] * population
-      if(length(rowMeans(data_files[, which_years], na.rm = T)) == 200){
-        dalys[ seq(((i-1)*200 + 1),i*200), ] = rowMeans(data_files[, which_years], na.rm = T)
-        costs[ seq(((i-1)*200 + 1),i*200), ] = data_files$cost
-        elims[ seq(((i-1)*200 + 1),i*200), ] = unlist(lapply(data_files$t_TAS_pass, TAS_pass_test))
-        true_elims[ seq(((i-1)*200 + 1),i*200), ] = data_files$true_elimination
+      if(length(rowMeans(data_files[, which_years], na.rm = T)) == nsims){
+        dalys[ seq(((i-1)*nsims + 1),i*nsims), ] = rowMeans(data_files[, which_years], na.rm = T)
+        costs[ seq(((i-1)*nsims + 1),i*nsims), ] = data_files$cost
+        elims[ seq(((i-1)*nsims + 1),i*nsims), ] = unlist(lapply(data_files$t_TAS_pass, TAS_pass_test))
+        true_elims[ seq(((i-1)*nsims + 1),i*nsims), ] = data_files$true_elimination
       }
       
     }
     
   }
   
-  mean_daly = matrix(0, 200, 1)
-  mean_cost = matrix(0, 200, 1)
-  mean_elim = matrix(0, 200, 1)
-  mean_true_elim = matrix(0, 200, 1)
+  mean_daly = matrix(0, nsims, 1)
+  mean_cost = matrix(0, nsims, 1)
+  mean_elim = matrix(0, nsims, 1)
+  mean_true_elim = matrix(0, nsims, 1)
   # take the average for cost and dalys, for simulations 1, 2, 3,...
-  for(i in 1:200){
-    mean_daly[i] = mean(dalys[seq(i, length(dalys), 200)], na.rm = T)
-    mean_cost[i] = mean(costs[seq(i, length(costs), 200)], na.rm = T)
-    mean_elim[i] = mean(elims[seq(i, length(costs), 200)], na.rm = T)
-    mean_true_elim[i] = mean(true_elims[seq(i, length(costs), 200)], na.rm = T)
+  for(i in 1:nsims){
+    mean_daly[i] = mean(dalys[seq(i, length(dalys), nsims)], na.rm = T)
+    mean_cost[i] = mean(costs[seq(i, length(costs), nsims)], na.rm = T)
+    mean_elim[i] = mean(elims[seq(i, length(costs), nsims)], na.rm = T)
+    mean_true_elim[i] = mean(true_elims[seq(i, length(costs), nsims)], na.rm = T)
   }
   return(list(dalys = mean_daly, costs = mean_cost, elims = mean_elim, true_elims = mean_true_elim))
   
