@@ -252,8 +252,9 @@ calculate_number_infected_over_time <- function(d, population){
 #' @export
 #'
 #' @examples
-calculate_number_IUs_stopped_MDA <- function(d){
-  years = (20:30)*12
+calculate_number_IUs_stopped_MDA <- function(d, max_year = 2030){
+  
+  years = (20:(max_year-2000))*12
   stop_time = d$t_TAS_pass
   prop_stopped = matrix(length(years), 1)
   for(i in 1:length(years)){
