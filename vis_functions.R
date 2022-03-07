@@ -354,7 +354,6 @@ calculate_blob_data <- function(scenario, # scenario name
 
 #' calculate_cloud_data 
 #' wrapper to loop over each simulation across all IUs
-#'  REPLACED BY calculate_dalys_and_costs_for_scenario_cloud
 #' 
 #' @param scenario 
 #' @param coverage 
@@ -533,8 +532,8 @@ add_blobs <- function(res, label, cex_i, subtract_cost= 0 , col){
 #'
 #' @return 
 #'
-#' @examples add_points(res_M2, "M2")
-add_blobs_v2 <- function(res, label, col_i, subtract_cost= 0 ){
+#' @examples
+add_blobs_nmeb <- function(res, label, col_i, subtract_cost= 0 ){
   points(mean(res[,"difference"]), mean(res[,"costs"])- subtract_cost,
          pch = 16, cex = 10, col = rgb(col_i[1]/255, col_i[2]/255, col_i[3]/255, 0.6))
   text(mean(res[,"difference"]), mean(res[,"costs"])- subtract_cost, labels = label) 
@@ -586,7 +585,7 @@ TAS_pass_test <- function(x){
 }
 
 #' make_blob_plot
-#'
+#' creates a plot of the costs versus DALYS averted for each scenario
 #' @param res_list 
 #' @param labels 
 #'
@@ -643,7 +642,7 @@ make_time_plots <- function(r, labels, y_label){
 }
 
 
-#' make_blob_plot_v2 : all blobs are the same size and the colour of each blob is defined
+#' make_blob_plot_nmeb : all blobs are the same size and the colour of each blob is defined
 #' by net monetary and elimination benefit calculation
 #' @param res_list 
 #' @param labels 
@@ -652,7 +651,7 @@ make_time_plots <- function(r, labels, y_label){
 #' @param lambda_EOT : amount of money we are willing to spend to increase probability of elimination by 1%
 #'
 #' @examples make_blob_plot(res_list, labels)
-make_blob_plot_v2 <- function(res_list, labels, lambda_DALY, lambda_EOT){
+make_blob_plot_nmeb <- function(res_list, labels, lambda_DALY, lambda_EOT){
   
   mean_diff <- unlist(lapply(res_list, find_mean_difference))
   mean_prob <- unlist(lapply(res_list, find_mean_elim_prob))
@@ -674,7 +673,7 @@ make_blob_plot_v2 <- function(res_list, labels, lambda_DALY, lambda_EOT){
   points(-999999999, 1,
          pch = 16, cex = 1)
   for(i in 1:length(res_list)){
-    add_blobs_v2(res_list[[i]], labels[i], col_vec[i,], subtract_cost = mean_cost[1])
+    add_blobs_nmeb(res_list[[i]], labels[i], col_vec[i,], subtract_cost = mean_cost[1])
   }
 }
 

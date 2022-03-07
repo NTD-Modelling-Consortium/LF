@@ -192,7 +192,7 @@ make_blob_plot(res_list, labels, cols)
 abline(h = cost_development, lty = "dashed", col = "gray")
 
 # blob plot with net monetary elimination benefit colouring
-make_blob_plot_v2(res_list, labels, lambda_DALY = 2, lambda_EOT = 100000)
+make_blob_plot_nmeb(res_list, labels, lambda_DALY = 2, lambda_EOT = 100000)
 abline(h = cost_development, lty = "dashed", col = "gray")
 
 ###################################################################################################
