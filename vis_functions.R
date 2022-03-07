@@ -67,7 +67,17 @@ read_scenario <- function(scenario, coverage, non_compliance,
 }
 
 
-# extract a simulation instead of a median
+# 
+#' extract_simulation
+#' extract a simulation instead of a median
+#' @param data_files 
+#' @param which_years 
+#' @param j the simulation number
+#'
+#' @return
+#' @export
+#'
+#' @examples
 extract_simulation <- function(data_files, which_years, j){
   # extract needed columns from scenario and counter-factual (cf)
   measure_2030 <- data_files$data_scenario[ , c( "post2020MDA","No_Pre_TAS_surveys", "No_TAS_surveys", which_years)]
@@ -145,7 +155,15 @@ calculate_costs <- function(summary_res, cost_scenario, cost_development, cost_c
   return(costs)
 }
 
-# extract whether elimination occured or not 
+#' calculate_elimination_sim
+#' extract whether elimination occured or not 
+#' @param data_files_elim 
+#' @param j simulation number
+#'
+#' @return
+#' @export
+#'
+#' @examples
 calculate_elimination_sim <- function(data_files_elim, j){
   
   elim_mat = data.frame(matrix(0, 1, 2)) # set up matrix to hold probs
@@ -194,6 +212,7 @@ calculate_probability_of_elimination <- function(data_files_elim){
 }
 
 
+#' check_sim_elimination
 #' function to check which simulations, held in a matrix with each simulation on a row, have reach elimination
 #'
 #' @param x : matrix holding simulation data
@@ -208,6 +227,15 @@ check_sim_elimination <- function(x){
 
 
 
+#' calculate_number_infected_over_time 
+#'
+#' @param d the simulation data file to obtain prevalences from 
+#' @param population population size
+#'
+#' @return
+#' @export
+#'
+#' @examples
 calculate_number_infected_over_time <- function(d, population){
   c1 = which(colnames(d) == "Jan-2020")
   c2 = which(colnames(d) == "Jan-2030")
@@ -216,6 +244,14 @@ calculate_number_infected_over_time <- function(d, population){
   return(number_infected)
 }
 
+#' calculate_number_IUs_stopped_MDA 
+#'
+#' @param d the simulation data file
+#'
+#' @return
+#' @export
+#'
+#' @examples
 calculate_number_IUs_stopped_MDA <- function(d){
   years = (20:30)*12
   stop_time = d$t_TAS_pass
@@ -227,6 +263,30 @@ calculate_number_IUs_stopped_MDA <- function(d){
   return(prop_stopped)
 }
 
+#' calculate_blob_data
+#' a wrapper to loop over scenarios, calculate measures of impact and cost
+#' and return data in format to make blob plot
+#'
+#'
+#' @param scenario 
+#' @param coverage 
+#' @param cf_coverage 
+#' @param non_compliance 
+#' @param cf_non_compliance 
+#' @param measure 
+#' @param elim 
+#' @param cost_scenario 
+#' @param cost_development 
+#' @param cost_cf 
+#' @param which_years 
+#' @param preTAS_survey_cost 
+#' @param TAS_survey_cost 
+#' @param IUs_vec 
+#'
+#' @return
+#' @export
+#'
+#' @examples
 calculate_blob_data <- function(scenario, # scenario name
                                 coverage, # coverage percentage
                                 cf_coverage, # coverage for cf
@@ -249,6 +309,7 @@ calculate_blob_data <- function(scenario, # scenario name
   num_infections_over_time <- matrix(ncol = 11, nrow = no_IUs)
   prop_IUs_Finished_MDA <- matrix(ncol = 11, nrow = no_IUs)
   colnames(res) <- c("IU_order", "difference", "elim_prob_cf",  "elim_prob_scen", "costs")
+  
   # cf_res <- matrix(ncol = 5, nrow = no_IUs)
   # colnames(cf_res) <- c("IU_order", "num_worms", "elim_prob", "num_MDAs", "costs")
   # scen_res <- matrix(ncol = 5, nrow = no_IUs)
@@ -296,6 +357,30 @@ calculate_blob_data <- function(scenario, # scenario name
   
 }
 
+#' calculate_cloud_data 
+#' wrapper to loop over each simulation across all IUs
+#' 
+#' 
+#' @param scenario 
+#' @param coverage 
+#' @param cf_coverage 
+#' @param non_compliance 
+#' @param cf_non_compliance 
+#' @param measure 
+#' @param elim 
+#' @param cost_scenario 
+#' @param cost_development 
+#' @param cost_cf 
+#' @param which_years 
+#' @param preTAS_survey_cost 
+#' @param TAS_survey_cost 
+#' @param IUs_vec 
+#' @param nsims 
+#'
+#' @return
+#' @export
+#'
+#' @examples
 calculate_cloud_data <- function(scenario, # scenario name
                                  coverage, # coverage percentage
                                  cf_coverage, # coverage for cf
@@ -493,6 +578,14 @@ find_mean_cost <- function(x){
 }
 
 
+#' TAS_pass_test 
+#'
+#' @param x value of time when TAS is passed
+#'
+#' @return
+#' @export
+#'
+#' @examples
 TAS_pass_test <- function(x){
   ifelse(((x<371) && (x>0)),1,0)
 }
@@ -592,6 +685,17 @@ make_blob_plot_v2 <- function(res_list, labels, lambda_DALY, lambda_EOT){
 
 
 
+#' make_cloud_plot
+#' makes cloud plot from cloud plot data obtained from calculate_cloud_data
+#' @param res_list 
+#' @param labels 
+#' @param cols 
+#' @param cex_fixed 
+#'
+#' @return
+#' @export
+#'
+#' @examples
 make_cloud_plot <- function(res_list, labels, cols, cex_fixed = TRUE){
   
   mean_diff <- unlist(lapply(res_list, find_mean_difference))
@@ -617,6 +721,20 @@ make_cloud_plot <- function(res_list, labels, cols, cex_fixed = TRUE){
 }
 
 
+#' add_cloud 
+#'  called from within make_cloud_plot
+#' @param res 
+#' @param label 
+#' @param col 
+#' @param subtract_cost 
+#' @param max_cost 
+#' @param res_0 
+#' @param cex_fixed 
+#'
+#' @return
+#' @export
+#'
+#' @examples
 add_cloud <- function(res, label, col, subtract_cost, max_cost, res_0, cex_fixed){
   nsims <- dim(res)[1]
   
@@ -627,6 +745,20 @@ add_cloud <- function(res, label, col, subtract_cost, max_cost, res_0, cex_fixed
   }
 }
 
+
+#' add_cloud_part
+#' called from within add_cloud
+#' @param res_j 
+#' @param label 
+#' @param col 
+#' @param subtract_cost 
+#' @param max_cost 
+#' @param cex_fixed 
+#'
+#' @return
+#' @export
+#'
+#' @examples
 add_cloud_part <- function(res_j, label, col, subtract_cost= 0, max_cost, cex_fixed){
   if(cex_fixed == TRUE){
     cex_i <- 3
@@ -675,21 +807,21 @@ calculate_nmeb <- function(lambda_DALY, lambda_EOT, res_list){
 }
 
 
-# add cloud part for nmeb plot
-add_cloud_part_nmeb <- function(res_j, label, col, subtract_cost= 0, max_cost,
-                                lambda_DALY, lambda_EOT, res_0){
-  cex_i <- res_j["costs"]/max_cost*10
-  nmeb_sim <-calculate_nmeb_simulation(lambda_DALY, lambda_EOT, res_j, res_0)
-  #### use nmeb sim to determine colour ####
-  #### but this needs to be realtive to other nmeb AND within scenario ####
-  points(res_j["difference"], res_j["costs"]- subtract_cost,
-         pch = 16, cex = cex_i, col = col)
-}
-
-# calculate nmeb per simulation
-calculate_nmeb_simulation <- function(lambda_DALY, lambda_EOT, res, res_0){
-  return(100 * lambda_EOT*(res$elim_prob_scen -elim_prob_cf ) + lambda_DALY*res$difference - (res$costs - res_$costs)) # return the nmeb of each strategy
-}
+# # add cloud part for nmeb plot
+# add_cloud_part_nmeb <- function(res_j, label, col, subtract_cost= 0, max_cost,
+#                                 lambda_DALY, lambda_EOT, res_0){
+#   cex_i <- res_j["costs"]/max_cost*10
+#   nmeb_sim <-calculate_nmeb_simulation(lambda_DALY, lambda_EOT, res_j, res_0)
+#   #### use nmeb sim to determine colour ####
+#   #### but this needs to be realtive to other nmeb AND within scenario ####
+#   points(res_j["difference"], res_j["costs"]- subtract_cost,
+#          pch = 16, cex = cex_i, col = col)
+# }
+# 
+# # calculate nmeb per simulation
+# calculate_nmeb_simulation <- function(lambda_DALY, lambda_EOT, res, res_0){
+#   return(100 * lambda_EOT*(res$elim_prob_scen -elim_prob_cf ) + lambda_DALY*res$difference - (res$costs - res_$costs)) # return the nmeb of each strategy
+# }
 
 
 
@@ -782,7 +914,7 @@ calculate_dalys_and_costs_for_scenario_cloud <- function(IUs_vec, scenario, cove
 
 
 
-#' Title
+#' plot_clouds
 #'
 #' @param all_dalys 
 #' @param all_costs 
@@ -828,7 +960,7 @@ plot_clouds <- function(all_dalys, all_costs, labels, draw_slopes = F){
 
 
 
-#' Title
+#' plot_blob_plot_from_all_daly_costs 
 #'
 #' @param all_dalys 
 #' @param all_costs 
@@ -883,6 +1015,21 @@ plot_blob_plot_from_all_daly_costs <- function(mean_dalys_diff, mean_cost_diff,
 
 
 
+#' make_blob_plot_from_cloud_data
+#'
+#' @param mean_dalys_diff 
+#' @param mean_cost_diff 
+#' @param mean_elim_diff 
+#' @param labels 
+#' @param lambda_DALY 
+#' @param lambda_EOT 
+#' @param additional_cost_dev 
+#' @param draw_slopes 
+#'
+#' @return
+#' @export
+#'
+#' @examples
 make_blob_plot_from_cloud_data <- function(mean_dalys_diff, mean_cost_diff, mean_elim_diff, 
                                            labels, lambda_DALY, lambda_EOT, additional_cost_dev, draw_slopes = F){
   
