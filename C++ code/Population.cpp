@@ -10,6 +10,7 @@
 #include <fstream>
 #include <sstream>
 #include <limits>
+#include <algorithm>
 #include "Population.hpp"
 #include "Worm.hpp"
 #include "MDAEvent.hpp"
@@ -300,18 +301,25 @@ RecordedPrevalence Population:: getPrevalence(PrevalenceEvent* outputPrev) const
 
 double Population::getMFPrev(){
     // get mf prevalence
-
+    std::vector<int> a;
+    for (int i = 0; i< size; i++){
+        a.push_back(i);
+    }
+    random_shuffle(a.begin(), a.end()); 
     double MFpos = 0; // number of people mf positive
     double numHosts = 0; // total number of hosts
     int maxAgeMonths = maxAgeMF*12;
     int minAgeMonths = minAgeMF*12;
-    for(int i =0; i < size; i++){
-        if((host_pop[i].age >= minAgeMonths ) &&(host_pop[i].age <= maxAgeMonths )){
-            bool infectedMF = ( stats.uniform_dist() <  (1 - exp(-1 * host_pop[i].M) ) );  //depends on how many mf present       
-            numHosts++; // increment number of hosts by 1
-            if (infectedMF) MFpos++; // if mf positive, increment MFpos by 1
+    int i;
+    for(int j = 0; j < size; j++){
+        while(numHosts < 300){
+            i = a[j];
+            if((host_pop[i].age >= minAgeMonths ) &&(host_pop[i].age <= maxAgeMonths )){
+                bool infectedMF = ( stats.uniform_dist() <  (1 - exp(-1 * host_pop[i].M) ) );  //depends on how many mf present       
+                numHosts++; // increment number of hosts by 1
+                if (infectedMF) MFpos++; // if mf positive, increment MFpos by 1
+            }
         }
-        
     }
     MFpos /= numHosts; // convert to prevalence of mf positive hosts
     // std::cout << "prev 2 = " <<  MFpos << std::endl;
