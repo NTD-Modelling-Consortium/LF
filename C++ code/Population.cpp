@@ -301,19 +301,19 @@ RecordedPrevalence Population:: getPrevalence(PrevalenceEvent* outputPrev) const
 
 double Population::getMFPrev(){
     // get mf prevalence
-    std::vector<int> a;
+    std::vector<int> a; // initiate vector to store the indices of individuals
     for (int i = 0; i< size; i++){
-        a.push_back(i);
-    }
-    random_shuffle(a.begin(), a.end()); 
+        a.push_back(i); // push to the store of individuals indices
+    } 
+    random_shuffle(a.begin(), a.end()); // shuffle the indices to be at random
     double MFpos = 0; // number of people mf positive
     double numHosts = 0; // total number of hosts
     int maxAgeMonths = maxAgeMF*12;
     int minAgeMonths = minAgeMF*12;
     int i;
     for(int j = 0; j < size; j++){
-        while(numHosts < 300){
-            i = a[j];
+        while(numHosts < 300){ // if we have selected 300 people to survey already, then don't select any more
+            i = a[j]; // get the next random index
             if((host_pop[i].age >= minAgeMonths ) &&(host_pop[i].age <= maxAgeMonths )){
                 bool infectedMF = ( stats.uniform_dist() <  (1 - exp(-1 * host_pop[i].M) ) );  //depends on how many mf present       
                 numHosts++; // increment number of hosts by 1
