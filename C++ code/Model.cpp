@@ -190,7 +190,7 @@ void Model::evolveAndSave(int y, Population& popln, Vector& vectors, Worm& worms
         
         // snippet to perform a survey
         if(t == nextSurveyTime){
-            if(preTAS_Pass == 0){ // if we have passed pre-TAS and TAS stage, then don't do anything
+            if(preTAS_Pass == 0){ // if we have not passed pre-TAS yet, then begin pre-TAS survey
 
 
                 mfprev = popln.getMFPrev(); // find the mf prevalence
