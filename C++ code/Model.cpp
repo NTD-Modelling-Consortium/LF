@@ -190,7 +190,7 @@ void Model::evolveAndSave(int y, Population& popln, Vector& vectors, Worm& worms
         
         // snippet to perform a survey
         if(t == nextSurveyTime){
-            if((preTAS_Pass == 0) || (TAS_Pass == 0)){ // if we have passed pre-TAS and TAS stage, then don't do anything
+            if(preTAS_Pass == 0){ // if we have passed pre-TAS and TAS stage, then don't do anything
 
 
                 mfprev = popln.getMFPrev(); // find the mf prevalence
@@ -199,18 +199,21 @@ void Model::evolveAndSave(int y, Population& popln, Vector& vectors, Worm& worms
             
                 if(mfprev <= popln.MFThreshold){ // if the mf prevalence is below threshold
                     preTAS_Pass= 1; // set pre-TAS pass indicator to 1
+                    nextSurveyTime += 12; // set next durvey time to be in 1 year, at which point, we begin TAS surveys
+                }else{
+                    nextSurveyTime = t + popln.interSurveyPeriod; // do another survey in length of time specified by interSurveyPeriod parameter 
                 }
-            
-                if(preTAS_Pass == 1){ // if we have passed the pre-TAS then do TAS 
-                    icprev = popln.getICPrev(); // find ic prevalence in specified age group
-                    popln.numTASSurveys += 1; // increment number of TAS surveys by 1
-                    if((icprev <= popln.ICThreshold) && (mfprev <= popln.MFThreshold)){ // if the ic prevalence is below the threshold and mf prev also below threshold
-                        TAS_Pass = 1; // set TAS pass indicator to 1
-                        popln.t_TAS_Pass = t; // store the time of passing TAS
-                    }   
+            }
+            if(preTAS_Pass == 1){ // if we have passed the pre-TAS then do TAS 
+                icprev = popln.getICPrev(); // find ic prevalence in specified age group
+                popln.numTASSurveys += 1; // increment number of TAS surveys by 1
+                if((icprev <= popln.ICThreshold) && (mfprev <= popln.MFThreshold)){ // if the ic prevalence is below the threshold and mf prev also below threshold
+                    TAS_Pass = 1; // set TAS pass indicator to 1
+                    popln.t_TAS_Pass = t; // store the time of passing TAS
+                    nextSurveyTime = 999999; // never do another survey, as we have passed the TAS survey
+                } else{
+                    nextSurveyTime = t + popln.interSurveyPeriod; // do another survey in length of time specified by interSurveyPeriod parameter 
                 }
-            
-                nextSurveyTime = t + popln.interSurveyPeriod; // do another survey in length of time specified by interSurveyPeriod parameter 
             }
         }
 
