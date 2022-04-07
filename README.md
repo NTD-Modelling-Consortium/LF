@@ -6,9 +6,9 @@ From within C++ code folder the following code should be run in the terminal in 
 
 **Code to compile the files**:
 
-g++ -g -I. -I./tinyxml -I/usr/include -I/Users/matthewgraham/gsl/include -L/Users/matthewgraham/gsl/lib -Wall -O3 -std=c++11 -lm -lgsl -lgslcblas *.cpp tinyxml/*.cpp -o transfil_N
+g++ -g -I. -I./tinyxml -I/usr/include -I/Users/matthewgraham/gsl/include -L/Users/matthewgraham/gsl/lib -Wall -O3 -std=c++11 -lm -lgsl -lgslcblas \*.cpp tinyxml/\*.cpp -o transfil_N
 
-where the gsl calls will need to be changed to where gsl library is installed on your computer. "*.cpp" refers to all .cpp files within the c++ code folder
+where the gsl calls will need to be changed to where gsl library is installed on your computer. "\*.cpp" refers to all .cpp files within the c++ code folder
 
 **Code to run the simulations**:
 
