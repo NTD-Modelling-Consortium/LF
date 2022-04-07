@@ -1,6 +1,6 @@
 # LF
 
-Along with files included in the C++ code folder, the gsl library is used so will need to be installed. The installation process is described here : https://coral.ise.lehigh.edu/jild13/2016/07/11/hello/
+Along with files included in the C++ code folder, the gsl library is used so will need to be installed. The installation process for gsl is described here: https://coral.ise.lehigh.edu/jild13/2016/07/11/hello/
 
 From within C++ code folder the following code should be run in the terminal in order to compile and run simulations.
 
