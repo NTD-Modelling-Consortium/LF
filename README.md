@@ -29,5 +29,5 @@ The gsl calls will need to be changed to where gsl library is installed on your 
 
 
 
-
+runIU.csv, dummy_visualizations.R and vis_functions.R were previously used for post-processing of results and can be safely ignored 
 
