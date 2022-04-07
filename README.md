@@ -17,9 +17,13 @@ where the gsl calls will need to be changed to where gsl library is installed on
 **inputs to this**:
 
 -s testscenario.xml : the file giving the scenario we want to run
+
 -n Pop_Distribution.csv : file describing the population distribution
+
 -p RandomParamIU4629.txt : file with the fitted 200 parameter sets for IU 4629. Change to whichever parameter sets we want to run
+
 -r 200: number of simualtions to run. Has to be smaller than or equal to the number of parameter sets given in the parameter file
+
 -o results: folder in which to save the outputs
 
 
