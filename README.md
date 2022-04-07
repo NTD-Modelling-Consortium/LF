@@ -15,7 +15,7 @@ The gsl calls will need to be changed to where gsl library is installed on your 
 
 ./transfil_N -s testscenario.xml -n Pop_Distribution.csv -p RandomParamIU4629.txt -r 200 -t 1 -o results
 
-**inputs to this**:
+**Inputs**:
 
 -s testscenario.xml: the file giving the scenario we want to run.
 
