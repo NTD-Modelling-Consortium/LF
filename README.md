@@ -25,7 +25,7 @@ The gsl calls will need to be changed to where gsl library is installed on your 
 
 -r 200: number of simualtions to run. Has to be smaller than or equal to the number of parameter sets given in the parameter file.
 
--o results: folder in which to save the outputs. This folder must be created inside the C++ code folder.
+-o results: folder in which to save the outputs of the simulation. This folder must be created inside the C++ code folder.
 
 
 
