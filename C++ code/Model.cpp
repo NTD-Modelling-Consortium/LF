@@ -184,64 +184,76 @@ void Model::evolveAndSave(int y, Population& popln, Vector& vectors, Worm& worms
         MDAEvent* applyMDA = sc.treatmentDue(t);
        
         RecordedPrevalence prevalence;
-     //   std::cout << "t = " << t << " , mf prev = " << popln.getMFPrev() << std::endl;
+       
         if(outputPrev)  //use alternative for of prevalence function as its required to return 2 values, but these must be calculated at the same time
            prevalence = popln.getPrevalence(outputPrev); //prev measured before mda done to kill mf in hosts
         
         // snippet to perform a survey
         if(t == nextSurveyTime){
-            if(preTAS_Pass == 0){ // if we have not passed pre-TAS yet, then begin pre-TAS survey
-
+            if((preTAS_Pass == 0) || (TAS_Pass == 0)){ // if we have passed pre-TAS and TAS stage, then don't do anything
+            // if yet to pass pre-TAS perform pre-TAS survey
 
                 mfprev = popln.getMFPrev(); // find the mf prevalence
-            
                 popln.numPreTASSurveys += 1; // increment number of pre-TAS tests by 1
-            
                 if(mfprev <= popln.MFThreshold){ // if the mf prevalence is below threshold
                     preTAS_Pass= 1; // set pre-TAS pass indicator to 1
-                    nextSurveyTime += 12; // set next durvey time to be in 1 year, at which point, we begin TAS surveys
-                }else{
-                    nextSurveyTime = t + popln.interSurveyPeriod; // do another survey in length of time specified by interSurveyPeriod parameter 
                 }
-            }
-            if(preTAS_Pass == 1){ // if we have passed the pre-TAS then do TAS 
-                icprev = popln.getICPrev(); // find ic prevalence in specified age group
-                popln.numTASSurveys += 1; // increment number of TAS surveys by 1
-                if((icprev <= popln.ICThreshold) && (mfprev <= popln.MFThreshold)){ // if the ic prevalence is below the threshold and mf prev also below threshold
-                    TAS_Pass = 1; // set TAS pass indicator to 1
-                    popln.t_TAS_Pass = t; // store the time of passing TAS
-                    nextSurveyTime = 999999; // never do another survey, as we have passed the TAS survey
-                } else{
-                    nextSurveyTime = t + popln.interSurveyPeriod; // do another survey in length of time specified by interSurveyPeriod parameter 
+
+                if(preTAS_Pass == 1){ // if we have passed the pre-TAS then do TAS 
+                    icprev = popln.getICPrev(); // find ic prevalence in specified age group
+                    // std::cout << icprev << std::endl;
+                    popln.numTASSurveys += 1; // increment number of TAS surveys by 1
+                    if((icprev <= popln.ICThreshold) && (mfprev <= popln.MFThreshold)){ // if the ic prevalence is below the threshold and mf prev also below threshold
+                        TAS_Pass = 1; // set TAS pass indicator to 1
+                        popln.t_TAS_Pass = t; // store the time of passing TAS
+                    }   
                 }
+
+                nextSurveyTime = t + popln.interSurveyPeriod;
+                
+                    
             }
+            
+            
         }
 
+        if(applyMDA){
+            if(popln.totMDAs < popln.firstTASNumMDA){
 
+                popln.ApplyTreatment(applyMDA, worms);
+                popln.totMDAs += 1;
+                if(t >= 240){
+                    popln.post2020MDAs += 1;
+                }
+                 //std::cout << "t = " << t << ", totMDA = " << popln.totMDAs << std::endl;
+                mfprev_aimp_new = popln.getMFPrev(); 
+                if (mfprev_aimp_new < mfprev_aimp_old)
+                    popln.aImp = popln.aImp * mfprev_aimp_new / mfprev_aimp_old;
+                    mfprev_aimp_old = popln.getMFPrev(); 
 
-        if(applyMDA){ // if it is time to do an MDA
-
-            if((preTAS_Pass == 1) && (TAS_Pass == 1)){ // if we have passed both pre-TAS and TAS then don't do anything
-                    
-            }else{ // if we haven't passed both surveys then do MDA
-                popln.ApplyTreatment(applyMDA, worms); //perform MDA
-                popln.totMDAs += 1; // add 1 to total number of MDAs
-                if(t >= 240){ // if we are past 2020
-                    popln.post2020MDAs += 1; //add 1 to post 2020 MDAS
-                }  
-                mfprev_aimp_new = popln.getMFPrev(); // find mf prevalence
-                if (mfprev_aimp_new < mfprev_aimp_old) // if new prevalence is below old prevalence
-                    popln.aImp = popln.aImp * mfprev_aimp_new / mfprev_aimp_old; // reduce importation by ratio of new and old prevalence
-                    mfprev_aimp_old = popln.getMFPrev();  // set new value of mf prevalence to "old" prevalence variable
-            }
-            if (popln.totMDAs == popln.firstTASNumMDA ){ // if we have reached the number of MDAs after which we have first survey
-                nextSurveyTime = t + 6; // do survey in 6 months time
+                if (popln.totMDAs == popln.firstTASNumMDA ){
+                    nextSurveyTime = t + 6;
+                }
+            }else if(popln.totMDAs >= popln.firstTASNumMDA){
+                
+                if((preTAS_Pass == 1) && (TAS_Pass == 1)){
+                    // std::cout << "mfprev= " << mfprev << ", icprev = " << icprev << std::endl;
+                }else{
+                    popln.ApplyTreatment(applyMDA, worms); //treated set. alters M, WM, WF, using covMDA set above
+                    popln.totMDAs += 1;
+                    if(t >= 240){
+                        popln.post2020MDAs += 1;
+                    }  
+                    mfprev_aimp_new = popln.getMFPrev(); 
+                    if (mfprev_aimp_new < mfprev_aimp_old)
+                        popln.aImp = popln.aImp * mfprev_aimp_new / mfprev_aimp_old;
+                        mfprev_aimp_old = popln.getMFPrev(); 
+                }
             }
         }
 
         
         if (outputPrev || applyMDA)
-        
             currentOutput.saveMonth(t, popln, outputPrev, prevalence, applyMDA);
         
         
