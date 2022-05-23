@@ -21,7 +21,7 @@ void Host::reset(int a){
     
     
     //called when host dies and is reborn or initialised
-    
+    totalWorms = 0; 
     WM = WF = 0;
     M = 0.0;
     bedNet = 0;
@@ -43,7 +43,7 @@ void Host::initialise(double deathRate, int maxAge, double k, double* totalBiteR
     
     reset(a);
     
-     numMDAs=0;
+    numMDAs=0;
     
 }
 
@@ -97,12 +97,13 @@ void Host::react( double dt, double deathRate, const int maxAge, double aImp, co
             births = stats.poisson_dist(meanWorms * dt);
             deaths = stats.poisson_dist( worms.getDeathRate()  * (double) WM * dt );
             WM += (births - deaths);
-            
+            totalWorms += births;
             //female worm update
             births = stats.poisson_dist(meanWorms * dt); //* exp(-1 * beta * I)
             deaths = stats.poisson_dist( worms.getDeathRate() * (double) WF * dt );
             WF += (births - deaths);
-            
+            totalWorms += births;
+
             //Mf update
             double mdeaths = dt * worms.getMFDeathRate() * M;// time * death rate * number
             double mbirths = dt * worms.repRate(monthsSinceTreated, WF, WM);
@@ -151,7 +152,7 @@ void Host::getsTreated(Worm& worms, std::string type ){
 Host::operator hostState() const{
     
     //save this object to the host state structure
-    return {WM, WF, M, biteRisk, age, monthsSinceTreated};
+    return {WM, WF, M, totalWorms, biteRisk, age, monthsSinceTreated};
     
     
 }
@@ -159,6 +160,7 @@ Host::operator hostState() const{
 void Host::restore(const hostState& state){
     
     //restore form hoststate object
+    totalWorms = state.totalWorms;
     WM = state.WM;
     WF = state.WF;
     M = state.M;

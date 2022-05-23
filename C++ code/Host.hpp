@@ -23,7 +23,7 @@ typedef struct {
     double biteRisk;
     double age; 
     unsigned monthsSinceTreated;
-
+    int totalWorms; // total number of worms over lifetime
     
 } hostState;
 
@@ -42,7 +42,7 @@ public:
     void react(double dt, double deathRate, const int maxAge, double aImp, const Vector& vectors, const Worm& worms );
     void getsTreated(Worm& worms, std::string type);
     void restore(const hostState& state);
-  int getNumMDAs() const {return numMDAs;};
+    int getNumMDAs() const {return numMDAs;};
     
     //state variables saved
     int WM,WF;                  // number of male worms, number of female worms
@@ -50,7 +50,7 @@ public:
     double biteRisk;            //mean number of bites per month
     double age;                 //age of host.
     unsigned monthsSinceTreated;  //host has been treated if
-    
+    int totalWorms; // total number of worms over lifetime
     
     bool bedNet;                 //host uses bednet.
     double uCompBednets;              //THe hosts probability of using a bednet for a given overall coverage
