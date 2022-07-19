@@ -1,0 +1,652 @@
+<?xml version="1.0" encoding="utf-8">
+<Model>
+<ParamList>
+<host>
+<param name="tau" value="0.00167" description="death rate" />
+<param name="rhoBU" value="0.0" description="correlation between non-compliance and bite risk" />
+<param name="rhoCN" value="0.0" description="correlation of non-compliance between bed-nets and MDA" />
+<param name="minAgePrev" value="5" description="minimum age for inclusion in prevalence calculation" />
+<param name="minAgeMDA" value="2" description="minimum age to receive" />
+<param name="minAgeMF" value="5" description="min age to be tested for MF" />
+<param name="maxAgeMF" value="100" description="max age to be tested for MF" />
+<param name="minAgeIC" value="6" description="minimum age to be tested for antigen" />
+<param name="maxAgeIC" value="7" description="maximum age to be tested for antigen" />
+<param name="ICsensitivity" value="0.97" description="sensitivity of IC test" />
+<param name="surveyStartDate" value="140" description="first MDA survey" />
+<param name="ICThreshold" value="0.01" description="IC threshold for MDA" />
+<param name="MFThreshold" value="0.01" description="MF threshold for MDA" />
+<param name="interSurveyPeriod" value="24" description="time between successive MDA surveys" />
+<param name="firstTASNumMDA" value="6" description="how many MDAs before first TAS survey" />
+
+</host>
+<vector>
+<param name="species" value="0" description="species of mosquito 0 - Anopheles, 1 - Culex" />
+<param name="L3" value="5" description="init larvae density" />
+<param name="lambda" value="10" description="bite rate per mosquito per month" />
+<param name="g" value="0.37" description="Proportion of mosquitoes which pick up infection when biting an infected host" />
+<param name="kappas1" value="4.395" description="L3 uptake and development" />
+<param name="r1" value="0.055" description="L3 uptake and development" />
+<param name="sigma" value="5.0" description="baseline death rate of mosquitos" />
+</vector>
+<worm>
+<param name="nu" value="0.0" description="poly-monogamy parameter" />
+<param name="alpha" value="1.0" description="mf birth rate per FW" />
+<param name="psi1" value="0.414" description="Proportion of L3 leaving mosquito per bite" />
+<param name="psi2" value="0.32" description="Proportion of L3 leaving mosquito that enter host" />
+<param name="s2" value="0.00275" description="Prop of L3 that enter human host developing into adult" />
+<param name="mu" value="0.0104" description="death rate of worms" />
+<param name="gamma" value="0.1" description="death rate of mf" />
+</worm>
+</ParamList>
+<ScenarioList name="Endgame" start="2000" end="2036">
+<scenario name="1">
+<mda t="168" type="da" coverage="0.65" syscomp="0.3" />
+<mda t="180" type="da" coverage="0.65" syscomp="0.3" />
+<mda t="192" type="da" coverage="0.65" syscomp="0.3" />
+<mda t="228" type="da" coverage="0.65" syscomp="0.3" />
+<mda t="240" type="da" coverage="0.65" syscomp="0.3" />
+<mda t="252" type="da" coverage="0.65" syscomp="0.3" />
+<mda t="264" type="da" coverage="0.65" syscomp="0.3" />
+<mda t="276" type="da" coverage="0.65" syscomp="0.3" />
+<mda t="288" type="da" coverage="0.65" syscomp="0.3" />
+<mda t="300" type="da" coverage="0.65" syscomp="0.3" />
+<mda t="312" type="da" coverage="0.65" syscomp="0.3" />
+<mda t="324" type="da" coverage="0.65" syscomp="0.3" />
+<mda t="336" type="da" coverage="0.65" syscomp="0.3" />
+<mda t="348" type="da" coverage="0.65" syscomp="0.3" />
+<mda t="360" type="da" coverage="0.65" syscomp="0.3" />
+<mda t="372" type="da" coverage="0.65" syscomp="0.3" />
+<mda t="384" type="da" coverage="0.65" syscomp="0.3" />
+<mda t="396" type="da" coverage="0.65" syscomp="0.3" />
+<mda t="408" type="da" coverage="0.65" syscomp="0.3" />
+<mda t="420" type="da" coverage="0.65" syscomp="0.3" />
+<mda t="432" type="da" coverage="0.65" syscomp="0.3" />
+<mda t="444" type="da" coverage="0.65" syscomp="0.3" />
+<mda t="456" type="da" coverage="0.65" syscomp="0.3" />
+<mda t="468" type="da" coverage="0.65" syscomp="0.3" />
+<mda t="480" type="da" coverage="0.65" syscomp="0.3" />
+<mda t="492" type="da" coverage="0.65" syscomp="0.3" />
+<mda t="504" type="da" coverage="0.65" syscomp="0.3" />
+<mda t="516" type="da" coverage="0.65" syscomp="0.3" />
+<mda t="528" type="da" coverage="0.65" syscomp="0.3" />
+<mda t="540" type="da" coverage="0.65" syscomp="0.3" />
+<mda t="552" type="da" coverage="0.65" syscomp="0.3" />
+<mda t="564" type="da" coverage="0.65" syscomp="0.3" />
+<output t="0" />
+<output t="12" />
+<output t="24" />
+<output t="36" />
+<output t="48" />
+<output t="60" />
+<output t="72" />
+<output t="84" />
+<output t="96" />
+<output t="108" />
+<output t="120" />
+<output t="132" />
+<output t="144" />
+<output t="156" />
+<output t="168" />
+<output t="180" />
+<output t="192" />
+<output t="204" />
+<output t="216" />
+<output t="228" />
+<output t="240" />
+<output t="252" />
+<output t="264" />
+<output t="276" />
+<output t="288" />
+<output t="300" />
+<output t="312" />
+<output t="324" />
+<output t="336" />
+<output t="348" />
+<output t="360" />
+<output t="372" />
+<output t="384" />
+<output t="396" />
+<output t="408" />
+<output t="420" />
+<output t="432" />
+<output t="444" />
+<output t="456" />
+<output t="468" />
+<output t="480" />
+<output t="492" />
+<output t="504" />
+<output t="516" />
+<output t="528" />
+<output t="540" />
+<output t="552" />
+<output t="564" />
+<bednet t="96" coverage="0.25" syscomp="0.99" />
+<bednet t="108" coverage="0.25" syscomp="0.99" />
+<bednet t="120" coverage="0.5" syscomp="0.99" />
+<bednet t="132" coverage="0.5" syscomp="0.99" />
+<bednet t="144" coverage="0.5" syscomp="0.99" />
+<bednet t="156" coverage="0.5" syscomp="0.99" />
+<bednet t="168" coverage="0.5" syscomp="0.99" />
+<bednet t="180" coverage="0.5" syscomp="0.99" />
+<bednet t="192" coverage="0.5" syscomp="0.99" />
+<bednet t="204" coverage="0.5" syscomp="0.99" />
+<bednet t="216" coverage="0.5" syscomp="0.99" />
+<bednet t="228" coverage="0.5" syscomp="0.99" />
+<bednet t="240" coverage="0.5" syscomp="0.99" />
+<bednet t="252" coverage="0.5" syscomp="0.99" />
+<bednet t="264" coverage="0.5" syscomp="0.99" />
+<bednet t="276" coverage="0.5" syscomp="0.99" />
+<bednet t="288" coverage="0.5" syscomp="0.99" />
+<bednet t="300" coverage="0.5" syscomp="0.99" />
+<bednet t="312" coverage="0.5" syscomp="0.99" />
+<bednet t="324" coverage="0.5" syscomp="0.99" />
+<bednet t="336" coverage="0.5" syscomp="0.99" />
+<bednet t="348" coverage="0.5" syscomp="0.99" />
+<bednet t="360" coverage="0.5" syscomp="0.99" />
+<bednet t="372" coverage="0.5" syscomp="0.99" />
+<bednet t="384" coverage="0.5" syscomp="0.99" />
+<bednet t="396" coverage="0.5" syscomp="0.99" />
+<bednet t="408" coverage="0.5" syscomp="0.99" />
+<bednet t="420" coverage="0.5" syscomp="0.99" />
+<bednet t="432" coverage="0.5" syscomp="0.99" />
+<bednet t="444" coverage="0.5" syscomp="0.99" />
+<bednet t="456" coverage="0.5" syscomp="0.99" />
+<bednet t="468" coverage="0.5" syscomp="0.99" />
+<bednet t="480" coverage="0.5" syscomp="0.99" />
+<bednet t="492" coverage="0.5" syscomp="0.99" />
+<bednet t="504" coverage="0.5" syscomp="0.99" />
+<bednet t="516" coverage="0.5" syscomp="0.99" />
+<bednet t="528" coverage="0.5" syscomp="0.99" />
+<bednet t="540" coverage="0.5" syscomp="0.99" />
+<bednet t="552" coverage="0.5" syscomp="0.99" />
+<bednet t="564" coverage="0.5" syscomp="0.99" />
+</scenario>
+<scenario name="2" start="168">
+<mda t="168" type="da" coverage="0.65" syscomp="0.3" />
+<mda t="180" type="da" coverage="0.65" syscomp="0.3" />
+<mda t="192" type="da" coverage="0.65" syscomp="0.3" />
+<mda t="228" type="da" coverage="0.65" syscomp="0.3" />
+<mda t="240" type="da" coverage="0.65" syscomp="0.3" />
+<mda t="252" type="da" coverage="0.65" syscomp="0.3" />
+<mda t="264" type="da" coverage="0.65" syscomp="0.3" />
+<mda t="276" type="da" coverage="0.65" syscomp="0.3" />
+<mda t="288" type="da" coverage="0.65" syscomp="0.3" />
+<mda t="300" type="da" coverage="0.65" syscomp="0.3" />
+<mda t="312" type="da" coverage="0.65" syscomp="0.3" />
+<mda t="324" type="da" coverage="0.65" syscomp="0.3" />
+<mda t="336" type="da" coverage="0.65" syscomp="0.3" />
+<mda t="348" type="da" coverage="0.65" syscomp="0.3" />
+<mda t="360" type="da" coverage="0.65" syscomp="0.3" />
+<mda t="372" type="da" coverage="0.8" syscomp="0.2" />
+<mda t="384" type="da" coverage="0.8" syscomp="0.2" />
+<mda t="396" type="da" coverage="0.8" syscomp="0.2" />
+<mda t="408" type="da" coverage="0.8" syscomp="0.2" />
+<mda t="420" type="da" coverage="0.8" syscomp="0.2" />
+<mda t="432" type="da" coverage="0.8" syscomp="0.2" />
+<mda t="444" type="da" coverage="0.8" syscomp="0.2" />
+<mda t="456" type="da" coverage="0.8" syscomp="0.2" />
+<mda t="468" type="da" coverage="0.8" syscomp="0.2" />
+<mda t="480" type="da" coverage="0.8" syscomp="0.2" />
+<mda t="492" type="da" coverage="0.8" syscomp="0.2" />
+<mda t="504" type="da" coverage="0.8" syscomp="0.2" />
+<mda t="516" type="da" coverage="0.8" syscomp="0.2" />
+<mda t="528" type="da" coverage="0.8" syscomp="0.2" />
+<mda t="540" type="da" coverage="0.8" syscomp="0.2" />
+<mda t="552" type="da" coverage="0.8" syscomp="0.2" />
+<mda t="564" type="da" coverage="0.8" syscomp="0.2" />
+<output t="0" />
+<output t="12" />
+<output t="24" />
+<output t="36" />
+<output t="48" />
+<output t="60" />
+<output t="72" />
+<output t="84" />
+<output t="96" />
+<output t="108" />
+<output t="120" />
+<output t="132" />
+<output t="144" />
+<output t="156" />
+<output t="168" />
+<output t="180" />
+<output t="192" />
+<output t="204" />
+<output t="216" />
+<output t="228" />
+<output t="240" />
+<output t="252" />
+<output t="264" />
+<output t="276" />
+<output t="288" />
+<output t="300" />
+<output t="312" />
+<output t="324" />
+<output t="336" />
+<output t="348" />
+<output t="360" />
+<output t="372" />
+<output t="384" />
+<output t="396" />
+<output t="408" />
+<output t="420" />
+<output t="432" />
+<output t="444" />
+<output t="456" />
+<output t="468" />
+<output t="480" />
+<output t="492" />
+<output t="504" />
+<output t="516" />
+<output t="528" />
+<output t="540" />
+<output t="552" />
+<output t="564" />
+<bednet t="96" coverage="0.25" syscomp="0.99" />
+<bednet t="108" coverage="0.25" syscomp="0.99" />
+<bednet t="120" coverage="0.5" syscomp="0.99" />
+<bednet t="132" coverage="0.5" syscomp="0.99" />
+<bednet t="144" coverage="0.5" syscomp="0.99" />
+<bednet t="156" coverage="0.5" syscomp="0.99" />
+<bednet t="168" coverage="0.5" syscomp="0.99" />
+<bednet t="180" coverage="0.5" syscomp="0.99" />
+<bednet t="192" coverage="0.5" syscomp="0.99" />
+<bednet t="204" coverage="0.5" syscomp="0.99" />
+<bednet t="216" coverage="0.5" syscomp="0.99" />
+<bednet t="228" coverage="0.5" syscomp="0.99" />
+<bednet t="240" coverage="0.5" syscomp="0.99" />
+<bednet t="252" coverage="0.5" syscomp="0.99" />
+<bednet t="264" coverage="0.5" syscomp="0.99" />
+<bednet t="276" coverage="0.5" syscomp="0.99" />
+<bednet t="288" coverage="0.5" syscomp="0.99" />
+<bednet t="300" coverage="0.5" syscomp="0.99" />
+<bednet t="312" coverage="0.5" syscomp="0.99" />
+<bednet t="324" coverage="0.5" syscomp="0.99" />
+<bednet t="336" coverage="0.5" syscomp="0.99" />
+<bednet t="348" coverage="0.5" syscomp="0.99" />
+<bednet t="360" coverage="0.5" syscomp="0.99" />
+<bednet t="372" coverage="0.5" syscomp="0.99" />
+<bednet t="384" coverage="0.5" syscomp="0.99" />
+<bednet t="396" coverage="0.5" syscomp="0.99" />
+<bednet t="408" coverage="0.5" syscomp="0.99" />
+<bednet t="420" coverage="0.5" syscomp="0.99" />
+<bednet t="432" coverage="0.5" syscomp="0.99" />
+<bednet t="444" coverage="0.5" syscomp="0.99" />
+<bednet t="456" coverage="0.5" syscomp="0.99" />
+<bednet t="468" coverage="0.5" syscomp="0.99" />
+<bednet t="480" coverage="0.5" syscomp="0.99" />
+<bednet t="492" coverage="0.5" syscomp="0.99" />
+<bednet t="504" coverage="0.5" syscomp="0.99" />
+<bednet t="516" coverage="0.5" syscomp="0.99" />
+<bednet t="528" coverage="0.5" syscomp="0.99" />
+<bednet t="540" coverage="0.5" syscomp="0.99" />
+<bednet t="552" coverage="0.5" syscomp="0.99" />
+<bednet t="564" coverage="0.5" syscomp="0.99" />
+</scenario>
+<scenario name="3a" start="168">
+<mda t="168" type="da" coverage="0.65" syscomp="0.3" />
+<mda t="180" type="da" coverage="0.65" syscomp="0.3" />
+<mda t="192" type="da" coverage="0.65" syscomp="0.3" />
+<mda t="228" type="da" coverage="0.65" syscomp="0.3" />
+<mda t="240" type="da" coverage="0.65" syscomp="0.3" />
+<mda t="252" type="da" coverage="0.65" syscomp="0.3" />
+<mda t="264" type="da" coverage="0.65" syscomp="0.3" />
+<mda t="276" type="da" coverage="0.65" syscomp="0.3" />
+<mda t="288" type="da" coverage="0.65" syscomp="0.3" />
+<mda t="300" type="da" coverage="0.65" syscomp="0.3" />
+<mda t="312" type="da" coverage="0.65" syscomp="0.3" />
+<mda t="324" type="da" coverage="0.65" syscomp="0.3" />
+<mda t="336" type="da" coverage="0.65" syscomp="0.3" />
+<mda t="348" type="da" coverage="0.65" syscomp="0.3" />
+<mda t="360" type="da" coverage="0.65" syscomp="0.3" />
+<mda t="372" type="ma1" coverage="0.8" syscomp="0.2" />
+<mda t="384" type="ma1" coverage="0.8" syscomp="0.2" />
+<mda t="396" type="ma1" coverage="0.8" syscomp="0.2" />
+<mda t="408" type="ma1" coverage="0.8" syscomp="0.2" />
+<mda t="420" type="ma1" coverage="0.8" syscomp="0.2" />
+<mda t="432" type="ma1" coverage="0.8" syscomp="0.2" />
+<mda t="444" type="ma1" coverage="0.8" syscomp="0.2" />
+<mda t="456" type="ma1" coverage="0.8" syscomp="0.2" />
+<mda t="468" type="ma1" coverage="0.8" syscomp="0.2" />
+<mda t="480" type="ma1" coverage="0.8" syscomp="0.2" />
+<mda t="492" type="ma1" coverage="0.8" syscomp="0.2" />
+<mda t="504" type="ma1" coverage="0.8" syscomp="0.2" />
+<mda t="516" type="ma1" coverage="0.8" syscomp="0.2" />
+<mda t="528" type="ma1" coverage="0.8" syscomp="0.2" />
+<mda t="540" type="ma1" coverage="0.8" syscomp="0.2" />
+<mda t="552" type="ma1" coverage="0.8" syscomp="0.2" />
+<mda t="564" type="ma1" coverage="0.8" syscomp="0.2" />
+<output t="0" />
+<output t="12" />
+<output t="24" />
+<output t="36" />
+<output t="48" />
+<output t="60" />
+<output t="72" />
+<output t="84" />
+<output t="96" />
+<output t="108" />
+<output t="120" />
+<output t="132" />
+<output t="144" />
+<output t="156" />
+<output t="168" />
+<output t="180" />
+<output t="192" />
+<output t="204" />
+<output t="216" />
+<output t="228" />
+<output t="240" />
+<output t="252" />
+<output t="264" />
+<output t="276" />
+<output t="288" />
+<output t="300" />
+<output t="312" />
+<output t="324" />
+<output t="336" />
+<output t="348" />
+<output t="360" />
+<output t="372" />
+<output t="384" />
+<output t="396" />
+<output t="408" />
+<output t="420" />
+<output t="432" />
+<output t="444" />
+<output t="456" />
+<output t="468" />
+<output t="480" />
+<output t="492" />
+<output t="504" />
+<output t="516" />
+<output t="528" />
+<output t="540" />
+<output t="552" />
+<output t="564" />
+<bednet t="96" coverage="0.25" syscomp="0.99" />
+<bednet t="108" coverage="0.25" syscomp="0.99" />
+<bednet t="120" coverage="0.5" syscomp="0.99" />
+<bednet t="132" coverage="0.5" syscomp="0.99" />
+<bednet t="144" coverage="0.5" syscomp="0.99" />
+<bednet t="156" coverage="0.5" syscomp="0.99" />
+<bednet t="168" coverage="0.5" syscomp="0.99" />
+<bednet t="180" coverage="0.5" syscomp="0.99" />
+<bednet t="192" coverage="0.5" syscomp="0.99" />
+<bednet t="204" coverage="0.5" syscomp="0.99" />
+<bednet t="216" coverage="0.5" syscomp="0.99" />
+<bednet t="228" coverage="0.5" syscomp="0.99" />
+<bednet t="240" coverage="0.5" syscomp="0.99" />
+<bednet t="252" coverage="0.5" syscomp="0.99" />
+<bednet t="264" coverage="0.5" syscomp="0.99" />
+<bednet t="276" coverage="0.5" syscomp="0.99" />
+<bednet t="288" coverage="0.5" syscomp="0.99" />
+<bednet t="300" coverage="0.5" syscomp="0.99" />
+<bednet t="312" coverage="0.5" syscomp="0.99" />
+<bednet t="324" coverage="0.5" syscomp="0.99" />
+<bednet t="336" coverage="0.5" syscomp="0.99" />
+<bednet t="348" coverage="0.5" syscomp="0.99" />
+<bednet t="360" coverage="0.5" syscomp="0.99" />
+<bednet t="372" coverage="0.8" syscomp="0.99" />
+<bednet t="384" coverage="0.8" syscomp="0.99" />
+<bednet t="396" coverage="0.8" syscomp="0.99" />
+<bednet t="408" coverage="0.8" syscomp="0.99" />
+<bednet t="420" coverage="0.8" syscomp="0.99" />
+<bednet t="432" coverage="0.8" syscomp="0.99" />
+<bednet t="444" coverage="0.8" syscomp="0.99" />
+<bednet t="456" coverage="0.8" syscomp="0.99" />
+<bednet t="468" coverage="0.8" syscomp="0.99" />
+<bednet t="480" coverage="0.8" syscomp="0.99" />
+<bednet t="492" coverage="0.8" syscomp="0.99" />
+<bednet t="504" coverage="0.8" syscomp="0.99" />
+<bednet t="516" coverage="0.8" syscomp="0.99" />
+<bednet t="528" coverage="0.8" syscomp="0.99" />
+<bednet t="540" coverage="0.8" syscomp="0.99" />
+<bednet t="552" coverage="0.8" syscomp="0.99" />
+</scenario>
+<scenario name="3b" start="168">
+<mda t="168" type="da" coverage="0.65" syscomp="0.3" />
+<mda t="180" type="da" coverage="0.65" syscomp="0.3" />
+<mda t="192" type="da" coverage="0.65" syscomp="0.3" />
+<mda t="228" type="da" coverage="0.65" syscomp="0.3" />
+<mda t="240" type="da" coverage="0.65" syscomp="0.3" />
+<mda t="252" type="da" coverage="0.65" syscomp="0.3" />
+<mda t="264" type="da" coverage="0.65" syscomp="0.3" />
+<mda t="276" type="da" coverage="0.65" syscomp="0.3" />
+<mda t="288" type="da" coverage="0.65" syscomp="0.3" />
+<mda t="300" type="da" coverage="0.65" syscomp="0.3" />
+<mda t="312" type="da" coverage="0.65" syscomp="0.3" />
+<mda t="324" type="da" coverage="0.65" syscomp="0.3" />
+<mda t="336" type="da" coverage="0.65" syscomp="0.3" />
+<mda t="348" type="da" coverage="0.65" syscomp="0.3" />
+<mda t="360" type="da" coverage="0.65" syscomp="0.3" />
+<mda t="372" type="ma1" coverage="0.65" syscomp="0.3" />
+<mda t="384" type="ma1" coverage="0.65" syscomp="0.3" />
+<mda t="396" type="ma1" coverage="0.65" syscomp="0.3" />
+<mda t="408" type="ma1" coverage="0.65" syscomp="0.3" />
+<mda t="420" type="ma1" coverage="0.65" syscomp="0.3" />
+<mda t="432" type="ma1" coverage="0.65" syscomp="0.3" />
+<mda t="444" type="ma1" coverage="0.65" syscomp="0.3" />
+<mda t="456" type="ma1" coverage="0.65" syscomp="0.3" />
+<mda t="468" type="ma1" coverage="0.65" syscomp="0.3" />
+<mda t="480" type="ma1" coverage="0.65" syscomp="0.3" />
+<mda t="492" type="ma1" coverage="0.65" syscomp="0.3" />
+<mda t="504" type="ma1" coverage="0.65" syscomp="0.3" />
+<mda t="516" type="ma1" coverage="0.65" syscomp="0.3" />
+<mda t="528" type="ma1" coverage="0.65" syscomp="0.3" />
+<mda t="540" type="ma1" coverage="0.65" syscomp="0.3" />
+<mda t="552" type="ma1" coverage="0.65" syscomp="0.3" />
+<mda t="564" type="ma1" coverage="0.65" syscomp="0.3" />
+<output t="0" />
+<output t="12" />
+<output t="24" />
+<output t="36" />
+<output t="48" />
+<output t="60" />
+<output t="72" />
+<output t="84" />
+<output t="96" />
+<output t="108" />
+<output t="120" />
+<output t="132" />
+<output t="144" />
+<output t="156" />
+<output t="168" />
+<output t="180" />
+<output t="192" />
+<output t="204" />
+<output t="216" />
+<output t="228" />
+<output t="240" />
+<output t="252" />
+<output t="264" />
+<output t="276" />
+<output t="288" />
+<output t="300" />
+<output t="312" />
+<output t="324" />
+<output t="336" />
+<output t="348" />
+<output t="360" />
+<output t="372" />
+<output t="384" />
+<output t="396" />
+<output t="408" />
+<output t="420" />
+<output t="432" />
+<output t="444" />
+<output t="456" />
+<output t="468" />
+<output t="480" />
+<output t="492" />
+<output t="504" />
+<output t="516" />
+<output t="528" />
+<output t="540" />
+<output t="552" />
+<output t="564" />
+<bednet t="96" coverage="0.25" syscomp="0.99" />
+<bednet t="108" coverage="0.25" syscomp="0.99" />
+<bednet t="120" coverage="0.5" syscomp="0.99" />
+<bednet t="132" coverage="0.5" syscomp="0.99" />
+<bednet t="144" coverage="0.5" syscomp="0.99" />
+<bednet t="156" coverage="0.5" syscomp="0.99" />
+<bednet t="168" coverage="0.5" syscomp="0.99" />
+<bednet t="180" coverage="0.5" syscomp="0.99" />
+<bednet t="192" coverage="0.5" syscomp="0.99" />
+<bednet t="204" coverage="0.5" syscomp="0.99" />
+<bednet t="216" coverage="0.5" syscomp="0.99" />
+<bednet t="228" coverage="0.5" syscomp="0.99" />
+<bednet t="240" coverage="0.5" syscomp="0.99" />
+<bednet t="252" coverage="0.5" syscomp="0.99" />
+<bednet t="264" coverage="0.5" syscomp="0.99" />
+<bednet t="276" coverage="0.5" syscomp="0.99" />
+<bednet t="288" coverage="0.5" syscomp="0.99" />
+<bednet t="300" coverage="0.5" syscomp="0.99" />
+<bednet t="312" coverage="0.5" syscomp="0.99" />
+<bednet t="324" coverage="0.5" syscomp="0.99" />
+<bednet t="336" coverage="0.5" syscomp="0.99" />
+<bednet t="348" coverage="0.5" syscomp="0.99" />
+<bednet t="360" coverage="0.5" syscomp="0.99" />
+<bednet t="372" coverage="0.5" syscomp="0.99" />
+<bednet t="384" coverage="0.5" syscomp="0.99" />
+<bednet t="396" coverage="0.5" syscomp="0.99" />
+<bednet t="408" coverage="0.5" syscomp="0.99" />
+<bednet t="420" coverage="0.5" syscomp="0.99" />
+<bednet t="432" coverage="0.5" syscomp="0.99" />
+<bednet t="444" coverage="0.5" syscomp="0.99" />
+<bednet t="456" coverage="0.5" syscomp="0.99" />
+<bednet t="468" coverage="0.5" syscomp="0.99" />
+<bednet t="480" coverage="0.5" syscomp="0.99" />
+<bednet t="492" coverage="0.5" syscomp="0.99" />
+<bednet t="504" coverage="0.5" syscomp="0.99" />
+<bednet t="516" coverage="0.5" syscomp="0.99" />
+<bednet t="528" coverage="0.5" syscomp="0.99" />
+<bednet t="540" coverage="0.5" syscomp="0.99" />
+<bednet t="552" coverage="0.5" syscomp="0.99" />
+<bednet t="564" coverage="0.5" syscomp="0.99" />
+</scenario>
+<scenario name="3c" start="168">
+<mda t="168" type="da" coverage="0.65" syscomp="0.3" />
+<mda t="180" type="da" coverage="0.65" syscomp="0.3" />
+<mda t="192" type="da" coverage="0.65" syscomp="0.3" />
+<mda t="228" type="da" coverage="0.65" syscomp="0.3" />
+<mda t="240" type="da" coverage="0.65" syscomp="0.3" />
+<mda t="252" type="da" coverage="0.65" syscomp="0.3" />
+<mda t="264" type="da" coverage="0.65" syscomp="0.3" />
+<mda t="276" type="da" coverage="0.65" syscomp="0.3" />
+<mda t="288" type="da" coverage="0.65" syscomp="0.3" />
+<mda t="300" type="da" coverage="0.65" syscomp="0.3" />
+<mda t="312" type="da" coverage="0.65" syscomp="0.3" />
+<mda t="324" type="da" coverage="0.65" syscomp="0.3" />
+<mda t="336" type="da" coverage="0.65" syscomp="0.3" />
+<mda t="348" type="da" coverage="0.65" syscomp="0.3" />
+<mda t="360" type="da" coverage="0.65" syscomp="0.3" />
+<mda t="372" type="da" coverage="0.65" syscomp="0.3" />
+<mda t="384" type="da" coverage="0.65" syscomp="0.3" />
+<mda t="396" type="da" coverage="0.65" syscomp="0.3" />
+<mda t="408" type="da" coverage="0.65" syscomp="0.3" />
+<mda t="420" type="da" coverage="0.65" syscomp="0.3" />
+<mda t="432" type="da" coverage="0.65" syscomp="0.3" />
+<mda t="444" type="da" coverage="0.65" syscomp="0.3" />
+<mda t="456" type="da" coverage="0.65" syscomp="0.3" />
+<mda t="468" type="da" coverage="0.65" syscomp="0.3" />
+<mda t="480" type="da" coverage="0.65" syscomp="0.3" />
+<mda t="492" type="da" coverage="0.65" syscomp="0.3" />
+<mda t="504" type="da" coverage="0.65" syscomp="0.3" />
+<mda t="516" type="da" coverage="0.65" syscomp="0.3" />
+<mda t="528" type="da" coverage="0.65" syscomp="0.3" />
+<mda t="540" type="da" coverage="0.65" syscomp="0.3" />
+<mda t="552" type="da" coverage="0.65" syscomp="0.3" />
+<mda t="564" type="da" coverage="0.65" syscomp="0.3" />
+<output t="0" />
+<output t="12" />
+<output t="24" />
+<output t="36" />
+<output t="48" />
+<output t="60" />
+<output t="72" />
+<output t="84" />
+<output t="96" />
+<output t="108" />
+<output t="120" />
+<output t="132" />
+<output t="144" />
+<output t="156" />
+<output t="168" />
+<output t="180" />
+<output t="192" />
+<output t="204" />
+<output t="216" />
+<output t="228" />
+<output t="240" />
+<output t="252" />
+<output t="264" />
+<output t="276" />
+<output t="288" />
+<output t="300" />
+<output t="312" />
+<output t="324" />
+<output t="336" />
+<output t="348" />
+<output t="360" />
+<output t="372" />
+<output t="384" />
+<output t="396" />
+<output t="408" />
+<output t="420" />
+<output t="432" />
+<output t="444" />
+<output t="456" />
+<output t="468" />
+<output t="480" />
+<output t="492" />
+<output t="504" />
+<output t="516" />
+<output t="528" />
+<output t="540" />
+<output t="552" />
+<output t="564" />
+<bednet t="96" coverage="0.25" syscomp="0.99" />
+<bednet t="108" coverage="0.25" syscomp="0.99" />
+<bednet t="120" coverage="0.5" syscomp="0.99" />
+<bednet t="132" coverage="0.5" syscomp="0.99" />
+<bednet t="144" coverage="0.5" syscomp="0.99" />
+<bednet t="156" coverage="0.5" syscomp="0.99" />
+<bednet t="168" coverage="0.5" syscomp="0.99" />
+<bednet t="180" coverage="0.5" syscomp="0.99" />
+<bednet t="192" coverage="0.5" syscomp="0.99" />
+<bednet t="204" coverage="0.5" syscomp="0.99" />
+<bednet t="216" coverage="0.5" syscomp="0.99" />
+<bednet t="228" coverage="0.5" syscomp="0.99" />
+<bednet t="240" coverage="0.5" syscomp="0.99" />
+<bednet t="252" coverage="0.5" syscomp="0.99" />
+<bednet t="264" coverage="0.5" syscomp="0.99" />
+<bednet t="276" coverage="0.5" syscomp="0.99" />
+<bednet t="288" coverage="0.5" syscomp="0.99" />
+<bednet t="300" coverage="0.5" syscomp="0.99" />
+<bednet t="312" coverage="0.5" syscomp="0.99" />
+<bednet t="324" coverage="0.5" syscomp="0.99" />
+<bednet t="336" coverage="0.5" syscomp="0.99" />
+<bednet t="348" coverage="0.5" syscomp="0.99" />
+<bednet t="360" coverage="0.5" syscomp="0.99" />
+<bednet t="372" coverage="0.8" syscomp="0.99" />
+<bednet t="384" coverage="0.8" syscomp="0.99" />
+<bednet t="396" coverage="0.8" syscomp="0.99" />
+<bednet t="408" coverage="0.8" syscomp="0.99" />
+<bednet t="420" coverage="0.8" syscomp="0.99" />
+<bednet t="432" coverage="0.8" syscomp="0.99" />
+<bednet t="444" coverage="0.8" syscomp="0.99" />
+<bednet t="456" coverage="0.8" syscomp="0.99" />
+<bednet t="468" coverage="0.8" syscomp="0.99" />
+<bednet t="480" coverage="0.8" syscomp="0.99" />
+<bednet t="492" coverage="0.8" syscomp="0.99" />
+<bednet t="504" coverage="0.8" syscomp="0.99" />
+<bednet t="516" coverage="0.8" syscomp="0.99" />
+<bednet t="528" coverage="0.8" syscomp="0.99" />
+<bednet t="540" coverage="0.8" syscomp="0.99" />
+<bednet t="552" coverage="0.8" syscomp="0.99" />
+<bednet t="564" coverage="0.8" syscomp="0.99" />
+</scenario>
+</ScenarioList>
+</Model>
