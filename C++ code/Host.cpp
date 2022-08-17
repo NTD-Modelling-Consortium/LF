@@ -17,21 +17,25 @@
 extern Statistics stats;
 
 
-void Host::reset(int a){
+void Host::reset(int a, double HydroceleShape, double LymphodemaShape){
     
     
     //called when host dies and is reborn or initialised
-    totalWorms = 0; 
+    
     WM = WF = 0;
+    totalWorms = 0;
+    totalWormYears = 0.0;
     M = 0.0;
     bedNet = 0;
     monthsSinceTreated = UINT_MAX; // never treated;
     age = a;
-    
+    hydroMult = stats.gamma_dist(HydroceleShape);
+    lymphoMult = stats.gamma_dist(LymphodemaShape);
+    sex = (stats.uniform_dist() < 0.5) ? 0 : 1;
 }
 
 
-void Host::initialise(double deathRate, int maxAge, double k, double* totalBiteRisk){
+void Host::initialise(double deathRate, int maxAge, double k, double* totalBiteRisk, double HydroceleShape, double LymphodemaShape){
     
     //called at start of new replicate
     
@@ -40,8 +44,10 @@ void Host::initialise(double deathRate, int maxAge, double k, double* totalBiteR
     //set infection risk
     *totalBiteRisk += (biteRisk = stats.gamma_dist(k)); //static var records totla risk of whole population
     //bite risk is mean bites per month
-    
-    reset(a);
+    hydroMult = stats.gamma_dist(HydroceleShape);
+    lymphoMult = stats.gamma_dist(LymphodemaShape);
+    sex = (stats.uniform_dist() < 0.5) ? 0 : 1;
+    reset(a, HydroceleShape, LymphodemaShape);
     
     numMDAs=0;
     
@@ -50,17 +56,17 @@ void Host::initialise(double deathRate, int maxAge, double k, double* totalBiteR
 
                                
 
-void Host::react( double dt, double deathRate, const int maxAge, double aImp, const Vector& vectors, const Worm& worms ) {
+void Host::react( double dt, double deathRate, const int maxAge, double aImp, const Vector& vectors, const Worm& worms, double HydroceleShape, double LymphodemaShape ) {
     
     //time-step
     age += dt;
-    
+    totalWormYears += (WM + WF)* dt;
     //each month 3 possible fates
     
     if ((hostDies(deathRate * dt)) || age > (12*maxAge)){ //if over age 100
         
         //host dies and is replaced by uninfected newborn with same bite risk (b)
-        reset(0);
+        reset(0, HydroceleShape, LymphodemaShape);
         
     }else{
         //host lives on
@@ -79,6 +85,7 @@ void Host::react( double dt, double deathRate, const int maxAge, double aImp, co
             
             //numer time bitten * prop of larval density (10) in vector that will become adult worms
             WM = WF = (int) (0.5 * vectors.averageNumBites() * biteRateScaleFactor * 10 * worms.proportionPerBite() / worms.getDeathRate()); //prob of being bitten and infected from a bite/worm death rate (default values make ~16)
+            totalWorms = WM+WF;
             M = 0;
         
         }else{
@@ -98,18 +105,20 @@ void Host::react( double dt, double deathRate, const int maxAge, double aImp, co
             deaths = stats.poisson_dist( worms.getDeathRate()  * (double) WM * dt );
             WM += (births - deaths);
             totalWorms += births;
+            
             //female worm update
             births = stats.poisson_dist(meanWorms * dt); //* exp(-1 * beta * I)
             deaths = stats.poisson_dist( worms.getDeathRate() * (double) WF * dt );
             WF += (births - deaths);
             totalWorms += births;
-
             //Mf update
             double mdeaths = dt * worms.getMFDeathRate() * M;// time * death rate * number
             double mbirths = dt * worms.repRate(monthsSinceTreated, WF, WM);
             M += (mbirths - mdeaths);
   
-            
+            // std::cout << "total worms = " << totalWorms << std::endl;
+            // std::cout << "female worms = " <<  WF << std::endl;
+            // std::cout << "male worms = " <<  WM << std::endl;
         }
         //drugs wear off each month
         monthsSinceTreated = (monthsSinceTreated+dt < UINT_MAX)? monthsSinceTreated+dt : UINT_MAX;
@@ -152,7 +161,7 @@ void Host::getsTreated(Worm& worms, std::string type ){
 Host::operator hostState() const{
     
     //save this object to the host state structure
-    return {WM, WF, M, totalWorms, biteRisk, age, monthsSinceTreated};
+    return {WM, WF, totalWorms, totalWormYears, M, biteRisk, age, monthsSinceTreated, hydroMult, lymphoMult, sex};
     
     
 }
@@ -160,14 +169,17 @@ Host::operator hostState() const{
 void Host::restore(const hostState& state){
     
     //restore form hoststate object
-    totalWorms = state.totalWorms;
     WM = state.WM;
     WF = state.WF;
+    totalWorms = state.totalWorms;
+    totalWormYears = state.totalWormYears;
     M = state.M;
     biteRisk = state.biteRisk;
     age = state.age;
     monthsSinceTreated = state.monthsSinceTreated;
-    
+    hydroMult = state.hydroMult;
+    lymphoMult = state.lymphoMult;
+    sex = state.sex;
 }
     
 

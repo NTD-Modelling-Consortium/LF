@@ -10,7 +10,10 @@
 #include <fstream>
 #include <sstream>
 #include <limits>
+#include <ios>
+#include <cmath>
 #include "Population.hpp"
+#include "Scenario.hpp"
 #include "Worm.hpp"
 #include "MDAEvent.hpp"
 #include "BedNetEvent.hpp"
@@ -90,12 +93,24 @@ Population::Population(TiXmlElement* xmlParameters){
         }else if (name == "firstTASNumMDA"){
             firstTASNumMDA= value;
             gotAll++;
+        }else if (name == "HydroceleTotalWorms"){
+            HydroceleTotalWorms= int(value);
+            gotAll++;
+        }else if (name == "HydroceleShape"){
+            HydroceleShape= value;
+            gotAll++;
+        }else if (name == "LymphodemaTotalWorms"){
+            LymphodemaTotalWorms= int(value);
+            gotAll++;
+        }else if (name == "LymphodemaShape"){
+            LymphodemaShape= value;
+            gotAll++;
         }else
             std::cout << "Unknown parameter " << name << " in Host parameter list." << std::endl;
     }
     
     
-    if(gotAll < 15){
+    if(gotAll < 19){
         std::cout << "Error in Population::Population. File  does not contain all the required parameters."<< std::endl;
         exit(1);
     }else
@@ -204,7 +219,7 @@ void  Population::initHosts(std::string distType, double k_val, double aImp_val)
     aImp = aImp_original; //save this as it need to appear in output file
     
     for(int i =0; i < size; i++) //TotalBiteRisk sums bites per month for whole popln
-        host_pop[i].initialise(tau, maxAge, k, &TotalBiteRisk); //sets worm count to 0 and treated/bednet to 0. Sets random age and bite risk
+        host_pop[i].initialise(tau, maxAge, k, &TotalBiteRisk, HydroceleShape,  LymphodemaShape); //sets worm count to 0 and treated/bednet to 0. Sets random age and bite risk
     
     
     u0CompBednets = std::numeric_limits<double>::max(); //initial value indicates first time bednets applied in this replicate
@@ -312,9 +327,162 @@ double Population::getMFPrev(){
         }
         
     }
-    MFpos /= numHosts; // convert to prevalence of mf positive hosts
+    if(numHosts > 0){
+        MFpos /= numHosts; // convert to prevalence of mf positive hosts
+    }
+    
 
     return MFpos;
+}
+
+
+double Population::getMFPrevByAge(double ageStart, double ageEnd){
+    // get mf prevalence
+
+    double MFpos = 0; // number of people mf positive
+    double numHosts = 0; // total number of hosts
+    int minAgeMonths = ageStart*12;
+    int maxAgeMonths = ageEnd*12;
+    for(int i =0; i < size; i++){
+       
+        if((host_pop[i].age >= minAgeMonths ) &&(host_pop[i].age <= maxAgeMonths )){
+            bool infectedMF = ( stats.uniform_dist() <  (1 - exp(-1 * host_pop[i].M) ) );  //depends on how many mf present       
+            numHosts++; // increment number of hosts by 1
+            if (infectedMF) MFpos++; // if mf positive, increment MFpos by 1
+        }
+        
+    }
+    if(numHosts > 0){
+        MFpos /= numHosts; // convert to prevalence of mf positive hosts
+    }
+    
+
+    return MFpos;
+}
+
+
+double Population::getNumberByAge(double ageStart, double ageEnd){
+    // get mf prevalence
+
+    double numHosts = 0; // total number of hosts
+    int minAgeMonths = ageStart*12;
+    int maxAgeMonths = ageEnd*12;
+    for(int i =0; i < size; i++){
+        if((host_pop[i].age >= minAgeMonths ) &&(host_pop[i].age <= maxAgeMonths )){
+            numHosts++; // increment number of hosts by 1
+        }
+    }
+   
+    return numHosts;
+}
+
+
+
+double Population::HydroceleTestByAge(int ageStart, int ageEnd, int HydroceleTotalWorms, double HydroceleShape){
+    // get proportion of people in a given age bracket who are hydrocele positive
+
+    double HydroPos = 0; // number of people mf positive
+    double numHosts = 0; // total number of hosts
+    int minAgeMonths = ageStart*12;
+    int maxAgeMonths = ageEnd*12;
+    double mult = 0;
+    for(int i =0; i < size; i++){
+       
+        if((host_pop[i].age >= minAgeMonths ) &&(host_pop[i].age <= maxAgeMonths ) && (host_pop[i].sex == 0)){ // only men can get hydrocele
+            mult = host_pop[i].hydroMult;// draw random number from gamma distribution with appropriate shape which gives individual susceptibility to sequelae
+            bool Hydro = ( (mult * host_pop[i].totalWorms) >  HydroceleTotalWorms );  // individual susceptibility * total worms > threshold or not 
+            numHosts++; // increment number of hosts by 1
+            if (Hydro) HydroPos++; // if hydrocele positive, increment hydrocelePos by 1
+        }
+        
+    }
+    if(numHosts > 0){
+        HydroPos /= numHosts; // convert to prevalence of hydrocele positive hosts
+    }
+    
+
+    return HydroPos;
+}
+
+double Population::LymphodemaTestByAge(int ageStart, int ageEnd, int LymphodemaTotalWorms, double LymphodemaShape){
+    // get proportion of people in a given age bracket who are lymphodema positive
+
+    double LymphodemaPos = 0; // number of people mf positive
+    double numHosts = 0; // total number of hosts
+    int minAgeMonths = ageStart*12;
+    int maxAgeMonths = ageEnd*12;
+    double mult = 0;
+    for(int i =0; i < size; i++){
+       
+        if((host_pop[i].age >= minAgeMonths ) &&(host_pop[i].age <= maxAgeMonths )){ // only men can get hydrocele
+            mult = host_pop[i].lymphoMult; // draw random number from gamma distribution with appropriate shape which gives individual susceptibility to sequelae
+            bool Lymphodema = ( (mult * host_pop[i].totalWorms) >  LymphodemaTotalWorms ); // individual susceptibility * total worms > threshold or not
+            numHosts++; // increment number of hosts by 1
+            if (Lymphodema) LymphodemaPos++; // if lymphodema positive, increment LymphodemaPos by 1
+        }
+        
+    }
+    if(numHosts > 0){
+        LymphodemaPos /= numHosts; // convert to prevalence of hydrocele positive hosts
+    }
+    
+
+    return LymphodemaPos;
+}
+
+
+void Population::saveTotalWorms(){
+    // get mf prevalence
+    std::ofstream outfile;
+    
+	outfile.open("total_worms.csv", std::ios::app);
+	for(int i =0; i < size; i++){
+        outfile<<host_pop[i].totalWorms<<",";
+    }
+    double prev = getMFPrev();
+    outfile << prev <<",";
+    prev = getICPrev();
+    outfile << prev << "\n";
+	outfile.close();
+   
+}
+
+
+
+void Population::saveTotalWormYears(){
+    // get mf prevalence
+    std::ofstream outfile;
+    
+	outfile.open("total_worm_years.csv", std::ios::app);
+	for(int i =0; i < size; i++){
+        outfile<<host_pop[i].totalWormYears<<",";
+    }
+    double prev = getMFPrev();
+    outfile << prev <<",";
+    prev = getICPrev();
+    outfile << prev << "\n";
+	outfile.close();
+   
+}
+
+
+
+
+void Population::saveAges(){
+    // get mf prevalence
+    
+    std::ofstream outfile;
+    
+	outfile.open("ages.csv", std::ios::app);
+	for(int i =0; i < size; i++){
+        outfile<< floor(host_pop[i].age / 12) <<",";
+    }
+    double prev = getMFPrev();
+    outfile << prev <<",";
+    prev = getICPrev();
+    outfile << prev << "\n";
+	outfile.close();
+   
 }
 
 
@@ -368,9 +536,16 @@ double Population::getLarvalUptakebyVector(double r1, double kappas1, Vector::ve
 void Population::evolve(double dt, const Vector& vectors, const Worm& worms){
     
     //advance one time step
-    for(int i =0; i < size; i++)
-        host_pop[i].react(dt, tau, maxAge, aImp,  vectors, worms);
-    
+    for(int i =0; i < size; i++){
+        host_pop[i].react(dt, tau, maxAge, aImp,  vectors, worms, HydroceleShape,  LymphodemaShape);
+        // if (i == 0)
+        //     std::cout << "indiv 1: total worms years = " << host_pop[i].totalWormYears << ", female worms = "<< host_pop[i].WF << ", male worms = "<< host_pop[i].WM << std::endl;
+        // if (i == 1)
+        //     std::cout << "indiv 2: total worms = " << host_pop[i].totalWorms << ", female worms = "<< host_pop[i].WF << ", male worms = "<< host_pop[i].WM << std::endl;
+    }
+        
+        
+        
     
 }
 
@@ -380,6 +555,31 @@ void Population::evolve(double dt, const Vector& vectors, const Worm& worms){
     
 }
 
+int Population::getLymphodemaTotalWorms()  {
+    
+    return LymphodemaTotalWorms;
+    
+}
+
+int Population::getHydroceleTotalWorms()  {
+    
+    return HydroceleTotalWorms;
+    
+}
+
+double Population::getLymphodemaShape()  {
+    
+    return LymphodemaShape;
+    
+}
+
+double Population::getHydroceleShape()  {
+    
+    return HydroceleShape;
+    
+}
+
+
 void Population::saveCurrentState(int month, std::string sname){
     
     //save host states and importation rate 
@@ -387,7 +587,7 @@ void Population::saveCurrentState(int month, std::string sname){
     savedMonth currentState;
     
     currentState.scenario = sname; //debugging only
-    currentState.data.resize(size, {0, 0, 0.0, 0.0, 0, 0}); //WM, WF,M,biteRisk,age,monthSinceTreated
+    currentState.data.resize(size, {0, 0, 0, 0.0, 0.0, 0.0, 0, 0}); //WM, WF,totalWorms, totalWormYears, M,biteRisk,age,monthSinceTreated
     
     for(int i =0; i < size; i++)
         currentState.data[i] = host_pop[i]; //overloaded operator extracts data members to struct
@@ -531,7 +731,7 @@ void Population::updateBedNetCoverage(BedNetEvent* bn){
        
 }
 
-void Population::ApplyTreatment(MDAEvent* mda, Worm& worms) {
+void Population::ApplyTreatment(MDAEvent* mda, Worm& worms, Scenario& sc, int t, int rep, std::string folderName) {
     
     //also must check if syscomp has changed since last scenario!!
     //coverage could change too so meed scalefactor
@@ -540,14 +740,17 @@ void Population::ApplyTreatment(MDAEvent* mda, Worm& worms) {
     
     bool firstTime = (u0CompMDA == std::numeric_limits<double>::max());
     bool sysCompChanged = (sysCompMDA != mda->getCompliance());
-    bool coverageChanged = (mdaCoverage != mda->getCoverage());
+    int startTime = sc.getStartMonth();
     
+    // std::cout <<"start time = " << startTime <<", TIME = "<< t <<", a = " <<  mdaCoverage <<  ", b = " << mda->getCoverage() <<std::endl;
+    bool coverageChanged = (mdaCoverage != mda->getCoverage());
+   
     if (mda->getCoverage()){  //crashes if this is zero, but never should be
         
      
         double coverageScaleFactor = 0.0;
         
-        if (firstTime || sysCompChanged){
+        if (firstTime || sysCompChanged || coverageChanged || (t == startTime)){
             
             //sysComp has changed so calculate hosts compliance probabilities as a function of coverage and the new syscomp
             
@@ -555,7 +758,7 @@ void Population::ApplyTreatment(MDAEvent* mda, Worm& worms) {
         
             u0CompMDA = calcU0(mda->getCoverage(), mda->getSigma2());
             mdaCoverage = mda->getCoverage(); //store coverage that was used to calculate this
-            
+            // std::cout << "a2 = " <<  mdaCoverage <<  ", b2 = " << mda->getCoverage() <<std::endl;
             if(!mda->getCompliance()){  //syscomp is zero. This means each indivual has an equal chance of complying each round.
                 for(int i =0; i < size; i++)
                     host_pop[i].uCompMDA = u0CompMDA; // MDA value fixed for all hosts, ie no systematic adherence
@@ -565,7 +768,7 @@ void Population::ApplyTreatment(MDAEvent* mda, Worm& worms) {
                 for(int i =0; i < size; i++)
                     host_pop[i].uCompMDA = stats.normal_dist(u0CompMDA, sqrt(mda->getSigma2()));
                 
-            }else{
+            }else{ 
                 
                 double sigmaMDA = sqrt(mda->getSigma2());
                 double sigmaBednets = sqrt(sysCompBednets / (1-sysCompBednets)); //if this is zero, setU will crash
@@ -580,20 +783,22 @@ void Population::ApplyTreatment(MDAEvent* mda, Worm& worms) {
             }
             
             
-        }else if (coverageChanged){
+        }else if (coverageChanged || (t == startTime)){
             
             //syscomp has not changed but coverage has so scale hosts compliance probabilities as a function of new coverage and the existing syscomp
             //we could recalculate u0CompMDA, but we dont want to do this as we want same host to have or low probabilitie as before
             
             //coverage has changed since the last time u0CompMDA was set. This would have been set when syscomp changed
+            
             coverageScaleFactor = calcU0(mda->getCoverage(), mda->getSigma2())-u0CompMDA;
+            
             
         }
         
         //apply
         int minAge = (mda->getMinAge() >= 0)? mda->getMinAge() : minAgeMDA;
         int minAgeMDAinMonths = minAge * 12;
-        
+      
         
          if(_DEBUG)
              std::cout << "Coverage = " << mda->getCoverage() << ", Actual coverage=";
@@ -609,20 +814,26 @@ void Population::ApplyTreatment(MDAEvent* mda, Worm& worms) {
                     host_pop[i].getsTreated(worms, mda->getType());
                     hostsTreated++;
                     
+                    
                 }
             }
             
         }
+        std::string type = mda->getType();
+        //   std::cout << "Coverage = " << mda->getCoverage() << ", Actual coverage=" <<  double(hostsTreated)/hostsOldEnough <<std::endl ;
+        sc.writeMDAData(t, hostsTreated, hostsOldEnough, minAgeMDA, maxAge, rep, type, folderName);
+        
          if(_DEBUG)
              std::cout << hostsTreated << "/" << hostsOldEnough << " " << double(hostsTreated)/hostsOldEnough * 100 << "%" << std::endl;
         
     }
-  
+
     sysCompMDA = mda->getCompliance();
-    
-    
+
+  
     
 }
+
 
 
 double Population::getBedNetCoverage() const {
@@ -792,7 +1003,6 @@ void Population::printMDAHistory() const {
         std::cout <<i<<" "<<bins[i]<<std::endl;
     
 }
-
 
 
 

@@ -25,6 +25,7 @@ class MDAEvent;
 class PrevalenceEvent;
 class BedNetEvent;
 class TiXmlElement;
+class Scenario;
 
 #define MAX_POP 11550
 
@@ -53,9 +54,17 @@ public:
     
     void loadPopulationSize(const std::string filename);
     static int getMaxAge();
+    int getLymphodemaTotalWorms();
+    int getHydroceleTotalWorms();
+    double getLymphodemaShape();
+    double getHydroceleShape();
     void initHosts(std::string distType, double k_val, double aImp_val);
     double getPopSize() ;
-   
+    void saveTotalWorms();
+    void saveAges();
+    void saveTotalWormYears();
+    void writePrevByAge();
+    
     RecordedPrevalence  getPrevalence(PrevalenceEvent* outputPrev)  const;
     
     double getLarvalUptakebyVector(double r1, double kappas1, Vector::vectorSpecies species) const;
@@ -63,13 +72,17 @@ public:
     double getBedNetSysComp() const ;
     double getImportationRateFactor()  const;
     double getMFPrev();
+    double getMFPrevByAge(double ageStart, double ageEnd);
+    double getNumberByAge(double ageStart, double ageEnd);
+    double HydroceleTestByAge(int ageStart, int ageEnd, int HydroceleTotalWorms, double HydroceleShape);
+    double LymphodemaTestByAge(int ageStart, int ageEnd, int LymphodemaTotalWorms, double LymphodemaShape);
     double getICPrev();
 
     void updateBedNetCoverage(BedNetEvent* bn);
     void updateImportationRate(double factor);
     
     void evolve(double dt, const Vector& vectors, const Worm& worms);
-    void ApplyTreatment(MDAEvent* mda,  Worm& worms);
+    void ApplyTreatment(MDAEvent* mda,  Worm& worms, Scenario& sc, int t, int rep, std::string folderName);
     void saveCurrentState(int month, std::string sname);
     void resetToMonth(int month);
     void clearSavedMonths();
@@ -79,7 +92,7 @@ public:
     int getMinAgePrev() const;
     int getMinAgeMDA() const;
     
-     void printMDAHistory() const;
+    void printMDAHistory() const;
     
     int surveyStartDate;
     double ICThreshold;
@@ -133,8 +146,8 @@ private:
     //max values for random parameters
     double mink;
     double maxk;
-    double maxaImp;
-    double meanaImp;
+    //double maxaImp;
+    //double meanaImp;
     
     
     double aImp_original;
@@ -152,6 +165,10 @@ private:
     int minAgeIC; //min age to be tested for antigen
     int maxAgeIC; //max age to be tested for antigen
     double ICsensitivity; // sensitivity of antigen test
+    int HydroceleTotalWorms;
+    double HydroceleShape;
+    int LymphodemaTotalWorms;
+    double LymphodemaShape;
     
     //saved months
     

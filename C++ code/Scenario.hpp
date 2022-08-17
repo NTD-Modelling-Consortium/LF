@@ -171,9 +171,15 @@ public:
     void printSurveysMDAs(std::ofstream& of, Output& results, int repnum, Population& popln) const;
     void closeFile();
     
-   
-    
-    
+    void InitIHMEData(int rep, std::string folder);
+    void InitIPMData(int rep, std::string folder);
+    void writePrevByAge(Population& popln, int t, int rep, std::string folder);
+    void writeNumberByAge(Population& popln, int t, int rep, std::string folder);
+    void writeSequelaeByAge(Population& popln, int t, int LymphodemaTotalWorms, double LymphodemaShape, int HydroceleTotalWorms, double HydroceleShape, int rep, std::string folder);
+    void writeMDAData(int t, int MDATreatments, int MDAPopSize, int minAgeMDA, int maxAge, int rep, std::string type, std::string folder);
+    void writeMDADataMissedYears(int t, int MDATreatments, int MDAPopSize, int minAgeMDA, int maxAge, int rep,  std::string folder);
+    void writeSurveyByAge(Population& popln, int t, int preTAS_Pass, int TAS_Pass, int rep, std::string folder);
+
 protected:
     
     

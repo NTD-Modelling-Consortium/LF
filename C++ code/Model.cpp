@@ -10,6 +10,8 @@
 #include <sstream>
 #include <chrono>
 #include <iomanip>
+#include <vector>
+
 
 #include "Model.hpp"
 #include "ScenariosList.hpp"
@@ -102,7 +104,7 @@ void Model::runScenarios(ScenariosList& scenarios, Population& popln, Vector& ve
           
             //evolve, saving any specified months along the way
             for (int y = 0; y < sc.getNumMonthsToSave(); y++)
-                evolveAndSave(y, popln, vectors, worms, sc, currentOutput);
+                evolveAndSave(y, popln, vectors, worms, sc, currentOutput, rep);
             
             //done for this scenario, save the prevalence values for this replicate
             if(!_DEBUG) sc.printResults(rep, currentOutput, popln);
@@ -152,10 +154,10 @@ void Model::burnIn(Population& popln, Vector& vectors, const Worm& worms, Output
 }
 
 
-void Model::evolveAndSave(int y, Population& popln, Vector& vectors, Worm& worms, Scenario& sc, Output& currentOutput){
+void Model::evolveAndSave(int y, Population& popln, Vector& vectors, Worm& worms, Scenario& sc, Output& currentOutput, int rep){
     
     //advance to the next target month
-    
+    std::string folderName = "res_endgame";
     int targetMonth = sc.getMonthToSave(y); //simulate to start of this month
     double mfprev = 1; //variable to check prevalence of mf for survey 
     double icprev = 1; //variable to check prevalence of ic for survey 
@@ -168,9 +170,33 @@ void Model::evolveAndSave(int y, Population& popln, Vector& vectors, Worm& worms
     double mfprev_aimp_old = popln.getMFPrev(); 
     double mfprev_aimp_new = 0;
     bool preTAS_Pass = 0;
+   // int maxAge = popln.getMaxAge();
     bool TAS_Pass = 0;
+    // int outputTime = floor(currentMonth/12);
+    //int outputTime = 0;
+    int LymphodemaTotalWorms = popln.getLymphodemaTotalWorms();
+    int HydroceleTotalWorms = popln.getHydroceleTotalWorms();
+    double LymphodemaShape = popln.getLymphodemaShape();
+    double HydroceleShape = popln.getHydroceleShape();
+    sc.InitIHMEData(rep, folderName);
+    sc.InitIPMData(rep, folderName);
+
     for (int t = currentMonth; t < targetMonth; t += dt){
-        
+
+        PrevalenceEvent* outputPrev = sc.prevalenceDue(t); //defines min age of host to include and method ic/mf
+        MDAEvent* applyMDA = sc.treatmentDue(t);
+        if (outputPrev || applyMDA ){
+
+            sc.writePrevByAge(popln, t, rep, folderName);
+            sc.writeNumberByAge(popln, t, rep, folderName);
+            sc.writeSequelaeByAge(popln, t, LymphodemaTotalWorms,  LymphodemaShape, HydroceleTotalWorms, HydroceleShape, rep, folderName);
+            sc.writeSurveyByAge(popln, t, preTAS_Pass, TAS_Pass, rep, folderName);
+
+            if(TAS_Pass == 1){
+                sc.writeMDADataMissedYears(t, 0, 0, popln.getMinAgeMDA(), 100, rep,  folderName);
+            }
+        }
+
         sc.updateImportationRate(popln, t);
         sc.updateBedNetCoverage(popln, t);
        
@@ -180,8 +206,8 @@ void Model::evolveAndSave(int y, Population& popln, Vector& vectors, Worm& worms
         //update larval density in the vector population according to new mf levels in host polution
         vectors.updateL3Density(popln, worms);
         
-        PrevalenceEvent* outputPrev = sc.prevalenceDue(t); //defines min age of host to include and method ic/mf
-        MDAEvent* applyMDA = sc.treatmentDue(t);
+        
+        
        
         RecordedPrevalence prevalence;
        
@@ -219,8 +245,8 @@ void Model::evolveAndSave(int y, Population& popln, Vector& vectors, Worm& worms
 
         if(applyMDA){
             if(popln.totMDAs < popln.firstTASNumMDA){
-
-                popln.ApplyTreatment(applyMDA, worms);
+                //do mda
+                popln.ApplyTreatment(applyMDA, worms, sc, t, rep, folderName);
                 popln.totMDAs += 1;
                 if(t >= 240){
                     popln.post2020MDAs += 1;
@@ -239,7 +265,7 @@ void Model::evolveAndSave(int y, Population& popln, Vector& vectors, Worm& worms
                 if((preTAS_Pass == 1) && (TAS_Pass == 1)){
                     // std::cout << "mfprev= " << mfprev << ", icprev = " << icprev << std::endl;
                 }else{
-                    popln.ApplyTreatment(applyMDA, worms); //treated set. alters M, WM, WF, using covMDA set above
+                    popln.ApplyTreatment(applyMDA, worms, sc, t, rep, folderName); //treated set. alters M, WM, WF, using covMDA set above
                     popln.totMDAs += 1;
                     if(t >= 240){
                         popln.post2020MDAs += 1;
@@ -253,10 +279,12 @@ void Model::evolveAndSave(int y, Population& popln, Vector& vectors, Worm& worms
         }
 
         
-        if (outputPrev || applyMDA)
+        if (outputPrev || applyMDA){
+            //std::cout << t << "," << popln.getMFPrev() << std::endl;
             currentOutput.saveMonth(t, popln, outputPrev, prevalence, applyMDA);
+        }
         
-        
+            
         if(_DEBUG && applyMDA) std::cout << applyMDA->getType() << " month " << currentMonth  << ", MDA at " << applyMDA->getCoverage() << " coverage" << std::endl;
 
     
@@ -265,7 +293,10 @@ void Model::evolveAndSave(int y, Population& popln, Vector& vectors, Worm& worms
     }
     //done
     currentMonth = targetMonth;
-    
+    //prev = popln.getMFPrev();
+    popln.saveTotalWorms();
+    popln.saveTotalWormYears();
+    popln.saveAges();
     if (y < (sc.getNumMonthsToSave()-1)){ //not finished this scenario
         popln.saveCurrentState(currentMonth, sc.getName()); //worms and importation rate. Scenario name just needed for debugging
         vectors.saveCurrentState(currentMonth); //larval density

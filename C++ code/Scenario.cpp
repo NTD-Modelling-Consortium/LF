@@ -9,6 +9,7 @@
 #include "Scenario.hpp"
 #include "Output.hpp"
 #include <sstream>
+#include <string> 
 
 
 
@@ -532,11 +533,233 @@ bool Scenario::requiresWC() const {
 }
 
 
+void Scenario::InitIHMEData(int rep,  std::string folder){
+    // get mf prevalence
+
+    
+    std::string fname;
+    std::string rep1 = std::to_string(rep);
+    std::size_t first_ = name.find("_");
+    std::string fol_n = name.substr(0,first_);
+    fname = folder + "/IHME_scen" + fol_n +"/IHME_scen" + name +  "_rep_" + rep1  + ".csv";
+    std::ofstream outfile;
+    outfile.open(fname);
+    if(rep == 0){
+        outfile << "espen_loc" << ","  << "year_id" << "," << "age_start" <<"," << "age_end" << "," << "measure" << "," << "draw_0" << "\n";
+    }else{
+         outfile << "draw_0" << "\n";
+    }
+    
+    outfile.close();
+
+}
+
+
+
+void Scenario::writePrevByAge(Population& popln, int t, int rep,  std::string folder){
+    // get mf prevalence
+    std::ofstream outfile;
+    int maxAge = popln.getMaxAge();
+    std::string fname;
+    std::size_t first_ = name.find("_");
+    std::string fol_n = name.substr(0,first_);
+    std::string rep1 = std::to_string(rep);
+    fname = folder + "/IHME_scen" + fol_n + "/IHME_scen" + name + "_rep_" + rep1  + ".csv";
+    int year = t/12 + 2000;
+	outfile.open(fname, std::ios::app);
+
+                
+   if(rep == 0){
+        for(int j =0; j < maxAge; j++){
+            outfile << name << ","  << year << "," << j <<"," << j+1 << "," << "prevalence" << "," << popln.getMFPrevByAge(j, j+1)<< "\n";
+        }
+   }else{
+        for(int j =0; j < maxAge; j++){
+            outfile << popln.getMFPrevByAge(j, j+1)<< "\n";
+        }
+   }
+   
+   
+	outfile.close();
+}
 
 
 
 
 
+void Scenario::writeNumberByAge(Population& popln, int t, int rep,  std::string folder){
+    // get mf prevalence
+    std::ofstream outfile;
+    int maxAge = popln.getMaxAge();
+    std::string fname;
+    std::size_t first_ = name.find("_");
+    std::string fol_n = name.substr(0,first_);
+    std::string rep1 = std::to_string(rep);
+    fname = folder + "/IHME_scen" + fol_n + "/IHME_scen" + name + "_rep_" + rep1  + ".csv";
+    int year = t/12 + 2000;
+    
+    outfile.open(fname, std::ios::app);     
+    if(rep == 0){
+        for(int j =0; j < maxAge; j++){
+           outfile << name << ","  << year << "," << j <<"," << j+1 << "," << "number" << "," << popln.getNumberByAge(j, j+1)<< "\n";
+        }
+    }else{
+        for(int j =0; j < maxAge; j++){
+            outfile << popln.getNumberByAge(j, j+1)<< "\n";
+        }   
+    } 
+    
+   
+	outfile.close();
+}
+
+
+
+
+
+
+void Scenario::writeSequelaeByAge(Population& popln, int t, int LymphodemaTotalWorms, double LymphodemaShape, int HydroceleTotalWorms, double HydroceleShape, int rep,  std::string folder){
+    // get mf prevalence
+    std::ofstream outfile;
+    int maxAge = popln.getMaxAge();
+    std::string fname;
+    
+    std::size_t first_ = name.find("_");
+    std::string fol_n = name.substr(0,first_);
+    std::string rep1 = std::to_string(rep);
+    fname = folder + "/IHME_scen" + fol_n + "/IHME_scen" + name +"_rep_" + rep1  + ".csv";
+  
+    int year = t/12 + 2000;
+    
+    outfile.open(fname, std::ios::app);   
+    if(rep == 0){
+        for(int j =0; j < maxAge; j++){
+            outfile << name << ","  << year << "," << j <<"," << j+1 << "," << "Hydrocele" << "," << popln.HydroceleTestByAge(j, j+1, HydroceleTotalWorms, HydroceleShape)<< "\n";
+        }
+        for(int j =0; j < maxAge; j++){
+            outfile << name << ","  << year << "," << j <<"," << j+1 << "," << "Lymphodema" << "," << popln.LymphodemaTestByAge(j, j+1, LymphodemaTotalWorms, LymphodemaShape)<< "\n";
+        }
+    }else{
+        for(int j =0; j < maxAge; j++){
+            outfile <<  popln.HydroceleTestByAge(j, j+1, HydroceleTotalWorms, HydroceleShape)<< "\n";
+        }
+        for(int j =0; j < maxAge; j++){
+            outfile <<  popln.LymphodemaTestByAge(j, j+1, LymphodemaTotalWorms, LymphodemaShape)<< "\n";
+        }
+    }   
+    
+   
+	outfile.close();
+}
+
+
+
+void Scenario::InitIPMData(int rep, std::string folder){
+    // get mf prevalence
+    std::string fname;
+    std::string rep1 = std::to_string(rep);
+    std::size_t first_ = name.find("_");
+    std::string fol_n = name.substr(0,first_);
+    fname = folder + "/IPM_scen" + fol_n + "/IPM_scen" + name + "_rep_" + rep1  + ".csv";
+    std::ofstream outfile;
+    outfile.open(fname);
+    outfile << "espen_loc" << ","  << "year_id" << "," << "age_start" <<"," << "age_end" << "," << "measure" << "," << "draw_0" << "\n";
+    outfile.close();
+
+}
+
+
+
+void Scenario::writeMDAData(int t, int MDATreatments, int MDAPopSize, int minAgeMDA, int maxAge, int rep, std::string type, std::string folder){
+    // get mf prevalence
+    std::ofstream outfile;
+    std::string fname;
+    std::string rep1 = std::to_string(rep);
+    std::size_t first_ = name.find("_");
+    std::string fol_n = name.substr(0,first_);
+    fname = folder +"/IPM_scen" + fol_n +  "/IPM_scen" + name + "_rep_" + rep1  + ".csv";
+
+    int year = t/12 + 2000;
+
+    outfile.open(fname, std::ios::app);        
+    
+    if(type == "da"){
+        outfile << name << ","  << year << "," << minAgeMDA <<"," << maxAge << "," << "MDATreatments1" << "," << MDATreatments << "\n";
+        outfile << name << ","  << year << "," << minAgeMDA <<"," << maxAge << "," << "MDATreatments2" << "," << 0 << "\n";
+        if(MDAPopSize >0){
+           outfile << name << ","  << year << "," << minAgeMDA <<"," << maxAge << "," << "MDACoverage1" << "," << double(MDATreatments)/MDAPopSize << "\n"; 
+        }else{
+            outfile << name << ","  << year << "," << minAgeMDA <<"," << maxAge << "," << "MDACoverage1" << "," << 0 << "\n"; 
+        }
+        
+        outfile << name << ","  << year << "," << minAgeMDA <<"," << maxAge << "," << "MDACoverage2" << "," << 0 << "\n";
+    }else{
+        outfile << name << ","  << year << "," << minAgeMDA <<"," << maxAge << "," << "MDATreatments1" << "," << 0 << "\n";
+        outfile << name << ","  << year << "," << minAgeMDA <<"," << maxAge << "," << "MDATreatments2" << "," << MDATreatments << "\n";
+        outfile << name << ","  << year << "," << minAgeMDA <<"," << maxAge << "," << "MDACoverage1" << "," << 0 << "\n";
+         if(MDAPopSize >0){
+           outfile << name << ","  << year << "," << minAgeMDA <<"," << maxAge << "," << "MDACoverage2" << "," << double(MDATreatments)/MDAPopSize << "\n"; 
+        }else{
+            outfile << name << ","  << year << "," << minAgeMDA <<"," << maxAge << "," << "MDACoverage2" << "," << 0 << "\n"; 
+        }
+    
+    }
+    
+   
+	outfile.close();
+}
+
+
+
+
+void Scenario::writeMDADataMissedYears(int t, int MDATreatments, int MDAPopSize, int minAgeMDA, int maxAge, int rep, std::string folder){
+    // get mf prevalence
+    std::ofstream outfile;
+    std::string fname;
+    std::string rep1 = std::to_string(rep);
+    std::size_t first_ = name.find("_");
+    std::string fol_n = name.substr(0,first_);
+    fname = folder +"/IPM_scen" + fol_n +  "/IPM_scen" + name + "_rep_" + rep1  + ".csv";
+
+    int year = t/12 + 2000;
+
+    outfile.open(fname, std::ios::app);        
+    
+    
+    outfile << name << ","  << year << "," << minAgeMDA <<"," << maxAge << "," << "MDATreatments1" << "," << 0 << "\n";
+
+    outfile << name << ","  << year << "," << minAgeMDA <<"," << maxAge << "," << "MDATreatments2" << "," << 0 << "\n";
+
+    outfile << name << ","  << year << "," << minAgeMDA <<"," << maxAge << "," << "MDACoverage1" << "," << 0 << "\n";   
+
+    outfile << name << ","  << year << "," << minAgeMDA <<"," << maxAge << "," << "MDACoverage2" << "," << 0 << "\n";
+   
+	outfile.close();
+}
+
+
+
+
+void Scenario::writeSurveyByAge(Population& popln, int t, int preTAS_Pass, int TAS_Pass, int rep, std::string folder){
+    // get mf prevalence
+    std::ofstream outfile;
+    
+    std::string fname;
+    std::string rep1 = std::to_string(rep);
+    std::size_t first_ = name.find("_");
+    std::string fol_n = name.substr(0,first_);
+    fname = folder + "/IPM_scen" + fol_n + "/IPM_scen" + name + "_rep_" + rep1  + ".csv";
+    int year = t/12 + 2000;
+    
+    outfile.open(fname, std::ios::app);         
+   
+    outfile << name << ","  << year << "," << "None" <<"," << "None" << "," << "numPreTASSurveys" << "," << popln.numPreTASSurveys<< "\n";
+    outfile << name << ","  << year << "," << "None" <<"," << "None" << "," << "TASSurveys" << "," << popln.numTASSurveys<< "\n";  
+    outfile << name << ","  << year << "," << "None" <<"," << "None" << "," << "PreTASPass" << "," << preTAS_Pass<< "\n";
+    outfile << name << ","  << year << "," << "None" <<"," << "None" << "," << "TASPass" << "," << TAS_Pass<< "\n";
+   
+	outfile.close();
+}
 
 
 
