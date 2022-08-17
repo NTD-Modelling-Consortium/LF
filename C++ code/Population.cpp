@@ -744,7 +744,10 @@ void Population::ApplyTreatment(MDAEvent* mda, Worm& worms, Scenario& sc, int t,
     
     // std::cout <<"start time = " << startTime <<", TIME = "<< t <<", a = " <<  mdaCoverage <<  ", b = " << mda->getCoverage() <<std::endl;
     bool coverageChanged = (mdaCoverage != mda->getCoverage());
-   
+    
+    u0CompMDA = calcU0(mda->getCoverage(), mda->getSigma2());
+    for(int i =0; i < size; i++)
+                    host_pop[i].uCompMDA = stats.normal_dist(u0CompMDA, sqrt(mda->getSigma2()));
     if (mda->getCoverage()){  //crashes if this is zero, but never should be
         
      
