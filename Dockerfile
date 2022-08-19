@@ -20,7 +20,7 @@ COPY . /ntd/ntd-model-lf
 
 # compile it
 WORKDIR '/ntd/ntd-model-lf/C++ code'
-RUN g++ *.cpp tinyxml/*.cpp -o transfil_N -g -I. -I./tinyxml $(/ntd/gsl/bin/gsl-config --libs) $(/ntd/gsl/bin/gsl-config --cflags) -Wall -O3 -std=c++11
+RUN g++ *.cpp tinyxml/*.cpp -o transfil_N -g -I. -I./tinyxml $(/ntd/gsl/bin/gsl-config --libs) $(/ntd/gsl/bin/gsl-config --cflags) -lstdc++fs -Wall -O3 -std=c++11
 RUN mkdir /ntd/bin
 RUN cp transfil_N /ntd/bin
 RUN rm -rf /ntd/ntd-model-lf
