@@ -1,19 +1,42 @@
 # LF
 
-Along with files included in the C++ code folder, the gsl library is used so will need to be installed. The installation process for gsl is described here: https://coral.ise.lehigh.edu/jild13/2016/07/11/hello/
+Along with files included in the C++ code folder, the gsl library is used so will need to be installed. The installation process for gsl is described [here](https://coral.ise.lehigh.edu/jild13/2016/07/11/hello/).
 
-From within C++ code folder the following code should be run in the terminal in order to compile and run simulations.
+Alternatively on macOS you can install gsl using homebrew: `brew install gsl`
 
-**Code to compile the files**:
+### Compiling
 
+From within `C++ code` folder the following command should be run in the terminal in order to compile and run simulations:
+
+```
 g++ -g -I. -I./tinyxml -I/usr/include -I/Users/matthewgraham/gsl/include -L/Users/matthewgraham/gsl/lib -Wall -O3 -std=c++11 -lm -lgsl -lgslcblas \*.cpp tinyxml/\*.cpp -o transfil_N
+```
+
+On MacOS, using homebrewed `gsl`:
+
+```
+g++ *.cpp tinyxml/*.cpp -o transfil_N -g -I. -I./tinyxml $( $(brew --prefix)/bin/gsl-config --libs ) $( $(brew --prefix)/bin/gsl-config --cflags ) -Wall -O3 -std=c++11
+```
+
+On Debian Linux 11+ using `g++` from `build-essential` you need to specify `-lstdc++fs` in the build command, and you'll also need to build `gsl` from scratch so you'll have to set up the `gsl-config` path appropriately. See `Dockerfile` for how it's done.
+
+```
+g++ \
+	*.cpp tinyxml/*.cpp \
+	-o transfil_N \
+	-g -I. -I./tinyxml \
+	$(/ntd/gsl/bin/gsl-config --libs) \
+	$(/ntd/gsl/bin/gsl-config --cflags) \
+	-lstdc++fs \
+	-Wall -O3 -std=c++11
+```
 
 
 The gsl calls will need to be changed to where gsl library is installed on your computer.
 
-**Code to run the simulations**:
+### Running simulations
 
-./transfil_N -s testscenario.xml -n Pop_Distribution.csv -p RandomParamIU4629.txt -r 200 -t 1 -o results
+./transfil\_N -s testscenario.xml -n Pop_Distribution.csv -p RandomParamIU4629.txt -r 200 -t 1 -o results
 
 **Inputs**:
 
