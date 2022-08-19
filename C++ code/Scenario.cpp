@@ -11,9 +11,18 @@
 #include <sstream>
 #include <string> 
 #include <sys/stat.h>
+
+#ifdef __APPLE__
 #include <filesystem>
 namespace fs = std::__fs::filesystem;
 
+#elif __linux__
+#include <experimental/filesystem>
+namespace fs = std::experimental::filesystem;
+
+#else
+#	error "Unknown OS"
+#endif
 
 bool IsPathExist(const std::string &s)
 {
