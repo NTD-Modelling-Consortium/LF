@@ -558,11 +558,8 @@ void Scenario::InitIHMEData(int rep,  std::string folder){
     fname = folder + "/IHME_scen" + fol_n + "/" + name +"/IHME_scen" + name +  "_rep_" + rep1  + ".csv";
     fname2 = folder + "/IHME_scen" + fol_n + "/" + name;
     if (stat(fname2.c_str(), &buffer) != 0) {
-    	std::cout << fname << " directory doesn't exist!";
         fs::create_directories(fname2);
-    } else {
-    	std::cout << fname << " directory exists!";
-    }
+    } 
     std::ofstream outfile;
     outfile.open(fname);
     if(rep == 0){
@@ -689,11 +686,8 @@ void Scenario::InitIPMData(int rep, std::string folder){
     fname = folder + "/IPM_scen" + fol_n + "/" + name +"/IPM_scen" + name +  "_rep_" + rep1  + ".csv";
     fname2 = folder + "/IPM_scen" + fol_n + "/" + name;
     if (stat(fname2.c_str(), &buffer) != 0) {
-    	std::cout << fname << " directory doesn't exist!";
         fs::create_directories(fname2);
-    } else {
-    	std::cout << fname << " directory exists!";
-    }
+    } 
     std::ofstream outfile;
     outfile.open(fname);
     outfile << "espen_loc" << ","  << "year_id" << "," << "age_start" <<"," << "age_end" << "," << "measure" << "," << "draw_0" << "\n";
