@@ -42,3 +42,7 @@ vignettes/*.pdf
 
 # built binary
 */transfil_N*
+
+# vim swap files
+*.swp
+*.swo
