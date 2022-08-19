@@ -10,6 +10,16 @@
 #include "Output.hpp"
 #include <sstream>
 #include <string> 
+#include <sys/stat.h>
+#include <filesystem>
+namespace fs = std::__fs::filesystem;
+
+
+bool IsPathExist(const std::string &s)
+{
+  struct stat buffer;
+  return (stat (s.c_str(), &buffer) == 0);
+}
 
 
 
@@ -536,12 +546,23 @@ bool Scenario::requiresWC() const {
 void Scenario::InitIHMEData(int rep,  std::string folder){
     // get mf prevalence
 
+    struct stat buffer;
+
+    
     
     std::string fname;
+    std::string fname2;
     std::string rep1 = std::to_string(rep);
     std::size_t first_ = name.find("_");
     std::string fol_n = name.substr(0,first_);
-    fname = folder + "/IHME_scen" + fol_n +"/IHME_scen" + name +  "_rep_" + rep1  + ".csv";
+    fname = folder + "/IHME_scen" + fol_n + "/" + name +"/IHME_scen" + name +  "_rep_" + rep1  + ".csv";
+    fname2 = folder + "/IHME_scen" + fol_n + "/" + name;
+    if (stat(fname2.c_str(), &buffer) != 0) {
+    	std::cout << fname << " directory doesn't exist!";
+        fs::create_directories(fname2);
+    } else {
+    	std::cout << fname << " directory exists!";
+    }
     std::ofstream outfile;
     outfile.open(fname);
     if(rep == 0){
@@ -564,7 +585,7 @@ void Scenario::writePrevByAge(Population& popln, int t, int rep,  std::string fo
     std::size_t first_ = name.find("_");
     std::string fol_n = name.substr(0,first_);
     std::string rep1 = std::to_string(rep);
-    fname = folder + "/IHME_scen" + fol_n + "/IHME_scen" + name + "_rep_" + rep1  + ".csv";
+    fname = folder + "/IHME_scen" + fol_n + "/" + name +"/IHME_scen" + name +  "_rep_" + rep1  + ".csv";
     int year = t/12 + 2000;
 	outfile.open(fname, std::ios::app);
 
@@ -595,7 +616,7 @@ void Scenario::writeNumberByAge(Population& popln, int t, int rep,  std::string 
     std::size_t first_ = name.find("_");
     std::string fol_n = name.substr(0,first_);
     std::string rep1 = std::to_string(rep);
-    fname = folder + "/IHME_scen" + fol_n + "/IHME_scen" + name + "_rep_" + rep1  + ".csv";
+    fname = folder + "/IHME_scen" + fol_n + "/" + name +"/IHME_scen" + name +  "_rep_" + rep1  + ".csv";
     int year = t/12 + 2000;
     
     outfile.open(fname, std::ios::app);     
@@ -627,7 +648,7 @@ void Scenario::writeSequelaeByAge(Population& popln, int t, int LymphodemaTotalW
     std::size_t first_ = name.find("_");
     std::string fol_n = name.substr(0,first_);
     std::string rep1 = std::to_string(rep);
-    fname = folder + "/IHME_scen" + fol_n + "/IHME_scen" + name +"_rep_" + rep1  + ".csv";
+    fname = folder + "/IHME_scen" + fol_n + "/" + name +"/IHME_scen" + name +  "_rep_" + rep1  + ".csv";
   
     int year = t/12 + 2000;
     
@@ -656,11 +677,23 @@ void Scenario::writeSequelaeByAge(Population& popln, int t, int LymphodemaTotalW
 
 void Scenario::InitIPMData(int rep, std::string folder){
     // get mf prevalence
+    struct stat buffer;
+
+    
+    
     std::string fname;
+    std::string fname2;
     std::string rep1 = std::to_string(rep);
     std::size_t first_ = name.find("_");
     std::string fol_n = name.substr(0,first_);
-    fname = folder + "/IPM_scen" + fol_n + "/IPM_scen" + name + "_rep_" + rep1  + ".csv";
+    fname = folder + "/IPM_scen" + fol_n + "/" + name +"/IPM_scen" + name +  "_rep_" + rep1  + ".csv";
+    fname2 = folder + "/IPM_scen" + fol_n + "/" + name;
+    if (stat(fname2.c_str(), &buffer) != 0) {
+    	std::cout << fname << " directory doesn't exist!";
+        fs::create_directories(fname2);
+    } else {
+    	std::cout << fname << " directory exists!";
+    }
     std::ofstream outfile;
     outfile.open(fname);
     outfile << "espen_loc" << ","  << "year_id" << "," << "age_start" <<"," << "age_end" << "," << "measure" << "," << "draw_0" << "\n";
@@ -677,7 +710,7 @@ void Scenario::writeMDAData(int t, int MDATreatments, int MDAPopSize, int minAge
     std::string rep1 = std::to_string(rep);
     std::size_t first_ = name.find("_");
     std::string fol_n = name.substr(0,first_);
-    fname = folder +"/IPM_scen" + fol_n +  "/IPM_scen" + name + "_rep_" + rep1  + ".csv";
+    fname = folder + "/IPM_scen" + fol_n + "/" + name +"/IPM_scen" + name +  "_rep_" + rep1  + ".csv";
 
     int year = t/12 + 2000;
 
@@ -719,7 +752,7 @@ void Scenario::writeMDADataMissedYears(int t, int MDATreatments, int MDAPopSize,
     std::string rep1 = std::to_string(rep);
     std::size_t first_ = name.find("_");
     std::string fol_n = name.substr(0,first_);
-    fname = folder +"/IPM_scen" + fol_n +  "/IPM_scen" + name + "_rep_" + rep1  + ".csv";
+    fname = folder + "/IPM_scen" + fol_n + "/" + name +"/IPM_scen" + name +  "_rep_" + rep1  + ".csv";
 
     int year = t/12 + 2000;
 
@@ -748,7 +781,7 @@ void Scenario::writeSurveyByAge(Population& popln, int t, int preTAS_Pass, int T
     std::string rep1 = std::to_string(rep);
     std::size_t first_ = name.find("_");
     std::string fol_n = name.substr(0,first_);
-    fname = folder + "/IPM_scen" + fol_n + "/IPM_scen" + name + "_rep_" + rep1  + ".csv";
+    fname = folder + "/IPM_scen" + fol_n + "/" + name +"/IPM_scen" + name +  "_rep_" + rep1  + ".csv";
     int year = t/12 + 2000;
     
     outfile.open(fname, std::ios::app);         

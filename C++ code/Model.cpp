@@ -294,9 +294,9 @@ void Model::evolveAndSave(int y, Population& popln, Vector& vectors, Worm& worms
     //done
     currentMonth = targetMonth;
     //prev = popln.getMFPrev();
-    popln.saveTotalWorms();
-    popln.saveTotalWormYears();
-    popln.saveAges();
+    // popln.saveTotalWorms();
+    // popln.saveTotalWormYears();
+    // popln.saveAges();
     if (y < (sc.getNumMonthsToSave()-1)){ //not finished this scenario
         popln.saveCurrentState(currentMonth, sc.getName()); //worms and importation rate. Scenario name just needed for debugging
         vectors.saveCurrentState(currentMonth); //larval density
