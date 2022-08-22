@@ -1,12 +1,12 @@
 # LF
 
-Along with files included in the C++ code folder, the gsl library is used so will need to be installed. The installation process for gsl is described [here](https://coral.ise.lehigh.edu/jild13/2016/07/11/hello/).
+Along with files included in the `src` folder, the gsl library is used so will need to be installed. The installation process for gsl is described [here](https://coral.ise.lehigh.edu/jild13/2016/07/11/hello/).
 
 Alternatively on macOS you can install gsl using homebrew: `brew install gsl`
 
 ### Compiling
 
-From within `C++ code` folder the following command should be run in the terminal in order to compile and run simulations:
+From within `src` folder the following command should be run in the terminal in order to compile and run simulations:
 
 ```
 g++ -g -I. -I./tinyxml -I/usr/include -I/Users/matthewgraham/gsl/include -L/Users/matthewgraham/gsl/lib -Wall -O3 -std=c++11 -lm -lgsl -lgslcblas \*.cpp tinyxml/\*.cpp -o transfil_N
@@ -15,28 +15,33 @@ g++ -g -I. -I./tinyxml -I/usr/include -I/Users/matthewgraham/gsl/include -L/User
 On MacOS, using homebrewed `gsl`:
 
 ```
-g++ *.cpp tinyxml/*.cpp -o transfil_N -g -I. -I./tinyxml $( $(brew --prefix)/bin/gsl-config --libs ) $( $(brew --prefix)/bin/gsl-config --cflags ) -Wall -O3 -std=c++11
+g++ \
+	*.cpp tinyxml/*.cpp \
+	-o transfil_N \
+	-g -I. -I./tinyxml \
+	$( $(brew --prefix)/bin/gsl-config --libs ) \
+	$( $(brew --prefix)/bin/gsl-config --cflags ) \
+	-Wall -O3 -std=c++11
 ```
 
-On Debian Linux 11+ using `g++` from `build-essential` you need to specify `-lstdc++fs` in the build command, and you'll also need to build `gsl` from scratch so you'll have to set up the `gsl-config` path appropriately. See `Dockerfile` for how it's done.
+On Debian Linux 11+ using `g++` from `build-essential` you need to specify `-lstdc++fs` in the build command:
 
 ```
 g++ \
 	*.cpp tinyxml/*.cpp \
 	-o transfil_N \
 	-g -I. -I./tinyxml \
-	$(/ntd/gsl/bin/gsl-config --libs) \
-	$(/ntd/gsl/bin/gsl-config --cflags) \
+	$(gsl-config --libs) \
+	$(gsl-config --cflags) \
 	-lstdc++fs \
 	-Wall -O3 -std=c++11
 ```
-
 
 The gsl calls will need to be changed to where gsl library is installed on your computer.
 
 ### Running simulations
 
-./transfil\_N -s testscenario.xml -n Pop_Distribution.csv -p RandomParamIU4629.txt -r 200 -t 1 -o results
+`./transfil\_N -s testscenario.xml -n Pop_Distribution.csv -p RandomParamIU4629.txt -r 200 -t 1 -o results`
 
 **Inputs**:
 
@@ -48,7 +53,7 @@ The gsl calls will need to be changed to where gsl library is installed on your 
 
 -r 200: number of simualtions to run. Has to be smaller than or equal to the number of parameter sets given in the parameter file.
 
--o results: folder in which to save the outputs of the simulation. This folder must be created inside the C++ code folder.
+-o results: folder in which to save the outputs of the simulation. This folder must be created inside the `src` folder.
 
 
 
