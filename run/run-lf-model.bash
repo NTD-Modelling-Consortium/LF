@@ -68,7 +68,7 @@ function combine_output_files () {
 	MODEL_OUTPUT_FILE_ROOT=res_endgame/${inst}_scen${scen}/${scen}_${iu}
 
 	# where do we want to put the combined file
-	IU_OUTPUT_PATH="ntd/${output_folder_name}/lf/scenario_${scen}/${iu}"
+	IU_OUTPUT_PATH="ntd/${output_folder_name}/lf/scenario_${scen}/${iu:0:3}/${iu}"
 
 	# what is the file going to be called
 	LOCAL_IU_OUTPUT_DIR="output/${IU_OUTPUT_PATH}"
