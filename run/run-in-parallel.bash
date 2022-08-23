@@ -5,7 +5,7 @@ if [[ $# != 1 ]] ; then
 	exit 1
 fi
 
-# destination below 'combined_output/ntd' where the outputs should be saved, e.g. 202208b
+# destination below 'output/ntd' where the outputs should be saved, e.g. 202208b
 output_folder_name="${1}"
 
 # work out how many jobs to run

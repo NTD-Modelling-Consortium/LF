@@ -71,7 +71,7 @@ function combine_output_files () {
 	IU_OUTPUT_PATH="ntd/${output_folder_name}/lf/scenario_${scen}/${iu}"
 
 	# what is the file going to be called
-	LOCAL_IU_OUTPUT_DIR="combined_output/${IU_OUTPUT_PATH}"
+	LOCAL_IU_OUTPUT_DIR="output/${IU_OUTPUT_PATH}"
 	LOCAL_IU_OUTPUT_FILE_NAME="${inst,,}-${iu}-lf-scenario_${scen}-${NUM_SIMULATIONS}.csv"
 	LOCAL_IU_OUTPUT_FILE_PATH="${LOCAL_IU_OUTPUT_DIR}/${LOCAL_IU_OUTPUT_FILE_NAME}"
 
