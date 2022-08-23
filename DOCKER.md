@@ -32,3 +32,20 @@
 	```
 	bash run-in-parallel.bash <output-folder-name>
 	```
+
+1. To run the model in a docker container as a background task (e.g. instead of `nohup` on a cloud server):
+
+	```
+	docker-credential-gcr configure-docker # this is for GCE only
+	docker pull gcr.io/<your-container-registry>/ntd-model-lf:latest
+	docker run -d -v ${PWD}/output:/ntd/run/combined_output gcr.io/<your-container-registry>/ntd-model-lf:latest bash run-in-parallel.bash <output-folder>
+	```
+
+1. To pass in a required number of `parallel` CPU tasks or model simulations:
+
+	```
+	docker run -d--rm --name runner  \
+		-v ${PWD}/output:/ntd/run/combined_output \
+		gcr.io/<your-container-registry>/ntd-model-lf:latest \
+		bash -c "NUM_JOBS=16 NUM_SIMULATIONS=200 bash run-in-parallel.bash <output-folder> >combined_output/lf.out 2>/combined_output.err"
+	```

@@ -46,3 +46,5 @@ vignettes/*.pdf
 # vim swap files
 *.swp
 *.swo
+
+output/*

@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+# shellcheck disable=SC2086
 
 # default options, potentially overridden in env
 PARAMETER_ROOT="${PARAMETER_ROOT:=./parameters}"
@@ -21,15 +22,15 @@ function run_ID () {
 	mkdir -p "${RESULTS}"
 
 	echo "== running ${NUM_SIMULATIONS} simulations of LF model with ${PARAMS} ${SCENARIO}"
-	time transfil_N \
+	transfil_N \
 		-p  "${PARAMS}" \
 		-s  "${SCENARIO}" \
 		-o "${RESULTS}" \
 		-n ./Pop_Distribution.csv \
-		-r ${NUM_SIMULATIONS}
+		-r "${NUM_SIMULATIONS}"
 
 	echo "== converting output files for IHME & IPM"
-	time do_file_conversions ${id} ${output_folder_name}
+	( time do_file_conversions "${id}" "${output_folder_name}" ) 2>&1
 
 	echo "== clearing out model 'result' files"
 	rm -rf "${RESULTS}"
@@ -49,6 +50,8 @@ function do_file_conversions () {
 		convert_output_files "${scen}" "${iu}" IPM "${output_folder_name}"
 
 	done
+
+	echo "== done converting output files"
 }
 
 function convert_output_files () {
@@ -63,7 +66,8 @@ function convert_output_files () {
 
 	MODEL_OUTPUT_FILE_ROOT=res_endgame/${inst}_scen${scen}/${scen}_${iu}
 
-	for n in $(seq 0 $(( $NUM_SIMULATIONS - 2)) ); do
+	# shellcheck disable=SC2004
+	for n in $(seq 0 $(( $NUM_SIMULATIONS - 2 )) ); do
 
 		NEXT_SEQUENCE_NUMBER=$(( n + 1 ))
 
@@ -116,11 +120,11 @@ function organise_output_files () {
 	LOCAL_IU_OUTPUT_DIR="combined_output/${IU_OUTPUT_PATH}"
 	LOCAL_IU_OUTPUT_FILE_NAME="${inst,,}-${iu}-lf-scenario_${scen}-${NUM_SIMULATIONS}.csv"
 	LOCAL_IU_OUTPUT_FILE_PATH="${LOCAL_IU_OUTPUT_DIR}/${LOCAL_IU_OUTPUT_FILE_NAME}"
-	LOCAL_IU_OUTPUT_FILE_PATH_BZ="${LOCAL_IU_OUTPUT_DIR}/${LOCAL_IU_OUTPUT_FILE_NAME}.bz2"
+#	LOCAL_IU_OUTPUT_FILE_PATH_BZ="${LOCAL_IU_OUTPUT_DIR}/${LOCAL_IU_OUTPUT_FILE_NAME}.bz2"
 
-	GCS_IU_OUTPUT_DIR="gs://ntd-endgame-result-data/${IU_OUTPUT_PATH}"
-	GCS_IU_OUTPUT_FILE_NAME="${LOCAL_IU_OUTPUT_FILE_NAME}.bz2"
-	GCS_IU_OUTPUT_FILE_PATH="${GCS_IU_OUTPUT_DIR}/${GCS_IU_OUTPUT_FILE_NAME}"
+#	GCS_IU_OUTPUT_DIR="gs://ntd-endgame-result-data/${IU_OUTPUT_PATH}"
+#	GCS_IU_OUTPUT_FILE_NAME="${LOCAL_IU_OUTPUT_FILE_NAME}.bz2"
+#	GCS_IU_OUTPUT_FILE_PATH="${GCS_IU_OUTPUT_DIR}/${GCS_IU_OUTPUT_FILE_NAME}"
 
 	mkdir -p "${LOCAL_IU_OUTPUT_DIR}"
 	mv $last_tmp ${LOCAL_IU_OUTPUT_FILE_PATH}
@@ -129,6 +133,7 @@ function organise_output_files () {
 	rm -rf ${MODEL_OUTPUT_FILE_ROOT}
 
 	# remove IU folders e.g. ./res_endgame/IPM_scen3b/3b_TCD10760
+	# shellcheck disable=SC2044
 	for s in $( find ./res_endgame -type d -empty ) ; do
 		if [[ -d "${s}" ]] ; then
 			rm -rf "${s}"
@@ -148,4 +153,4 @@ if [[ $# != 2 ]] ; then
 	exit 1
 fi
 
-run_ID ${1} ${2}
+run_ID "${1}" "${2}"

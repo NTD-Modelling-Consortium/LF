@@ -8,4 +8,15 @@ fi
 # destination below 'combined_output/ntd' where the outputs should be saved, e.g. 202208b
 output_folder_name="${1}"
 
-NUM_SIMULATIONS=${NUM_SIMULATIONS:=5} time parallel -a running-id-list.txt bash run-lf-model.bash "${output_folder_name}"
+# work out how many jobs to run
+NUM_JOBS=${NUM_JOBS:=default}
+if [[ "${NUM_JOBS}" = "default" ]] ; then
+	JOBS_ARG=""
+else
+	JOBS_ARG="-j${NUM_JOBS}"
+fi
+
+RUNNING_ID_LIST_FILE=${RUNNING_ID_LIST_FILE:=running-id-list.txt}
+
+# run the job
+NUM_SIMULATIONS=${NUM_SIMULATIONS:=5} time parallel ${JOBS_ARG} -a "${RUNNING_ID_LIST_FILE}" bash run-lf-model.bash "${output_folder_name}"
