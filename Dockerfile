@@ -6,10 +6,14 @@ RUN apt-get update -y && \
 		build-essential \
 		vim curl git htop \
 		silversearcher-ag \
+		gsl-bin libgsl-dev \
 		libxml2-utils \
 		parallel \
-		gsl-bin libgsl-dev \
+		python3 pip \
 		time
+
+# and python CSV package
+RUN pip install pandas
 
 # create ntd dir
 RUN mkdir /ntd
