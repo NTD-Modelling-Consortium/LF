@@ -22,7 +22,7 @@ function run_ID () {
 	mkdir -p "${RESULTS}"
 
 	echo "== running ${NUM_SIMULATIONS} simulations of LF model with ${PARAMS} ${SCENARIO}"
-	transfil_N \
+	time transfil_N \
 		-p  "${PARAMS}" \
 		-s  "${SCENARIO}" \
 		-o "${RESULTS}" \
