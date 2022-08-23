@@ -41,5 +41,6 @@ for rep in range( 1, int( num_simulations ) ):
 	}[ institute ]
 
 	main_df[ f'draw_{rep}' ] = next_df.iloc[ :, iloc_idx ]
+	main_df = main_df.copy()
 
 main_df.to_csv( output_file_path, index = False )
