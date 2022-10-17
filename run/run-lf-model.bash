@@ -22,7 +22,7 @@ function run_ID () {
 	mkdir -p "${RESULTS}"
 
 	echo "== running ${NUM_SIMULATIONS} simulations of LF model with ${PARAMS} ${SCENARIO}"
-	time transfil_N \
+	time ./transfil_N \
 		-p  "${PARAMS}" \
 		-s  "${SCENARIO}" \
 		-o "${RESULTS}" \
@@ -83,6 +83,11 @@ function combine_output_files () {
 
 	echo "== bzip2-ing output file ${LOCAL_IU_OUTPUT_FILE_PATH}"
 	bzip2 --force --best "${LOCAL_IU_OUTPUT_FILE_PATH}"
+
+	# TODO work out how to do this without interfering with parallel runs
+#	echo "== removing model output files in ${MODEL_OUTPUT_FILE_ROOT}"
+#	find "${MODEL_OUTPUT_FILE_ROOT}" -type f -exec rm {} \;
+#	rmdir "${MODEL_OUTPUT_FILE_ROOT}"
 
 }
 
