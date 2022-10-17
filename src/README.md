@@ -1,1 +1,5 @@
 Cpp files are run to simulate an LF epidemic
+
+Worm variable:
+wormsTreated function: This function outputs surviving worms based on a treatment round. This is dependent on the drug used, defined by "type" variable. For example "da" is drug diethylcarbamazine and albendazole.  propWormsKilled = (wPropMDA >=0)?wPropMDA:0.55; defines that 55% of worms are killed.
+mfTreated function: Proportion of mf killed by treatment. mfPropMDA variable defines the proportion of mf will be left after treatment. For da drug regimen, mfPropMDA = 1-1; means that 100% of mf will be removed from individual. 
