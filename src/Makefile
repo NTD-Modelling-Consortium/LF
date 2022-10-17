@@ -1,34 +1,59 @@
-OBJS := main.o ScenariosList.o Scenario.o Population.o Host.o Model.o Output.o Vector.o Worm.o Statistics.o MDAEvent.o BedNetEvent.o PrevalenceEvent.o ImportationRateEvent.o tinyxml/tinystr.o tinyxml/tinyxmlparser.o tinyxml/tinyxmlerror.o tinyxml/tinyxml.o 
+# define object files
+OBJS := \
+	main.o \
+	BedNetEvent.o \
+	Host.o \
+	ImportationRateEvent.o \
+	MDAEvent.o \
+	Model.o \
+	Output.o \
+	Population.o \
+	PrevalenceEvent.o \
+	RecordedPrevalence.o \
+	Scenario.o \
+	ScenariosList.o \
+	Statistics.o \
+	Vector.o \
+	Worm.o \
+	tinyxml/tinystr.o \
+	tinyxml/tinyxml.o \
+	tinyxml/tinyxmlerror.o \
+	tinyxml/tinyxmlparser.o
 
 # Provide any options and flags for the compiler here
 CFLAGS    = -Wall -O3 -std=c++11
 
+# work out where to find 'gsl-config' to get GSL CFLAGS and library path
+GSL_CONFIG := $(shell which gsl-config)
+
 # Set name of final executable file here
-EXENAME = transfil
+EXENAME = transfil_N
 
 # If you are linking to external libraries, provide them here
-LIBS  = -lm -lgsl -lgslcblas
+LIBS  = -lm
 
-# If there are libraries with non-standard paths, provide the paths here
-LIBDIR = -L$(HOME)/lib
+# Get your system's packaged GSL paths
+GSL_LIBS := $(shell $(GSL_CONFIG) --libs)
 
-# If there are header files with non-standard paths, provide the paths here
-INCLDIR = -I. -I./tinyxml -I$(HOME)/include
+# Add tinyxml and system-packaged GSL include paths
+INCLDIR = -I. -I./tinyxml $(shell $(GSL_CONFIG) --cflags)
 
+# default build target
 default:$(EXENAME)
 
 # link to generate executable file
 $(EXENAME): $(OBJS)
-	g++ $(LIBDIR) $(OBJS) $(LIBS) -o $(EXENAME)
+	g++ $(OBJS) $(LIBS) $(GSL_LIBS) -o $(EXENAME)
 
 # pull in dependency info for *existing* .o files
 -include $(OBJS:.o=.d)
 
 # compile and generate dependency info
 %.o: %.cpp
-	gcc -c $(CFLAGS) $(INCLDIR) $*.cpp -o $*.o
-	gcc -MM $(CFLAGS) $(INCLDIR) $*.cpp > $*.d
+	g++ -c $(CFLAGS) $(INCLDIR) $*.cpp -o $*.o
+	g++ -MM $(CFLAGS) $(INCLDIR) $*.cpp > $*.d
 
 # remove compilation products
 clean:
-	rm -f $(EXENAME) *.o *.d
+	rm -rf $(EXENAME) $(EXENAME).* *.o *.d tinyxml/*.o tinyxml/*.d
+	rm -f ../run/$(EXENAME)
