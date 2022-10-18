@@ -62,7 +62,6 @@ function combine_output_files () {
 	output_folder_name=${4}
 
 	echo "== combining ${inst} files for IU ${iu} scenario ${scen}"
-	last_tmp=$( mktemp )
 
 	# where does the model write its output
 	MODEL_OUTPUT_FILE_ROOT=res_endgame/${inst}_scen${scen}/${scen}_${iu}
@@ -83,11 +82,6 @@ function combine_output_files () {
 
 	echo "== bzip2-ing output file ${LOCAL_IU_OUTPUT_FILE_PATH}"
 	bzip2 --force --best "${LOCAL_IU_OUTPUT_FILE_PATH}"
-
-	# TODO work out how to do this without interfering with parallel runs
-#	echo "== removing model output files in ${MODEL_OUTPUT_FILE_ROOT}"
-#	find "${MODEL_OUTPUT_FILE_ROOT}" -type f -exec rm {} \;
-#	rmdir "${MODEL_OUTPUT_FILE_ROOT}"
 
 }
 

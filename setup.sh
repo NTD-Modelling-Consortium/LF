@@ -15,6 +15,12 @@ if [[ -z $( which pipenv ) ]] ; then
 	exit 1
 fi
 
+# check for packaged pgrep install
+if [[ -z $( which pgrep ) ]] ; then
+	echo "=> error: please install 'pgrep' using your system package manager (homebrew:pgrep/aptitude:procps)" >&2
+	exit 1
+fi
+
 # do the C++ build
 echo "-> building C++ LF model ..."
 
