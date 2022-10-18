@@ -29,8 +29,15 @@ GSL_CONFIG := $(shell which gsl-config)
 # Set name of final executable file here
 EXENAME = transfil_N
 
-# If you are linking to external libraries, provide them here
-LIBS  = -lm
+# add the Linux C++ 'fs' library if on Linux, -lm only if on Darwin
+# (as it's provided by gsl-config on Linux)
+UNAME := $(shell uname)
+
+ifeq ($(UNAME),Darwin)
+	LIBS = -lm
+else ifeq ($(UNAME),Linux)
+	LIBS += -lstdc++fs
+endif
 
 # Get your system's packaged GSL paths
 GSL_LIBS := $(shell $(GSL_CONFIG) --libs)
