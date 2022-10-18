@@ -40,6 +40,11 @@ echo
 echo "-> setting up python LF model runner ..."
 
 cd "${RUN_DIR}"
+# clear out existing virtualenv
+set +e
+pipenv --rm 2>/dev/null
+set -e
+rm -rf Pipfile*
 pipenv install --dev
 pipenv run pip install .
 echo
