@@ -20,17 +20,19 @@ function usage () {
 	exit 1
 }
 
+# convert $1 (relative filename) to absolute
 function get_abs_filename() {
-  # $1 : relative filename
   echo "$(cd "$(dirname "$1")" && pwd)/$(basename "$1")"
 }
 
+# set up sensible defaults
 NUM_SIMULATIONS=200
 NUM_PARALLEL_JOBS=default
 RUNNING_ID_LIST_FILE=$( get_abs_filename run/running-id-list.txt )
 OUTPUT_SUBDIRECTORY=$( date +%Y%ma )
 PROJECT_ROOT_DIR=$( get_abs_filename . )
 
+# read CLI options
 while getopts "n:f:o:j:" opts ; do
 
 	case "${opts}" in

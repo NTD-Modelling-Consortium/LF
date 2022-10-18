@@ -3,8 +3,8 @@
 # bail out immediately if anything errors
 set -euo pipefail
 
+# convert $1 (relative filename) to absolute
 function get_abs_filename() {
-  # $1 : relative filename
   echo "$(cd "$(dirname "$1")" && pwd)/$(basename "$1")"
 }
 
