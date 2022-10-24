@@ -1,4 +1,4 @@
-This is an individual based model of lymphatic filariasis in a human population. Along with modeling worms within humans there is a larvae population in the environment, which is modeled. This simulation requires a .txt file which gives the needed parameters for the model, along with a .xml file which gives the intervention scenario for the simulation. Multiple scenarios can be specified in the .xml file. The initially specified scenario will be run from time 0. Subsequent simulations can be run from time 0, or from a saved point from the original simulation.
+This is an individual based model of lymphatic filariasis in a human population. Along with modeling worms within humans there is a larvae population in the environment. This simulation requires a .txt file which gives the needed parameters for the model, along with a .xml file which gives the intervention scenario for the simulation. Multiple scenarios can be specified in the .xml file. The initially specified scenario will be run from time 0. Subsequent simulations can be run from time 0, or from a saved point from the original simulation.
 
 
 # Worm variable:
