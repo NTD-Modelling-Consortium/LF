@@ -1,7 +1,8 @@
-This is an individual based model of lymphatic filariasis (LF) in a human population. To model LF we keep track of the number of worms within human individuals. Worms produce microfilariae (mf), which can then be picked up by mosquitoes in the environment when they feed on humans. Within the mosquito these microfilariae develop through multiple stages until they become L3 larvae, at which point they can infect humans when feeding. The density of these L3 larvae is tracked within the mosquito population.
+This is an individual based model of lymphatic filariasis (LF) in a human population. To model LF we keep track of the number of worms within human individuals. Worms produce microfilariae (mf), which can then infect mosquitoes in the environment when they feed on humans. Within the mosquito these microfilariae develop through multiple stages until they become L3 larvae, at which point they can infect humans when feeding. The density of these L3 larvae is tracked within the mosquito population.
 
 This simulation requires a .txt file which gives the needed parameters for the model, along with a .xml file which gives the intervention scenario for the simulation. Multiple scenarios can be specified in the .xml file. The initially specified scenario will be run from time 0. Subsequent simulations can be run from time 0, or from a saved point from the original simulation.
 
+A common use of this code may be to investigate the impact of different drug regimens on the spread of LF. To achieve this, we need to edit the Worm.cpp file, which contains infomation related to the effectiveness of drug regimens. We also need to create a .xml file which performs the interventions as we wish them to be done.
 
 # Worm variable:
 In the Worm.cpp file, there are functions which define the efficacy of drug regimens. This is important for testing the impact of improved drugs. These functions are briefly described below.
