@@ -1,0 +1,40 @@
+# Host parameters
+
+tau value=0.00167
+rhoBU value=0.0 
+rhoCN value=0.0 
+minAgePrev value=5 
+minAgeMDA value=5 
+minAgeMF value=5
+maxAgeMF value=100
+minAgeIC value=6 
+maxAgeIC value=7
+ICsensitivity value=0.97 
+surveyStartDate value=140 
+ICThreshold value=0.01
+MFThreshold value=0.01
+interSurveyPeriod value=24 
+firstTASNumMDA value=6
+HydroceleTotalWorms value=11
+HydroceleShape value=0.71 
+LymphodemaTotalWorms value=11 
+LymphodemaShape value=0.02
+neverTreated value=0.05 
+
+# Vector parameters
+species value=0 #description=species of mosquito 0 - Anopheles, 1 - Culex
+L3 value=5
+lambda value=10 
+g value=0.37 
+kappas1 value=4.395
+r1 value=0.055
+sigma value=5.0 
+
+# Worm parameters
+nu value=0.0 
+alpha value=1.0 
+psi1 value=0.414 
+psi2 value=0.32 
+s2 value=0.00275 
+mu value=0.0104 
+gamma value=0.1 
