@@ -17,7 +17,7 @@
 extern Statistics stats;
 
 
-void Host::reset(int a, double HydroceleShape, double LymphodemaShape){
+void Host::reset(int a, double HydroceleShape, double LymphodemaShape, double neverTreated){
     
     
     //called when host dies and is reborn or initialised
@@ -32,10 +32,12 @@ void Host::reset(int a, double HydroceleShape, double LymphodemaShape){
     hydroMult = stats.gamma_dist(HydroceleShape);
     lymphoMult = stats.gamma_dist(LymphodemaShape);
     sex = (stats.uniform_dist() < 0.5) ? 0 : 1;
+    neverTreat = (stats.uniform_dist() < neverTreated) ? 1 : 0;
 }
 
 
-void Host::initialise(double deathRate, int maxAge, double k, double* totalBiteRisk, double HydroceleShape, double LymphodemaShape){
+void Host::initialise(double deathRate, int maxAge, double k, double* totalBiteRisk, 
+double HydroceleShape, double LymphodemaShape, double neverTreated){
     
     //called at start of new replicate
     
@@ -47,8 +49,8 @@ void Host::initialise(double deathRate, int maxAge, double k, double* totalBiteR
     hydroMult = stats.gamma_dist(HydroceleShape);
     lymphoMult = stats.gamma_dist(LymphodemaShape);
     sex = (stats.uniform_dist() < 0.5) ? 0 : 1;
-    reset(a, HydroceleShape, LymphodemaShape);
-    
+    reset(a, HydroceleShape, LymphodemaShape, neverTreated);
+  
     numMDAs=0;
     
 }
@@ -56,7 +58,9 @@ void Host::initialise(double deathRate, int maxAge, double k, double* totalBiteR
 
                                
 
-void Host::react( double dt, double deathRate, const int maxAge, double aImp, const Vector& vectors, const Worm& worms, double HydroceleShape, double LymphodemaShape ) {
+void Host::react( double dt, double deathRate, const int maxAge, double aImp, 
+const Vector& vectors, const Worm& worms, double HydroceleShape, double LymphodemaShape,
+double neverTreated) {
     
     //time-step
     age += dt;
@@ -66,7 +70,7 @@ void Host::react( double dt, double deathRate, const int maxAge, double aImp, co
     if ((hostDies(deathRate * dt)) || age > (12*maxAge)){ //if over age 100
         
         //host dies and is replaced by uninfected newborn with same bite risk (b)
-        reset(0, HydroceleShape, LymphodemaShape);
+        reset(0, HydroceleShape, LymphodemaShape, neverTreated);
         
     }else{
         //host lives on

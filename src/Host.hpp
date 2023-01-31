@@ -27,7 +27,7 @@ typedef struct {
     double hydroMult;
     double lymphoMult;
     int sex;
-    
+    int neverTreat;
 } hostState;
 
 
@@ -40,9 +40,11 @@ class Host {
     
 public:
     
-    void initialise(double deathRate, int maxAge, double k, double* totalBiteRisk, double HydroceleShape, double LymphodemaShape); //initialise state variables.
-    void reset(int age, double HydroceleShape, double LymphodemaShape);
-    void react(double dt, double deathRate, const int maxAge, double aImp, const Vector& vectors, const Worm& worms, double HydroceleShape, double LymphodemaShape);
+    void initialise(double deathRate, int maxAge, double k, double* totalBiteRisk, 
+    double HydroceleShape, double LymphodemaShape, double neverTreated); //initialise state variables.
+    void reset(int age, double HydroceleShape, double LymphodemaShape, double neverTreated);
+    void react(double dt, double deathRate, const int maxAge, double aImp, const Vector& vectors, 
+    const Worm& worms, double HydroceleShape, double LymphodemaShape, double neverTreated);
     void getsTreated(Worm& worms, std::string type);
     void restore(const hostState& state);
   int getNumMDAs() const {return numMDAs;};
@@ -58,7 +60,8 @@ public:
     double hydroMult;
     double lymphoMult;
     int sex; // 0 = male, 1 = female
-    
+    int neverTreat;
+
     bool bedNet;                 //host uses bednet.
     double uCompBednets;              //THe hosts probability of using a bednet for a given overall coverage
     double uCompMDA;

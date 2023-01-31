@@ -42,11 +42,12 @@ public:
     
     enum vectorSpecies {Anopheles, Culex};
     double L3;              //larval density in vector population
+    double v_to_h;          //vector to host ratio
     
 private:
     
     double lambda;          //bites per month
-    double v_to_h;          //vector to host ratio
+    
     const double sN = 0.03; //prob successful feeding though bednet
     const double dN=0.41;   //prob that mosquito dies on bednet
     

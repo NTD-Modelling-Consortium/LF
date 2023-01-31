@@ -11,18 +11,9 @@
 #include <sstream>
 #include <string> 
 #include <sys/stat.h>
-
-#ifdef __APPLE__
 #include <filesystem>
 namespace fs = std::__fs::filesystem;
 
-#elif __linux__
-#include <experimental/filesystem>
-namespace fs = std::experimental::filesystem;
-
-#else
-#	error "Unknown OS"
-#endif
 
 bool IsPathExist(const std::string &s)
 {
@@ -184,6 +175,8 @@ void  Scenario::openFileandPrintHeadings(std::string region, Output& results){
            myFileWC << name << "\tPevalence calculated using Worm count method" <<std::endl;
            
        }
+
+    
     
     
     //do we need extra file for extra age-restriced outputs?
@@ -597,11 +590,11 @@ void Scenario::writePrevByAge(Population& popln, int t, int rep,  std::string fo
 
                 
    if(rep == 0){
-        for(int j =0; j < maxAge; j++){
-            outfile << name << ","  << year << "," << j <<"," << j+1 << "," << "prevalence" << "," << popln.getMFPrevByAge(j, j+1)<< "\n";
+        for(int j = 0; j < maxAge; j++){
+            outfile << name << ","  << year << "," << j <<"," << j+1 << "," << "prevalence" << "," << popln.getMFPrevByAge(j, j+1) << "\n";
         }
    }else{
-        for(int j =0; j < maxAge; j++){
+        for(int j = 0; j < maxAge; j++){
             outfile << popln.getMFPrevByAge(j, j+1)<< "\n";
         }
    }
@@ -719,7 +712,7 @@ void Scenario::writeMDAData(int t, int MDATreatments, int MDAPopSize, int minAge
 
     outfile.open(fname, std::ios::app);        
     
-    if(type == "da"){
+    if(type != "ma1" ){
         outfile << name << ","  << year << "," << minAgeMDA <<"," << maxAge << "," << "MDATreatments1" << "," << MDATreatments << "\n";
         outfile << name << ","  << year << "," << minAgeMDA <<"," << maxAge << "," << "MDATreatments2" << "," << 0 << "\n";
         if(MDAPopSize >0){
@@ -794,6 +787,47 @@ void Scenario::writeSurveyByAge(Population& popln, int t, int preTAS_Pass, int T
     outfile << name << ","  << year << "," << "None" <<"," << "None" << "," << "PreTASPass" << "," << preTAS_Pass<< "\n";
     outfile << name << ","  << year << "," << "None" <<"," << "None" << "," << "TASPass" << "," << TAS_Pass<< "\n";
    
+	outfile.close();
+}
+
+
+
+void Scenario::writeL3(const Vector& vectors, int t, int preTAS_Pass, int TAS_Pass, int rep, std::string folder){
+    // get mf prevalence
+    std::ofstream outfile;
+    
+    std::string fname;
+    std::string rep1 = std::to_string(rep);
+    std::size_t first_ = name.find("_");
+    std::string fol_n = name.substr(0,first_);
+    fname = folder + "/IPM_scen" + fol_n + "/" + name +"/IPM_scen" + name +  "_rep_" + rep1  + ".csv";
+    int year = t/12 + 2000;
+    
+    outfile.open(fname, std::ios::app);         
+   
+    outfile << name << ","  << year << "," << "None" <<"," << "None" << "," << "L3" << "," << vectors.L3 << "\n";
+    
+	outfile.close();
+}
+
+
+
+
+void Scenario::writeMF(double mfPrev, int t,  int rep, std::string folder){
+    // get mf prevalence
+    std::ofstream outfile;
+    
+    std::string fname;
+    std::string rep1 = std::to_string(rep);
+    std::size_t first_ = name.find("_");
+    std::string fol_n = name.substr(0,first_);
+    fname = folder + "/IPM_scen" + fol_n + "/" + name +"/IPM_scen" + name +  "_rep_" + rep1  + ".csv";
+    int year = t/12 + 2000;
+    
+    outfile.open(fname, std::ios::app);         
+   
+    outfile << name << ","  << year << "," << "None" <<"," << "None" << "," << "MF" << "," << mfPrev << "\n";
+    
 	outfile.close();
 }
 

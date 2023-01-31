@@ -157,7 +157,7 @@ void Model::burnIn(Population& popln, Vector& vectors, const Worm& worms, Output
 void Model::evolveAndSave(int y, Population& popln, Vector& vectors, Worm& worms, Scenario& sc, Output& currentOutput, int rep){
     
     //advance to the next target month
-    std::string folderName = "res_endgame";
+    std::string folderName = "res_new_scen1a";
     int targetMonth = sc.getMonthToSave(y); //simulate to start of this month
     double mfprev = 1; //variable to check prevalence of mf for survey 
     double icprev = 1; //variable to check prevalence of ic for survey 
@@ -167,11 +167,14 @@ void Model::evolveAndSave(int y, Population& popln, Vector& vectors, Worm& worms
     popln.numPreTASSurveys = 0;
     popln.numTASSurveys = 0;
     popln.t_TAS_Pass = -1;
+    int MFlowNoMDA = 0;
     double mfprev_aimp_old = popln.getMFPrev(); 
     double mfprev_aimp_new = 0;
     bool preTAS_Pass = 0;
+
    // int maxAge = popln.getMaxAge();
-    bool TAS_Pass = 0;
+    int TAS_Pass = 0;
+    int neededTASPass = 3;
     // int outputTime = floor(currentMonth/12);
     //int outputTime = 0;
     int LymphodemaTotalWorms = popln.getLymphodemaTotalWorms();
@@ -180,21 +183,24 @@ void Model::evolveAndSave(int y, Population& popln, Vector& vectors, Worm& worms
     double HydroceleShape = popln.getHydroceleShape();
     sc.InitIHMEData(rep, folderName);
     sc.InitIPMData(rep, folderName);
-
+    int vec_control = 0;
+    //std::cout << popln.getMFPrev() << std::endl;
+   // std::cout << vectors.v_to_h << std::endl;
+   // vectors.v_to_h = vectors.v_to_h * 0;
+   // std::cout << vectors.v_to_h << std::endl;
     for (int t = currentMonth; t < targetMonth; t += dt){
-
+        // std::cout << vectors.v_to_h << std::endl;   
         PrevalenceEvent* outputPrev = sc.prevalenceDue(t); //defines min age of host to include and method ic/mf
         MDAEvent* applyMDA = sc.treatmentDue(t);
         if (outputPrev || applyMDA ){
-
+            double MFPrev = popln.getMFPrev();
+            //std::cout << popln.getMFPrev() << std::endl;
             sc.writePrevByAge(popln, t, rep, folderName);
             sc.writeNumberByAge(popln, t, rep, folderName);
             sc.writeSequelaeByAge(popln, t, LymphodemaTotalWorms,  LymphodemaShape, HydroceleTotalWorms, HydroceleShape, rep, folderName);
             sc.writeSurveyByAge(popln, t, preTAS_Pass, TAS_Pass, rep, folderName);
-
-            if(TAS_Pass == 1){
-                sc.writeMDADataMissedYears(t, 0, 0, popln.getMinAgeMDA(), 100, rep,  folderName);
-            }
+            sc.writeL3(vectors, t, preTAS_Pass, TAS_Pass,rep, folderName);
+            sc.writeMF(MFPrev, t,rep, folderName);
         }
 
         sc.updateImportationRate(popln, t);
@@ -216,7 +222,7 @@ void Model::evolveAndSave(int y, Population& popln, Vector& vectors, Worm& worms
         
         // snippet to perform a survey
         if(t == nextSurveyTime){
-            if((preTAS_Pass == 0) || (TAS_Pass == 0)){ // if we have passed pre-TAS and TAS stage, then don't do anything
+            if((preTAS_Pass == 0) || (TAS_Pass < neededTASPass )){ // if we have passed pre-TAS and TAS stage, then don't do anything
             // if yet to pass pre-TAS perform pre-TAS survey
 
                 mfprev = popln.getMFPrev(); // find the mf prevalence
@@ -227,14 +233,21 @@ void Model::evolveAndSave(int y, Population& popln, Vector& vectors, Worm& worms
 
                 if(preTAS_Pass == 1){ // if we have passed the pre-TAS then do TAS 
                     icprev = popln.getICPrev(); // find ic prevalence in specified age group
-                    // std::cout << icprev << std::endl;
                     popln.numTASSurveys += 1; // increment number of TAS surveys by 1
                     if((icprev <= popln.ICThreshold) && (mfprev <= popln.MFThreshold)){ // if the ic prevalence is below the threshold and mf prev also below threshold
-                        TAS_Pass = 1; // set TAS pass indicator to 1
+                        TAS_Pass += 1; // set TAS pass indicator to 1
                         popln.t_TAS_Pass = t; // store the time of passing TAS
-                    }   
+                    }else{
+                        TAS_Pass = 0;
+                    }
                 }
-
+                if(TAS_Pass == 1){
+                    if(vec_control == 0){
+                        //vectors.v_to_h = vectors.v_to_h * 0.7;
+                        vec_control = 1;
+                    }
+                    
+                }
                 nextSurveyTime = t + popln.interSurveyPeriod;
                 
                     
@@ -244,7 +257,19 @@ void Model::evolveAndSave(int y, Population& popln, Vector& vectors, Worm& worms
         }
 
         if(applyMDA){
-            if(popln.totMDAs < popln.firstTASNumMDA){
+             if(popln.totMDAs == 0){
+                 mfprev = popln.getMFPrev(); 
+                if ((mfprev > popln.MFThreshold) && (MFlowNoMDA == 0)){
+                     popln.ApplyTreatment(applyMDA, worms, sc, t, rep, folderName);
+                     popln.totMDAs += 1;
+                }else{
+                     MFlowNoMDA += 1;
+                     if(MFlowNoMDA == popln.firstTASNumMDA){
+                        nextSurveyTime = t + 6;
+                     }
+                     sc.writeMDADataMissedYears(t, 0, 0, popln.getMinAgeMDA(), 100, rep,  folderName);
+                 }
+             }else if(popln.totMDAs < popln.firstTASNumMDA){
                 //do mda
                 popln.ApplyTreatment(applyMDA, worms, sc, t, rep, folderName);
                 popln.totMDAs += 1;
@@ -262,7 +287,8 @@ void Model::evolveAndSave(int y, Population& popln, Vector& vectors, Worm& worms
                 }
             }else if(popln.totMDAs >= popln.firstTASNumMDA){
                 
-                if((preTAS_Pass == 1) && (TAS_Pass == 1)){
+                if((preTAS_Pass == 1) && (TAS_Pass >= 1)){
+                    sc.writeMDADataMissedYears(t, 0, 0, popln.getMinAgeMDA(), 100, rep,  folderName);
                     // std::cout << "mfprev= " << mfprev << ", icprev = " << icprev << std::endl;
                 }else{
                     popln.ApplyTreatment(applyMDA, worms, sc, t, rep, folderName); //treated set. alters M, WM, WF, using covMDA set above
@@ -277,7 +303,29 @@ void Model::evolveAndSave(int y, Population& popln, Vector& vectors, Worm& worms
                 }
             }
         }
+        if(t < popln.getNeverTreatChangeTime()){
+            popln.neverTreatToOriginal();
+        }
 
+        if (t >= popln.getNeverTreatChangeTime()){
+            popln.changeNeverTreat();
+        }
+
+        if(t < popln.getICTestChangeTime()){
+            popln.ICTestToOriginal();
+        }
+
+        if (t >= popln.getICTestChangeTime()){
+            popln.changeICTest();
+        }
+
+
+
+        // if((t % 10) == 0){
+        //     std::cout << "t = " << t << ", " << popln.getNeverTreat() << std::endl;
+        //     std::cout << "t = " << t << ", test Sens = " << popln.getICSens() << std::endl;
+        //     std::cout << "t = " << t << ", test Spec = " << popln.getICSpec() << std::endl;
+        // }
         
         if (outputPrev || applyMDA){
             //std::cout << t << "," << popln.getMFPrev() << std::endl;
@@ -287,7 +335,7 @@ void Model::evolveAndSave(int y, Population& popln, Vector& vectors, Worm& worms
             
         if(_DEBUG && applyMDA) std::cout << applyMDA->getType() << " month " << currentMonth  << ", MDA at " << applyMDA->getCoverage() << " coverage" << std::endl;
 
-    
+
     
         //next t
     }

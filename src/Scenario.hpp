@@ -179,7 +179,8 @@ public:
     void writeMDAData(int t, int MDATreatments, int MDAPopSize, int minAgeMDA, int maxAge, int rep, std::string type, std::string folder);
     void writeMDADataMissedYears(int t, int MDATreatments, int MDAPopSize, int minAgeMDA, int maxAge, int rep,  std::string folder);
     void writeSurveyByAge(Population& popln, int t, int preTAS_Pass, int TAS_Pass, int rep, std::string folder);
-
+    void writeL3(const Vector& vectors, int t, int preTAS_Pass, int TAS_Pass, int rep, std::string folder);
+    void writeMF(double MFPrev, int t,  int rep, std::string folder);
 protected:
     
     
@@ -199,7 +200,7 @@ protected:
     std::vector<int> monthsToSave;
    
     std::string name;
-    std::ofstream myFileMF, myFileIC, myFileWC;
+    std::ofstream myFileMF, myFileIC, myFileWC, myFileL3;
     std::ofstream myFileExtraMF, myFileExtraIC, myFileExtraWC;
     
     std::ofstream* popFiles = NULL;

@@ -131,12 +131,12 @@ int Worm::wormsTreated(int W, std::string type) {
         fecRed = 9;
     }else if (type=="ida"){
         propWormsKilled = (wPropMDA >=0)?wPropMDA:0.55;
-        fecRed = 12; //no temporary sterilization
+        fecRed = 9; //no temporary sterilization
     }else if (type=="aa"){
         propWormsKilled = (wPropMDA >=0)?wPropMDA:0.35;
         fecRed = 0;
     }else if (type=="ia"){
-        propWormsKilled = (wPropMDA >=0)?wPropMDA:0.35;
+        propWormsKilled = (wPropMDA >=0)?wPropMDA:0.55;
         fecRed = 9;
     }else if (type=="ds"){
         propWormsKilled = (wPropMDA >=0)?wPropMDA:0.59;
@@ -163,13 +163,13 @@ double Worm::mfTreated(double M, std::string type) {
         mfPropMDA = 1-1;
         fecRed = 9;
     }else if (type=="ida"){
-        mfPropMDA = 1-1;
-        fecRed = 12; //no temporary sterilization
+        mfPropMDA = 1-0.99;
+        fecRed = 9; //no temporary sterilization
     }else if (type=="aa"){
         mfPropMDA = 1-0;
         fecRed = 0;
     }else if (type=="ia"){
-        mfPropMDA = 1-0.99;
+        mfPropMDA = 1-1;
         fecRed = 9;
     }else if (type=="ds"){
         mfPropMDA = 1-0.86;
