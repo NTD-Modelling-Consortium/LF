@@ -28,7 +28,7 @@ extern Statistics stats;
 
 Population::Population(TiXmlElement* xmlParameters){
     
-    
+    neverTreatedChangeTime = 10000;
     int gotAll = 0;
     
     TiXmlElement* xmlHost = xmlParameters->FirstChildElement("host");
@@ -87,6 +87,18 @@ Population::Population(TiXmlElement* xmlParameters){
         }else if (name == "ICsensitivity"){
             ICsensitivity = value;
             gotAll++;
+        }else if (name == "ICspecificity"){
+            ICspecificity = value;
+            gotAll++;
+        }else if (name == "ICsensitivityChange"){
+            ICsensitivityChange = value;
+            gotAll++;
+        }else if (name == "ICspecificityChange"){
+            ICspecificityChange = value;
+            gotAll++;
+        }else if (name == "ICTestChangeTime"){
+            ICTestChangeTime = value;
+            gotAll++;
         }else if (name == "interSurveyPeriod"){
             interSurveyPeriod = value;
             gotAll++;
@@ -105,19 +117,30 @@ Population::Population(TiXmlElement* xmlParameters){
         }else if (name == "LymphodemaShape"){
             LymphodemaShape= value;
             gotAll++;
+        }else if (name == "neverTreated"){
+            neverTreated = value;
+            gotAll++;
+        }else if (name == "neverTreatedChange"){
+            neverTreatedChange = value;
+            gotAll++;
+        }else if (name == "neverTreatedChangeTime"){
+            neverTreatedChangeTime = value;
+            gotAll++;
         }else
             std::cout << "Unknown parameter " << name << " in Host parameter list." << std::endl;
     }
     
     
-    if(gotAll < 19){
+    if(gotAll < 24){
         std::cout << "Error in Population::Population. File  does not contain all the required parameters."<< std::endl;
         exit(1);
     }else
         std::cout << "Population parameters: tau=" << tau << ", rhoBU=" << rhoBU << ", rhoCN=" << rhoCN <<  ", minAgePrev=" << minAgePrev << ", minAgeMDA=" << minAgeMDA << std::endl << std::endl;
 
     
-    
+    neverTreatedOriginal = neverTreated;
+    ICsensitivityOriginal = ICsensitivity;
+    ICspecificityOriginal = ICspecificity;
 }
 
 
@@ -219,7 +242,7 @@ void  Population::initHosts(std::string distType, double k_val, double aImp_val)
     aImp = aImp_original; //save this as it need to appear in output file
     
     for(int i =0; i < size; i++) //TotalBiteRisk sums bites per month for whole popln
-        host_pop[i].initialise(tau, maxAge, k, &TotalBiteRisk, HydroceleShape,  LymphodemaShape); //sets worm count to 0 and treated/bednet to 0. Sets random age and bite risk
+        host_pop[i].initialise(tau, maxAge, k, &TotalBiteRisk, HydroceleShape,  LymphodemaShape, neverTreated); //sets worm count to 0 and treated/bednet to 0. Sets random age and bite risk
     
     
     u0CompBednets = std::numeric_limits<double>::max(); //initial value indicates first time bednets applied in this replicate
@@ -320,11 +343,14 @@ double Population::getMFPrev(){
     int maxAgeMonths = maxAgeMF*12;
     int minAgeMonths = minAgeMF*12;
     for(int i =0; i < size; i++){
+
         if((host_pop[i].age >= minAgeMonths ) &&(host_pop[i].age <= maxAgeMonths )){
             bool infectedMF = ( stats.uniform_dist() <  (1 - exp(-1 * host_pop[i].M) ) );  //depends on how many mf present       
             numHosts++; // increment number of hosts by 1
             if (infectedMF) MFpos++; // if mf positive, increment MFpos by 1
         }
+        
+        
         
     }
     if(numHosts > 0){
@@ -343,13 +369,31 @@ double Population::getMFPrevByAge(double ageStart, double ageEnd){
     double numHosts = 0; // total number of hosts
     int minAgeMonths = ageStart*12;
     int maxAgeMonths = ageEnd*12;
+    //double xx;
     for(int i =0; i < size; i++){
-       
+        // xx = stats.uniform_dist();
+        // if(host_pop[i].neverTreat == 0){
+        //     if((host_pop[i].age >= minAgeMonths ) &&(host_pop[i].age <= maxAgeMonths )){
+        //         bool infectedMF = ( stats.uniform_dist() <  (1 - exp(-1 * host_pop[i].M) ) );  //depends on how many mf present       
+        //         numHosts++; // increment number of hosts by 1
+        //         if (infectedMF) MFpos++; // if mf positive, increment MFpos by 1
+        //     }
+        // }
+        // if((host_pop[i].neverTreat == 1) && (xx > 0.98)){
+        //     if((host_pop[i].age >= minAgeMonths ) &&(host_pop[i].age <= maxAgeMonths )){
+        //         bool infectedMF = ( stats.uniform_dist() <  (1 - exp(-1 * host_pop[i].M) ) );  //depends on how many mf present       
+        //         numHosts++; // increment number of hosts by 1
+        //         if (infectedMF) MFpos++; // if mf positive, increment MFpos by 1
+        //     }
+        // }
+
+  
         if((host_pop[i].age >= minAgeMonths ) &&(host_pop[i].age <= maxAgeMonths )){
-            bool infectedMF = ( stats.uniform_dist() <  (1 - exp(-1 * host_pop[i].M) ) );  //depends on how many mf present       
-            numHosts++; // increment number of hosts by 1
-            if (infectedMF) MFpos++; // if mf positive, increment MFpos by 1
+                bool infectedMF = ( stats.uniform_dist() <  (1 - exp(-1 * host_pop[i].M) ) );  //depends on how many mf present       
+                numHosts++; // increment number of hosts by 1
+                if (infectedMF) MFpos++; // if mf positive, increment MFpos by 1
         }
+        
         
     }
     if(numHosts > 0){
@@ -414,7 +458,7 @@ double Population::LymphodemaTestByAge(int ageStart, int ageEnd, int LymphodemaT
     double mult = 0;
     for(int i =0; i < size; i++){
        
-        if((host_pop[i].age >= minAgeMonths ) &&(host_pop[i].age <= maxAgeMonths )){ // only men can get hydrocele
+        if((host_pop[i].age >= minAgeMonths ) && (host_pop[i].age <= maxAgeMonths )){ // only men can get hydrocele
             mult = host_pop[i].lymphoMult; // draw random number from gamma distribution with appropriate shape which gives individual susceptibility to sequelae
             bool Lymphodema = ( (mult * host_pop[i].totalWorms) >  LymphodemaTotalWorms ); // individual susceptibility * total worms > threshold or not
             numHosts++; // increment number of hosts by 1
@@ -502,9 +546,13 @@ double Population::getICPrev(){
             }else{
                 true_pos = 0;
             }
+            
             bool infectedIC = ( stats.uniform_dist() <  (true_pos * ICsensitivity));  //depends on how many mf present       
+            infectedIC = infectedIC + ( stats.uniform_dist() <  ((1-true_pos) * (1-ICspecificity)));  //depends on how many mf present       
             numHosts++; // increment number of hosts by 1
             if (infectedIC) ICpos++; // if mf positive, increment MFpos by 1
+            
+            
         }
     }
     ICpos /= numHosts; // convert to prevalence of mf positive hosts
@@ -537,7 +585,7 @@ void Population::evolve(double dt, const Vector& vectors, const Worm& worms){
     
     //advance one time step
     for(int i =0; i < size; i++){
-        host_pop[i].react(dt, tau, maxAge, aImp,  vectors, worms, HydroceleShape,  LymphodemaShape);
+        host_pop[i].react(dt, tau, maxAge, aImp,  vectors, worms, HydroceleShape,  LymphodemaShape, neverTreated);
         // if (i == 0)
         //     std::cout << "indiv 1: total worms years = " << host_pop[i].totalWormYears << ", female worms = "<< host_pop[i].WF << ", male worms = "<< host_pop[i].WM << std::endl;
         // if (i == 1)
@@ -579,7 +627,41 @@ double Population::getHydroceleShape()  {
     
 }
 
+double Population::getNeverTreatChangeTime(){
+    return neverTreatedChangeTime;
+}
 
+double Population::getNeverTreat(){
+    return neverTreated;
+}
+
+void Population::changeNeverTreat(){
+    neverTreated = neverTreatedChange;
+}
+
+void Population::neverTreatToOriginal(){
+    neverTreated = neverTreatedOriginal;
+}
+
+double Population::getICTestChangeTime(){
+    return ICTestChangeTime;
+}
+
+double Population::getICSens(){
+    return ICsensitivity;
+}
+double Population::getICSpec(){
+    return ICspecificity;
+}
+void Population::changeICTest(){
+    ICsensitivity = ICsensitivityChange;
+    ICspecificity = ICspecificityChange;
+}
+
+void Population::ICTestToOriginal(){
+    ICsensitivity = ICsensitivityOriginal;
+    ICspecificity = ICspecificityOriginal;
+}
 void Population::saveCurrentState(int month, std::string sname){
     
     //save host states and importation rate 
@@ -808,20 +890,30 @@ void Population::ApplyTreatment(MDAEvent* mda, Worm& worms, Scenario& sc, int t,
         
         int hostsOldEnough = 0;
         int hostsTreated = 0;
-        
+
         for(int i =0; i < size; i++){
-            
+         
             if(host_pop[i].age >= minAgeMDAinMonths){
                 hostsOldEnough++;
                 if (stats.normal_dist(host_pop[i].uCompMDA+coverageScaleFactor,1.0)<0){
-                    host_pop[i].getsTreated(worms, mda->getType());
-                    hostsTreated++;
-                    
+                    if(host_pop[i].neverTreat == 0){
+                        if(host_pop[i].age >= 15*12){
+                            if (stats.uniform_dist() < (1)){
+                                host_pop[i].getsTreated(worms, mda->getType());
+                                hostsTreated++;
+                                }
+                        }else{
+                            host_pop[i].getsTreated(worms, mda->getType());
+                            hostsTreated++;
+                        }
+                    }
                     
                 }
             }
             
         }
+
+       
         std::string type = mda->getType();
         //   std::cout << "Coverage = " << mda->getCoverage() << ", Actual coverage=" <<  double(hostsTreated)/hostsOldEnough <<std::endl ;
         sc.writeMDAData(t, hostsTreated, hostsOldEnough, minAgeMDA, maxAge, rep, type, folderName);

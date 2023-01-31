@@ -58,6 +58,7 @@ public:
     int getHydroceleTotalWorms();
     double getLymphodemaShape();
     double getHydroceleShape();
+    double getNeverTreatChangeTime();
     void initHosts(std::string distType, double k_val, double aImp_val);
     double getPopSize() ;
     void saveTotalWorms();
@@ -77,16 +78,23 @@ public:
     double HydroceleTestByAge(int ageStart, int ageEnd, int HydroceleTotalWorms, double HydroceleShape);
     double LymphodemaTestByAge(int ageStart, int ageEnd, int LymphodemaTotalWorms, double LymphodemaShape);
     double getICPrev();
-
+    void changeNeverTreat();
+    void changeICTest();
+    void neverTreatToOriginal();
+    void ICTestToOriginal();
+    double getICTestChangeTime();
     void updateBedNetCoverage(BedNetEvent* bn);
     void updateImportationRate(double factor);
-    
+    double getNeverTreat();
     void evolve(double dt, const Vector& vectors, const Worm& worms);
     void ApplyTreatment(MDAEvent* mda,  Worm& worms, Scenario& sc, int t, int rep, std::string folderName);
     void saveCurrentState(int month, std::string sname);
     void resetToMonth(int month);
     void clearSavedMonths();
-    
+    double getICSens();
+   
+    double getICSpec();
+   
     std::vector<std::string> printRandomVariableNames() const;
     std::vector<double> printRandomVariableValues() const;
     int getMinAgePrev() const;
@@ -133,6 +141,7 @@ private:
     double u0CompBednets;     //Need to set Host::uCompN for bednet compliance. This is the mean of a normal distribution from which a random value is take to determine whether host complies or not
                         //Set to a value that will give a probability of compliance equal to the specified coverage covN
     double u0CompMDA;
+    double u0CompMDA_adult;
    
     
     double k;     //shape parameter for gamma distrib used to get biteRisk
@@ -165,10 +174,22 @@ private:
     int minAgeIC; //min age to be tested for antigen
     int maxAgeIC; //max age to be tested for antigen
     double ICsensitivity; // sensitivity of antigen test
+    double ICspecificity; // sensitivity of antigen test
+    double ICsensitivityOriginal; // sensitivity of antigen test
+    double ICspecificityOriginal; // sensitivity of antigen test
+    double ICsensitivityChange; // sensitivity of antigen test
+    double ICspecificityChange; // sensitivity of antigen test
+    double ICTestChangeTime;
+
     int HydroceleTotalWorms;
     double HydroceleShape;
     int LymphodemaTotalWorms;
     double LymphodemaShape;
+    double neverTreated;
+    double neverTreatedOriginal;
+    double neverTreatedChange;
+    double neverTreatedChangeTime;
+  
     
     //saved months
     

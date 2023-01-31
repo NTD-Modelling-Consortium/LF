@@ -124,7 +124,7 @@ void Vector::updateL3Density(const Population& popln, const Worm& worms){
     //equilibrium is mean uptake   * num bites per mosquito * prop picking up infection / (death rate + num bites * prop l3 leaving per bite)
     L3 =  mfUptake * ( 1.0 - bedNetCoverage ) * lambda * g /(deathrate + lambda * worms.getPropLeavingVectorPerBite());
     
-    
+    //L3=0.01;
     
 }
 
@@ -141,6 +141,8 @@ double Vector::averageNumBites() const {
     return lambda * v_to_h;
     
 }
+
+
 
 double Vector::probBitesThroughNet() const {
     
