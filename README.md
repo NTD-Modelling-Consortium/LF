@@ -2,7 +2,8 @@
 
 Along with files included in the `src` folder, the gsl library is used so will need to be installed. The installation process for gsl is described [here](https://coral.ise.lehigh.edu/jild13/2016/07/11/hello/).
 
-Alternatively on macOS you can install gsl using homebrew: `brew install gsl`
+- Alternatively on macOS you can install gsl using homebrew: `brew install gsl`
+- Or on Debian/Ubuntu Linux you can install packages `gsl-bin libgsl-dev` using apt/aptitude
 
 ### Compiling
 

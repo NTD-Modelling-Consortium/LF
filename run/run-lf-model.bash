@@ -22,7 +22,7 @@ function run_ID () {
 	mkdir -p "${RESULTS}"
 
 	echo "== running ${NUM_SIMULATIONS} simulations of LF model with ${PARAMS} ${SCENARIO}"
-	time transfil_N \
+	time ./transfil_N \
 		-p  "${PARAMS}" \
 		-s  "${SCENARIO}" \
 		-o "${RESULTS}" \
@@ -41,7 +41,7 @@ function do_file_combinations () {
 	id=${1}
 	output_folder_name=${2}
 
-	for scen_iu in $( xmllint --xpath "/Model/ScenarioList/scenario/@name" <( tail -n +2 scenarios/scenariosNoImp${id}.xml ) | sed 's/name="\([^"]*\)"/\1/g' ) ; do
+	for scen_iu in $( xmllint --xpath "/Model/ScenarioList/scenario/@name" <( tail -n +2 ${SCENARIO_ROOT}/scenariosNoImp${id}.xml ) | sed 's/name="\([^"]*\)"/\1/g' ) ; do
 
 		scen=$( echo $scen_iu | cut -f 1 -d _ )
 		iu=$( echo $scen_iu | cut -f 2 -d _ )
@@ -62,7 +62,6 @@ function combine_output_files () {
 	output_folder_name=${4}
 
 	echo "== combining ${inst} files for IU ${iu} scenario ${scen}"
-	last_tmp=$( mktemp )
 
 	# where does the model write its output
 	MODEL_OUTPUT_FILE_ROOT=res_endgame/${inst}_scen${scen}/${scen}_${iu}

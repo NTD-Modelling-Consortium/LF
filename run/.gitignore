@@ -1,8 +1,11 @@
 scenarios/*
 parameters/*
 res_endgame/*
+results/*
+output/*
 combined_output/*
 gcp-*.bash
 build/*
 *.egg-info/*
-Pipfile
+Pipfile*
+*.csv
