@@ -171,7 +171,8 @@ void Model::evolveAndSave(int y, Population& popln, Vector& vectors, Worm& worms
     double mfprev_aimp_old = popln.getMFPrev(); 
     double mfprev_aimp_new = 0;
     bool preTAS_Pass = 0;
-
+    int changeSensSpec = 0;
+    int changeNeverTreat = 0;
    // int maxAge = popln.getMaxAge();
     int TAS_Pass = 0;
     int neededTASPass = 3;
@@ -184,11 +185,27 @@ void Model::evolveAndSave(int y, Population& popln, Vector& vectors, Worm& worms
     sc.InitIHMEData(rep, folderName);
     sc.InitIPMData(rep, folderName);
     int vec_control = 0;
+
+    for(int q = 0; q < popln.sensSpecChangeCount; q++)  {
+        if(popln.sensSpecChangeName[q] == sc.getName()){
+            changeSensSpec = 1;
+           // std::cout << "Change sens spec this scenario";
+        }
+    }
+    for(int q = 0; q < popln.neverTreatChangeCount; q++)  {
+        if(popln.neverTreatChangeName[q] == sc.getName()){
+            changeNeverTreat = 1;
+            // std::cout << "Change never treat this scenario";
+        }
+        
+    }
     //std::cout << popln.getMFPrev() << std::endl;
    // std::cout << vectors.v_to_h << std::endl;
    // vectors.v_to_h = vectors.v_to_h * 0;
    // std::cout << vectors.v_to_h << std::endl;
     for (int t = currentMonth; t < targetMonth; t += dt){
+
+       
         // std::cout << vectors.v_to_h << std::endl;   
         PrevalenceEvent* outputPrev = sc.prevalenceDue(t); //defines min age of host to include and method ic/mf
         MDAEvent* applyMDA = sc.treatmentDue(t);
@@ -202,7 +219,7 @@ void Model::evolveAndSave(int y, Population& popln, Vector& vectors, Worm& worms
             sc.writeL3(vectors, t, preTAS_Pass, TAS_Pass,rep, folderName);
             sc.writeMF(MFPrev, t,rep, folderName);
         }
-
+        //std::cout << popln.sensSpecChangeCount << std::endl;
         sc.updateImportationRate(popln, t);
         sc.updateBedNetCoverage(popln, t);
        
@@ -308,7 +325,10 @@ void Model::evolveAndSave(int y, Population& popln, Vector& vectors, Worm& worms
         }
 
         if (t >= popln.getNeverTreatChangeTime()){
-            popln.changeNeverTreat();
+            if(changeNeverTreat == 1){
+                popln.changeNeverTreat();
+              //  std::cout << sc.getName()<< " change never treat " << std::endl;
+            }
         }
 
         if(t < popln.getICTestChangeTime()){
@@ -316,7 +336,11 @@ void Model::evolveAndSave(int y, Population& popln, Vector& vectors, Worm& worms
         }
 
         if (t >= popln.getICTestChangeTime()){
-            popln.changeICTest();
+            if(changeSensSpec == 1){
+                popln.changeICTest();
+               // std::cout << sc.getName()<< " change sens spec" << std::endl;
+            }
+            
         }
 
 
