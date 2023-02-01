@@ -39,6 +39,7 @@ Population::Population(TiXmlElement* xmlParameters){
         
     }
     
+
     TiXmlElement* xmlParam = NULL;
     
     for ( xmlParam = xmlHost->FirstChildElement("param"); xmlParam != NULL; xmlParam = xmlParam->NextSiblingElement("param")){
@@ -47,6 +48,8 @@ Population::Population(TiXmlElement* xmlParameters){
         double value;
         name.assign(xmlParam->Attribute("name"));
         xmlParam->Attribute("value", &value);
+        
+
         
         if (name == "tau"){
             tau = value;
@@ -126,9 +129,20 @@ Population::Population(TiXmlElement* xmlParameters){
         }else if (name == "neverTreatedChangeTime"){
             neverTreatedChangeTime = value;
             gotAll++;
+        }else if (name == "sensSpecChangeScen"){
+            sensSpecChangeName.push_back(std::to_string(int(value)));
+            sensSpecChangeCount = sensSpecChangeCount +  1;
+        }else if (name == "neverTreatChangeScen"){
+            neverTreatChangeName.push_back(std::to_string(int(value)));
+            neverTreatChangeCount = neverTreatChangeCount +  1;
         }else
             std::cout << "Unknown parameter " << name << " in Host parameter list." << std::endl;
     }
+
+    // for(int i = 0; i < sensSpecChangeCount; i++){
+    //     std::cout << sensSpecChangeName[i] << std::endl;
+    // }
+    
     
     
     if(gotAll < 24){

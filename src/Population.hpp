@@ -82,6 +82,7 @@ public:
     void changeICTest();
     void neverTreatToOriginal();
     void ICTestToOriginal();
+    
     double getICTestChangeTime();
     void updateBedNetCoverage(BedNetEvent* bn);
     void updateImportationRate(double factor);
@@ -92,7 +93,7 @@ public:
     void resetToMonth(int month);
     void clearSavedMonths();
     double getICSens();
-   
+    
     double getICSpec();
    
     std::vector<std::string> printRandomVariableNames() const;
@@ -113,6 +114,10 @@ public:
     int post2020MDAs = 0;
     int t_TAS_Pass = -1;
     double aImp;
+    int sensSpecChangeCount = 0;
+    int neverTreatChangeCount = 0;
+    std::vector< std::string > sensSpecChangeName;
+    std::vector< std::string > neverTreatChangeName;
 private:
     
     double calcU0(double coverage, double sigma);

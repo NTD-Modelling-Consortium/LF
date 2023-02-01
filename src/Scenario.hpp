@@ -170,7 +170,8 @@ public:
     void printReplicate(std::ofstream& of, Output& results, int repnum, Population& popln) const;
     void printSurveysMDAs(std::ofstream& of, Output& results, int repnum, Population& popln) const;
     void closeFile();
-    
+    std::string getName();
+
     void InitIHMEData(int rep, std::string folder);
     void InitIPMData(int rep, std::string folder);
     void writePrevByAge(Population& popln, int t, int rep, std::string folder);

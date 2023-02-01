@@ -833,3 +833,8 @@ void Scenario::writeMF(double mfPrev, int t,  int rep, std::string folder){
 
 
 
+std::string Scenario::getName(){
+    std::size_t first_ = name.find("_");
+    std::string fol_n = name.substr(0,first_);
+    return fol_n;
+}
