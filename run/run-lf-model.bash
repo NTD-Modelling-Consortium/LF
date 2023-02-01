@@ -41,7 +41,7 @@ function do_file_combinations () {
 	id=${1}
 	output_folder_name=${2}
 
-	for scen_iu in $( xmllint --xpath "/Model/ScenarioList/scenario/@name" <( tail -n +2 scenarios/scenariosNoImp${id}.xml ) | sed 's/name="\([^"]*\)"/\1/g' ) ; do
+	for scen_iu in $( xmllint --xpath "/Model/ScenarioList/scenario/@name" <( tail -n +2 ${SCENARIO_ROOT}/scenariosNoImp${id}.xml ) | sed 's/name="\([^"]*\)"/\1/g' ) ; do
 
 		scen=$( echo $scen_iu | cut -f 1 -d _ )
 		iu=$( echo $scen_iu | cut -f 2 -d _ )

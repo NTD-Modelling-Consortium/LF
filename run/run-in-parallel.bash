@@ -3,6 +3,9 @@
 # bail out immediately if anything errors
 set -euo pipefail
 
+# default results folder
+RESULTS_ROOT="${RESULTS_ROOT:=$( realpath ./run/results )}"
+
 # convert $1 (relative filename) to absolute
 function get_abs_filename() {
   echo "$(cd "$(dirname "$1")" && pwd)/$(basename "$1")"
