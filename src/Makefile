@@ -21,7 +21,7 @@ OBJS := \
 	tinyxml/tinyxmlparser.o
 
 # Provide any options and flags for the compiler here
-CFLAGS    = -Wall -O3 -std=c++11
+CFLAGS    = -Wall -O3 -std=c++17
 
 # work out where to find 'gsl-config' to get GSL CFLAGS and library path
 GSL_CONFIG := $(shell which gsl-config)
