@@ -2,10 +2,11 @@
 # shellcheck disable=SC2086
 
 # default options, potentially overridden in env
+NUM_SIMULATIONS=${NUM_SIMULATIONS:=5}
 PARAMETER_ROOT="${PARAMETER_ROOT:=./parameters}"
 SCENARIO_ROOT="${SCENARIO_ROOT:=./scenarios}"
 RESULTS_ROOT="${RESULTS_ROOT:=./results}"
-NUM_SIMULATIONS=${NUM_SIMULATIONS:=5}
+OUTPUT_ROOT="${OUTPUT_ROOT:=$( realpath ./run/output/ntd )}"
 
 # run the model for a given ID, provided as $2 and passed in at bottom
 function run_ID () {
@@ -29,7 +30,7 @@ function run_ID () {
 		-n ./Pop_Distribution.csv \
 		-r "${NUM_SIMULATIONS}"
 
-	echo "== combining output files for IHME & IPM"
+	echo "== combining output files for IHME & IPM using output folder ${output_folder_name}"
 	( time do_file_combinations "${id}" "${output_folder_name}" ) 2>&1
 
 	echo "== clearing out model 'result' files"
@@ -67,10 +68,10 @@ function combine_output_files () {
 	MODEL_OUTPUT_FILE_ROOT=res_endgame/${inst}_scen${scen}/${scen}_${iu}
 
 	# where do we want to put the combined file
-	IU_OUTPUT_PATH="ntd/${output_folder_name}/lf/scenario_${scen}/${iu:0:3}/${iu}"
+	IU_OUTPUT_PATH="${output_folder_name}/lf/scenario_${scen}/${iu:0:3}/${iu}"
 
 	# what is the file going to be called
-	LOCAL_IU_OUTPUT_DIR="output/${IU_OUTPUT_PATH}"
+	LOCAL_IU_OUTPUT_DIR="${IU_OUTPUT_PATH}"
 	LOCAL_IU_OUTPUT_FILE_NAME="${inst,,}-${iu}-lf-scenario_${scen}-${NUM_SIMULATIONS}.csv"
 	LOCAL_IU_OUTPUT_FILE_PATH="${LOCAL_IU_OUTPUT_DIR}/${LOCAL_IU_OUTPUT_FILE_NAME}"
 

@@ -16,7 +16,7 @@ function error () {
 }
 
 function usage () {
-	error "usage: ${0} [-n <num-simulations>] [-f <running-id-list-file>] [-o <output-subdirectory>] [-j <num-parallel-jobs>]"
+	error "usage: ${0} [-n <num-simulations>] [-f <running-id-list-file>] [-o <output-subdirectory>] [-j <num-parallel-jobs>] [-s <scenarios- dir>] [-p <parameters-dir>] [-r <results-dir>] [-O <output-dir>]"
 	exit 1
 }
 
@@ -36,9 +36,10 @@ PROJECT_ROOT_DIR=$( get_abs_filename . )
 PARAMETER_ROOT="${PARAMETER_ROOT:=$( realpath ./run/parameters )}"
 SCENARIO_ROOT="${SCENARIO_ROOT:=$( realpath ./run/scenarios )}"
 RESULTS_ROOT="${RESULTS_ROOT:=$( realpath ./run/results )}"
+OUTPUT_ROOT="${OUTPUT_ROOT:=$( realpath ./run/output/ntd )}"
 
 # read CLI options
-while getopts "n:f:o:j:s:p:r:" opts ; do
+while getopts "n:f:o:j:s:p:r:O:" opts ; do
 
 	case "${opts}" in
 
@@ -74,6 +75,10 @@ while getopts "n:f:o:j:s:p:r:" opts ; do
 			RESULTS_ROOT=$( realpath "${OPTARG}" )
 			;;
 
+		O)
+			OUTPUT_ROOT=$( realpath "${OPTARG}" )
+			;;
+
 		*)
 			usage
 			;;
@@ -84,17 +89,22 @@ done
 
 # check input/output directories
 if [[ ! -d "${SCENARIO_ROOT}" ]] ; then
-	error "scenario root must be a real path to a directory"
+	error "scenario-dir must be a real path to a directory"
 	usage
 fi
 
 if [[ ! -d "${PARAMETER_ROOT}" ]] ; then
-	error "parameter root must be a real path to a directory"
+	error "parameter-dir must be a real path to a directory"
 	usage
 fi
 
 if [[ ! -d "${RESULTS_ROOT}" ]] ; then
-	error "result root must be a real path to a directory"
+	error "result-dir must be a real path to a directory"
+	usage
+fi
+
+if [[ ! -d "${OUTPUT_ROOT}" ]] ; then
+	error "output-dir must be a real path to a directory"
 	usage
 fi
 
@@ -105,8 +115,8 @@ echo "- across ${NUM_PARALLEL_JOBS} parallel jobs"
 echo "- use ID list file ${RUNNING_ID_LIST_FILE}"
 echo "- use scenarios in directory ${SCENARIO_ROOT}"
 echo "- use parameters in directory ${PARAMETER_ROOT}"
-echo "- write results in directory ${RESULTS_ROOT}"
-echo "- output combined model results to directory ./run/output/ntd/${OUTPUT_SUBDIRECTORY}"
+echo "- write intermediate results in directory ${RESULTS_ROOT}"
+echo "- write combined model output files to directory ${OUTPUT_ROOT}/${OUTPUT_SUBDIRECTORY}"
 
 # confirm go-ahead
 info "confirm? (enter 1 to go ahead)"
@@ -133,7 +143,8 @@ select CHOICE in yes no ; do
 					SCENARIO_ROOT="${SCENARIO_ROOT}" \
 					PARAMETER_ROOT="${PARAMETER_ROOT}" \
 					RESULTS_ROOT="${RESULTS_ROOT}" \
-				bash run-in-parallel.bash "${OUTPUT_SUBDIRECTORY}" \
+					OUTPUT_ROOT="${OUTPUT_ROOT}" \
+				bash run-in-parallel.bash "${OUTPUT_ROOT}/${OUTPUT_SUBDIRECTORY}" \
 					2>&1 \
 					> "${PROJECT_ROOT_DIR}/${LOG_FILE}" \
 					< /dev/null \

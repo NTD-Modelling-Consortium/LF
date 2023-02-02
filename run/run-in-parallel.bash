@@ -32,7 +32,7 @@ fi
 # try to read a provided run timestamp, default to now()
 RUN_STAMP=${RUN_STAMP:=$( date +%Y%m%d%H%M%S )}
 
-# destination below 'output/ntd' where the outputs should be saved, e.g. 202208b
+# destination below ${OUTPUT_ROOT} where the outputs should be saved, e.g. 202208b
 output_folder_name="${1}"
 
 # work out how many jobs to run in parallel based on environment variable
@@ -49,7 +49,7 @@ RUNNING_ID_LIST_FILE=${RUNNING_ID_LIST_FILE:=running-id-list.txt}
 # print out run-stamp info
 echo "-> running LF model at ${RUN_STAMP} using ${NUM_PARALLEL_JOBS} parallel jobs"
 # shellcheck disable=SC2086
-echo "-> saving output into $( get_abs_filename ./output/ntd/${1} )" >&2
+echo "-> saving output into ${output_folder_name}" >&2
 
 # run the job in parallel
 NUM_SIMULATIONS=${NUM_SIMULATIONS:=5} \
@@ -58,7 +58,7 @@ NUM_SIMULATIONS=${NUM_SIMULATIONS:=5} \
 
 # clean up
 echo "== LF model run ${RUN_STAMP} removing intermediate model output files in $( get_abs_filename . )/{res_endgame,results}"
-rm -rf res_endgame results
+rm -rf res_endgame results/*
 
 # indicate completion
 FINISH_STAMP=$( date +%Y%m%d%H%M%S )
