@@ -52,9 +52,18 @@ echo
 # extract data files
 echo "-> extracting scenario and parameter files ..."
 
+if [[ -d parameters ]] ; then
+	rm -rf parameters
+fi
 tar jxf parameters.tbz
+
+if [[ -d scenarios ]] ; then
+	rm -rf scenarios
+fi
 tar jxf scenarios.tbz
+
 ls -ld parameters scenarios
+
 cd "${PROJECT_ROOT}"
 cp src/Pop_Distribution.csv run
 echo
