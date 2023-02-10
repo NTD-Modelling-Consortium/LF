@@ -651,6 +651,13 @@ double Population::getNeverTreat(){
 
 void Population::changeNeverTreat(){
     neverTreated = neverTreatedChange;
+    for(int i =0; i < size; i++){
+        if(host_pop[i].neverTreat == 1){
+            if(stats.uniform_dist() > neverTreatedChange / neverTreatedOriginal){
+                host_pop[i].neverTreat = 0;
+            }
+        }
+    }
 }
 
 void Population::neverTreatToOriginal(){
@@ -911,17 +918,12 @@ void Population::ApplyTreatment(MDAEvent* mda, Worm& worms, Scenario& sc, int t,
                 hostsOldEnough++;
                 if (stats.normal_dist(host_pop[i].uCompMDA+coverageScaleFactor,1.0)<0){
                     if(host_pop[i].neverTreat == 0){
-                        if(host_pop[i].age >= 15*12){
-                            if (stats.uniform_dist() < (1)){
-                                host_pop[i].getsTreated(worms, mda->getType());
-                                hostsTreated++;
-                                }
-                        }else{
-                            host_pop[i].getsTreated(worms, mda->getType());
-                            hostsTreated++;
-                        }
-                    }
-                    
+                       
+                        host_pop[i].getsTreated(worms, mda->getType());
+                        hostsTreated++;
+                               
+                       
+                    } 
                 }
             }
             
