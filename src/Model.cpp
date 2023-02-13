@@ -157,7 +157,7 @@ void Model::burnIn(Population& popln, Vector& vectors, const Worm& worms, Output
 void Model::evolveAndSave(int y, Population& popln, Vector& vectors, Worm& worms, Scenario& sc, Output& currentOutput, int rep){
     
     //advance to the next target month
-    std::string folderName = "res_endgame";
+    std::string folderName = "res_v2";
     int targetMonth = sc.getMonthToSave(y); //simulate to start of this month
     double mfprev = 1; //variable to check prevalence of mf for survey 
     double icprev = 1; //variable to check prevalence of ic for survey 
@@ -363,6 +363,7 @@ void Model::evolveAndSave(int y, Population& popln, Vector& vectors, Worm& worms
     
         //next t
     }
+    popln.neverTreatToOriginal();
     //done
     currentMonth = targetMonth;
     //prev = popln.getMFPrev();
