@@ -129,6 +129,7 @@ select CHOICE in yes no ; do
 			# create a log file namae
 			RUN_STAMP=$( date +%Y%m%d%H%M%S )
 			LOG_FILE="lf-run-${RUN_STAMP}-output.txt"
+			FINISH_FILE="lf-run-${RUN_STAMP}-finished.txt"
 
 			# work from the 'run' directory where the Python etc lives
 			cd run
@@ -153,8 +154,10 @@ select CHOICE in yes no ; do
 			# inform user
 			# shellcheck disable=SC2086
 			REAL_LOG_PATH=$( realpath ${PROJECT_ROOT_DIR}/${LOG_FILE} )
-			info "LF model is running in a detached shell"
-			echo "log output is being saved to file: ${REAL_LOG_PATH}"
+			info "LF model is running in a detached shell."
+			echo "Log output is being saved to file: ${REAL_LOG_PATH}"
+			echo "When the model runs have finished, the file $( realpath ${PROJECT_ROOT_DIR}/${FINISH_FILE} ) will be created."
+
 			exit 0
 			;;
 

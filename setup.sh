@@ -3,6 +3,12 @@
 # bail out immediately if anything errors
 set -euo pipefail
 
+function info () {
+	# shellcheck disable=SC2086,SC2027
+    echo -e '\E[37;44m'"\033[1m"$1"\033[0m"
+    tput -T linux sgr0
+}
+
 # check for packaged GSL install
 if [[ -z $( which gsl-config ) ]] ; then
 	echo "=> error: please install 'gsl' using your system package manager ('brew install gsl' / 'apt-get install -y gsl-bin libgsl-dev')." >&2
@@ -22,7 +28,7 @@ if [[ -z $( which pgrep ) ]] ; then
 fi
 
 # do the C++ build
-echo "-> building C++ LF model ..."
+info "-> building C++ LF model ..."
 
 EXENAME="transfil_N"
 PROJECT_ROOT="${PWD}"
@@ -30,14 +36,14 @@ RUN_DIR="${PROJECT_ROOT}/run"
 cd src
 make && ( [[ -f "${EXENAME}" ]] && cp "${EXENAME}" "${RUN_DIR}/${EXENAME}" ) && echo
 
-echo "-> checking for executable in ${RUN_DIR} ..."
+info "-> checking for executable in ${RUN_DIR} ..."
 
 cd "${PROJECT_ROOT}"
 ls -l "${RUN_DIR}/${EXENAME}"
 echo
 
 # set up the python virtualenv
-echo "-> setting up python LF model runner ..."
+info "-> setting up python LF model runner ..."
 
 cd "${RUN_DIR}"
 # clear out existing virtualenv
@@ -50,7 +56,7 @@ pipenv run pip install .
 echo
 
 # extract data files
-echo "-> extracting scenario and parameter files ..."
+info "-> extracting scenario and parameter files ..."
 
 if [[ -d parameters ]] ; then
 	rm -rf parameters
@@ -68,4 +74,4 @@ cd "${PROJECT_ROOT}"
 cp src/Pop_Distribution.csv run
 echo
 
-echo "-> LF model and runner are built and ready to run."
+info "-> LF model and runner are built and ready to run."
