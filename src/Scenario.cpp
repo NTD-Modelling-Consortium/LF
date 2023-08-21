@@ -12,7 +12,7 @@
 #include <string> 
 #include <sys/stat.h>
 #include <filesystem>
-namespace fs = std::__fs::filesystem;
+namespace fs = std::filesystem;
 
 
 bool IsPathExist(const std::string &s)
