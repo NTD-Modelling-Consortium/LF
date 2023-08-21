@@ -28,6 +28,7 @@ typedef struct {
     double lymphoMult;
     int sex;
     int neverTreat;
+    double pTreat; // probability of treatment drawn from a beta distribution as defined in section 1.5.3 of supplement to https://www.ncbi.nlm.nih.gov/pmc/articles/PMC5340860/
 } hostState;
 
 
@@ -47,8 +48,8 @@ public:
     const Worm& worms, double HydroceleShape, double LymphodemaShape, double neverTreated);
     void getsTreated(Worm& worms, std::string type);
     void restore(const hostState& state);
-  int getNumMDAs() const {return numMDAs;};
-    
+    int getNumMDAs() const {return numMDAs;};
+    void initialisePTreat(double alpha, double beta);
     //state variables saved
     int WM,WF;                  // number of male worms, number of female worms
     int totalWorms;
@@ -61,7 +62,7 @@ public:
     double lymphoMult;
     int sex; // 0 = male, 1 = female
     int neverTreat;
-
+    double pTreat;
     bool bedNet;                 //host uses bednet.
     double uCompBednets;              //THe hosts probability of using a bednet for a given overall coverage
     double uCompMDA;

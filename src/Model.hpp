@@ -35,9 +35,10 @@ public:
 protected:
     
     void burnIn(Population& popln, Vector& vectors, const Worm& worms, Output& currentOutput, PrevalenceEvent* pe);
-    void evolveAndSave(int y, Population& popln, Vector& vectors, Worm& worms, Scenario& sc, Output& currentOutput, int rep);
+    void evolveAndSave(int y, Population& popln, Vector& vectors, Worm& worms, Scenario& sc, Output& currentOutput, int rep, std::vector<double>& k_vals, std::vector<double>& v_to_h_vals, int updateParams);
     void getRandomParameters(int index, std::vector<double>& k_vals, std::vector<double>& v_to_h_vals, std::vector<double>& aImp_vals, std::vector<double>& wPropMDA, unsigned replicates, std::string fname);
-    
+    void getRandomParametersMultiplePerLine(int index, std::vector<double>& k_vals, std::vector<double>& v_to_h_vals, std::vector<double>& aImp_vals, std::vector<double>& wProp_vals, unsigned replicates, std::string fname);
+    void ProcessLine(const std::string &line, std::vector<double>& k_vals, std::vector<double>& v_to_h_vals, std::vector<double>& aImp_vals, std::vector<double>& wProp_vals);
     int currentMonth;
     double dt;
     

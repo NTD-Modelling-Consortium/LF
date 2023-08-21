@@ -100,6 +100,11 @@ void Vector::reset(std::string distType, double v_to_h_val){
     
 }
 
+void Vector::updateVtoH(double v_to_h_val){
+    v_to_h =  v_to_h_val;
+
+}
+
 void Vector::updateL3Density(const Population& popln, const Worm& worms){
     
     //called each month, average number of L3 larvae taken up by each mosquito

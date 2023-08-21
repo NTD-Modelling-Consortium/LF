@@ -59,6 +59,12 @@ double Statistics::exp_dist(double mu){
 }
 
 
+double Statistics::beta_dist(double alpha, double beta){
+    
+    //exponential dist with mean mu
+    return  gsl_ran_beta(rando, alpha, beta);
+}
+
 double Statistics::cdf_normal_Pinv(double p, double sd){
     
     //return value for which there is a probability p that value taken from a normal distribution with SD=1

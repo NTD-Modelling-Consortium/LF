@@ -47,6 +47,7 @@ public:
     int poisson_dist(double rate);
     double exp_dist(double mu);
     double cdf_normal_Pinv(double p, double sd);
+    double beta_dist(double alpha, double beta);
     
     std::string selectDistribType();
    

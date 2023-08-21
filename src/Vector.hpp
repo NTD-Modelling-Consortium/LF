@@ -36,6 +36,7 @@ public:
     void saveCurrentState(int month);
     void resetToMonth(int month);
     void clearSavedMonths();
+    void updateVtoH(double v_to_h_val);
 
     std::vector<std::string> printRandomVariableNames() const;
     std::vector<double> printRandomVariableValues() const;

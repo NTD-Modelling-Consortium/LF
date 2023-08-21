@@ -65,7 +65,8 @@ public:
     void saveAges();
     void saveTotalWormYears();
     void writePrevByAge();
-    
+    int PreTASSurvey();
+    int TASSurvey(double t);
     RecordedPrevalence  getPrevalence(PrevalenceEvent* outputPrev)  const;
     
     double getLarvalUptakebyVector(double r1, double kappas1, Vector::vectorSpecies species) const;
@@ -77,18 +78,23 @@ public:
     double getNumberByAge(double ageStart, double ageEnd);
     double HydroceleTestByAge(int ageStart, int ageEnd, int HydroceleTotalWorms, double HydroceleShape);
     double LymphodemaTestByAge(int ageStart, int ageEnd, int LymphodemaTotalWorms, double LymphodemaShape);
+    void initPTreat(double cov, double rho);
+    void editPTreat(double cov, double rho);
+    void checkForZeroPTreat(double cov, double rho);
     double getICPrev();
     void changeNeverTreat();
     void changeICTest();
     void neverTreatToOriginal();
     void ICTestToOriginal();
-    
+    void updateKVal(double k_val);
+
     double getICTestChangeTime();
     void updateBedNetCoverage(BedNetEvent* bn);
     void updateImportationRate(double factor);
     double getNeverTreat();
     void evolve(double dt, const Vector& vectors, const Worm& worms);
     void ApplyTreatment(MDAEvent* mda,  Worm& worms, Scenario& sc, int t, int rep, std::string folderName);
+    void ApplyTreatmentUpdated(MDAEvent* mda,  Worm& worms, Scenario& sc, int t, int rep, std::string folderName);
     void saveCurrentState(int month, std::string sname);
     void resetToMonth(int month);
     void clearSavedMonths();
@@ -100,7 +106,7 @@ public:
     std::vector<double> printRandomVariableValues() const;
     int getMinAgePrev() const;
     int getMinAgeMDA() const;
-    
+    int getUpdateParams() const;
     void printMDAHistory() const;
     
     int surveyStartDate;
@@ -169,7 +175,8 @@ private:
     double bedNetCov;       //the value when syscomp last changed, ie the value used ot calculate hosts' u values
     double mdaCoverage;
    
-    
+    int updateParams;
+    int NoMDALowMF;
     int minAgePrev; //min age to include in prevalance clac
     
     int minAgeMDA; //min age to receive MDA

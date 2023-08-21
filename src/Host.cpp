@@ -33,6 +33,7 @@ void Host::reset(int a, double HydroceleShape, double LymphodemaShape, double ne
     lymphoMult = stats.gamma_dist(LymphodemaShape);
     sex = (stats.uniform_dist() < 0.5) ? 0 : 1;
     neverTreat = (stats.uniform_dist() < neverTreated) ? 1 : 0;
+    pTreat = 0;
 }
 
 
@@ -50,18 +51,21 @@ double HydroceleShape, double LymphodemaShape, double neverTreated){
     lymphoMult = stats.gamma_dist(LymphodemaShape);
     sex = (stats.uniform_dist() < 0.5) ? 0 : 1;
     reset(a, HydroceleShape, LymphodemaShape, neverTreated);
-  
-    numMDAs=0;
+    pTreat = 0;
+    
     
 }
 
+void Host::initialisePTreat(double alpha, double beta){
+    pTreat = stats.beta_dist(alpha, beta);
+}
 
-                               
+
 
 void Host::react( double dt, double deathRate, const int maxAge, double aImp, 
 const Vector& vectors, const Worm& worms, double HydroceleShape, double LymphodemaShape,
 double neverTreated) {
-    
+    //double totalbites = 0;
     //time-step
     age += dt;
     totalWormYears += (WM + WF)* dt;
@@ -98,7 +102,7 @@ double neverTreated) {
         
             double bites = vectors.averageNumBites() * biteRisk * biteRateScaleFactor; //average bite rate scaled to this individual and further scaled down if they are under 9 years old
             if (bedNet) bites *= vectors.probBitesThroughNet(); // reduce bites if host has bednet
-            
+            //totalbites+= bites;
             double wormsPerBite = vectors.getL3Density() * worms.proportionPerBite(); //density of larvae in vector poln * proportion entering host and growing up to adult worms
             double meanWorms = 0.5 * bites * wormsPerBite; //This is mean per unit time of poisson distribution. 0.5 as half of each gender
             
@@ -124,6 +128,7 @@ double neverTreated) {
             // std::cout << "female worms = " <<  WF << std::endl;
             // std::cout << "male worms = " <<  WM << std::endl;
         }
+       // std::cout << "total bites = " << totalbites << std::endl;
         //drugs wear off each month
         monthsSinceTreated = (monthsSinceTreated+dt < UINT_MAX)? monthsSinceTreated+dt : UINT_MAX;
     
