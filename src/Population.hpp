@@ -107,6 +107,7 @@ public:
     int getMinAgePrev() const;
     int getMinAgeMDA() const;
     int getUpdateParams() const;
+    int getNoMDALowMF() const;
     void printMDAHistory() const;
     
     int surveyStartDate;

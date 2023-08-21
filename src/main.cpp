@@ -159,7 +159,7 @@ int main(int argc, char **argv) {
     
     //Run
     Model model;
-    model.runScenarios(Scenarios, hostPopulation, vectors, worms, replicates, dt, index, randParamsfile);
+    model.runScenarios(Scenarios, hostPopulation, vectors, worms, replicates, dt, index, randParamsfile, opDir);
 
     
     gettimeofday(&tv2, NULL);

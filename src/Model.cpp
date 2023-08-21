@@ -27,7 +27,7 @@ extern bool _DEBUG;
 extern Statistics stats;
 
 
-void Model::runScenarios(ScenariosList& scenarios, Population& popln, Vector& vectors, Worm& worms, int replicates, double timestep, int index, std::string randParamsfile){
+void Model::runScenarios(ScenariosList& scenarios, Population& popln, Vector& vectors, Worm& worms, int replicates, double timestep, int index, std::string randParamsfile, std::string opDir){
     
     std::cout << std::endl << "Index " << index << " running " << scenarios.getName() << " with " << scenarios.getNumScenarios() << " scenarios" << std::endl;
     
@@ -107,7 +107,7 @@ void Model::runScenarios(ScenariosList& scenarios, Population& popln, Vector& ve
           
             //evolve, saving any specified months along the way
             for (int y = 0; y < sc.getNumMonthsToSave(); y++)
-                evolveAndSave(y, popln, vectors, worms, sc, currentOutput, rep, k_vals, v_to_h_vals, popln.getUpdateParams());
+                evolveAndSave(y, popln, vectors, worms, sc, currentOutput, rep, k_vals, v_to_h_vals, popln.getUpdateParams(), opDir);
             
             //done for this scenario, save the prevalence values for this replicate
             if(!_DEBUG) sc.printResults(rep, currentOutput, popln);
@@ -158,14 +158,14 @@ void Model::burnIn(Population& popln, Vector& vectors, const Worm& worms, Output
 
 
 void Model::evolveAndSave(int y, Population& popln, Vector& vectors, Worm& worms, Scenario& sc, Output& currentOutput, int rep,
-std::vector<double>& k_vals, std::vector<double>& v_to_h_vals, int updateParams){
+std::vector<double>& k_vals, std::vector<double>& v_to_h_vals, int updateParams, std::string opDir){
     
     //advance to the next target month
-    std::string folderName = "res_endgame";
+    std::string folderName = opDir + "/endgame";
     int paramIndex = 0;
     int targetMonth = sc.getMonthToSave(y); //simulate to start of this month
     double mfprev = 1; //variable to check prevalence of mf for survey 
-    double icprev = 1; //variable to check prevalence of ic for survey 
+    //double icprev = 1; //variable to check prevalence of ic for survey 
     double nextSurveyTime = -100000; // variable updated to 3 years after survey if mf prevalence below threshold, don't do mda if time is before this value
     popln.totMDAs = 0;
     popln.post2020MDAs = 0;
@@ -203,6 +203,7 @@ std::vector<double>& k_vals, std::vector<double>& v_to_h_vals, int updateParams)
         }
         
     }
+
 
     for (int t = currentMonth; t < targetMonth; t += dt){
         if ((updateParams) && (t%12 == 0) && (paramIndex <= (k_vals.size()-1))){
@@ -281,7 +282,7 @@ std::vector<double>& k_vals, std::vector<double>& v_to_h_vals, int updateParams)
             // if this this the first MDA then if the NoMDALowMF indicator is 1 then we need to check the MF prevalence in the population
             // as if this is low then we wil not begin MDA. If the indicator is not 1 then we will do MDA even with low MF prevalence
             if(popln.totMDAs == 0){
-                if(popln.NoMDALowMF == 1){
+                if(popln.getNoMDALowMF() == 1){
                     mfprev = popln.getMFPrev(); 
                     if ((mfprev > popln.MFThreshold) && (MFlowNoMDA == 0)){
                         popln.ApplyTreatmentUpdated(applyMDA, worms, sc, t, rep, folderName);

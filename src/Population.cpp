@@ -329,6 +329,10 @@ int Population::getUpdateParams() const{
     return updateParams;
 }
 
+int Population::getNoMDALowMF() const{
+    return NoMDALowMF;
+}
+
 void  Population::initHosts(std::string distType, double k_val, double aImp_val){
     
     //generate a new population size and reset all members at the start of a new replicate
