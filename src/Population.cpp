@@ -304,10 +304,11 @@ void Population::editPTreat(double cov, double rho){
     // which are stored in the oldPTreat array. This works as the entries in the pTreats
     // array are already in ascending order.
     //std::cout << "NEWPtreat" << std::endl;
-    for(int i = 0; i < size; i++){
-        int rank = std::distance(indices, std::find(indices, indices + size, i)) ;
-        host_pop[i].pTreat = pTreats[rank];
+    // Assign the newly drawn treatment probabilities to the appropriate individuals
+    for (int i = 0; i < size; i++) {
+        host_pop[indices[i]].pTreat = pTreats[i];
     }
+
 }
 
 void Population::checkForZeroPTreat(double cov, double rho){
@@ -407,9 +408,10 @@ void Population::updateKVal(double k_val){
     // the appropriate place in the host_pop based on the rank of the current values there
     // which are stored in the oldPTreat array. This works as the entries in the pTreats
     // array are already in ascending order.
-    for(int i = 0; i < size; i++){
-        int rank = std::distance(indices, std::find(indices, indices + size, i)) ;
-        host_pop[i].biteRisk = biteRisk[rank];
+    
+    // Assign the newly drawn treatment probabilities to the appropriate individuals
+    for (int i = 0; i < size; i++) {
+        host_pop[indices[i]].biteRisk = biteRisk[i];
     }
 }
 
@@ -1118,11 +1120,8 @@ void Population::ApplyTreatmentUpdated(MDAEvent* mda, Worm& worms, Scenario& sc,
                 hostsOldEnough++;
                 if (stats.uniform_dist() < host_pop[i].pTreat){
                     if(host_pop[i].neverTreat == 0){
-                       
                         host_pop[i].getsTreated(worms, mda->getType());
                         hostsTreated++;
-                               
-                       
                     } 
                 }
             }
