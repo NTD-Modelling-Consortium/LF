@@ -161,7 +161,8 @@ void Model::evolveAndSave(int y, Population& popln, Vector& vectors, Worm& worms
 std::vector<double>& k_vals, std::vector<double>& v_to_h_vals, int updateParams, std::string opDir){
     
     //advance to the next target month
-    std::string folderName = opDir + "/endgame";
+    std::string folderName = opDir ;
+    std::string MDAType;
     int paramIndex = 0;
     int targetMonth = sc.getMonthToSave(y); //simulate to start of this month
     double mfprev = 1; //variable to check prevalence of mf for survey 
@@ -185,6 +186,8 @@ std::vector<double>& k_vals, std::vector<double>& v_to_h_vals, int updateParams,
     //int outputTime = 0;
     int LymphodemaTotalWorms = popln.getLymphodemaTotalWorms();
     int HydroceleTotalWorms = popln.getHydroceleTotalWorms();
+    int numMDADoses = 0; // number of MDA doses given out in a year
+    int totalTargetPop = 0;
     double LymphodemaShape = popln.getLymphodemaShape();
     double HydroceleShape = popln.getHydroceleShape();
     sc.InitIHMEData(rep, folderName);
@@ -192,6 +195,15 @@ std::vector<double>& k_vals, std::vector<double>& v_to_h_vals, int updateParams,
     int vec_control = 0;
     double prevCov = -1;
     double prevRho = -1;
+    int minAge;
+    int maxAge = popln.returnMaxAge();
+
+    // indicator if we should do the MDA when the MDA is called. 
+    // This will be switched to 0 if preTAS is passed, then the MDA function will be called, but will not be done
+    // We will still get the output of the MDA showing that no people were treated this year.
+    // This is to keep the output of MDA's constant so that we can combine different runs even if they have different numbers of MDA's performed.
+    int DoMDA = 1;
+
     for(int q = 0; q < popln.sensSpecChangeCount; q++)  {
         if(popln.sensSpecChangeName[q] == sc.getName()){
             changeSensSpec = 1;
@@ -206,22 +218,38 @@ std::vector<double>& k_vals, std::vector<double>& v_to_h_vals, int updateParams,
 
 
     for (int t = currentMonth; t < targetMonth; t += dt){
+
+
         if ((updateParams) && (t%12 == 0) && (paramIndex <= (k_vals.size()-1))){
             popln.updateKVal(k_vals[paramIndex]);
             vectors.updateVtoH(v_to_h_vals[paramIndex]);
             paramIndex++;
         }
-
+        // if(t%12==0){
+        //      double MFPrev = popln.getMFPrev();
+        //      std::cout << "t = " << t << ", Mf prev = "<< MFPrev << std::endl;
+        //  }
         PrevalenceEvent* outputPrev = sc.prevalenceDue(t); //defines min age of host to include and method ic/mf
         MDAEvent* applyMDA = sc.treatmentDue(t);
-        if (outputPrev || applyMDA ){
+        if (t % 12 == 0 ){
+
             double MFPrev = popln.getMFPrev();
             sc.writePrevByAge(popln, t, rep, folderName);
             sc.writeNumberByAge(popln, t, rep, folderName);
             sc.writeSequelaeByAge(popln, t, LymphodemaTotalWorms,  LymphodemaShape, HydroceleTotalWorms, HydroceleShape, rep, folderName);
             sc.writeSurveyByAge(popln, t, preTAS_Pass, TAS_Pass, rep, folderName);
-            sc.writeL3(vectors, t, preTAS_Pass, TAS_Pass,rep, folderName);
+            // sc.writeL3(vectors, t, preTAS_Pass, TAS_Pass,rep, folderName);
             sc.writeMF(MFPrev, t,rep, folderName);
+            if(numMDADoses == 0){
+                MDAType = "None";
+                minAge = -1;
+                maxAge = -1;
+            }
+            
+            sc.writeMDA(t, numMDADoses,totalTargetPop, minAge, maxAge, rep, MDAType, folderName);
+            
+            numMDADoses = 0;
+            totalTargetPop = 0;
         }
         sc.updateImportationRate(popln, t);
         sc.updateBedNetCoverage(popln, t);
@@ -261,6 +289,8 @@ std::vector<double>& k_vals, std::vector<double>& v_to_h_vals, int updateParams,
 
         //std::cout << applyMDA->getMonth() << std::endl;
         if(applyMDA){
+            MDAType = popln.returnMDAType(applyMDA);
+            minAge = popln.returnMinAgeMDA(applyMDA);
             double cov = applyMDA->getCoverage();
             double rho = applyMDA->getCompliance();
             // if we this is the first MDA, then we need to initialise the Probability of treatment for each person
@@ -278,29 +308,51 @@ std::vector<double>& k_vals, std::vector<double>& v_to_h_vals, int updateParams,
             }
             // check for anyone with 0 probability of treatment, as these will be people who have not had this value initialised
             popln.checkForZeroPTreat(cov, rho);
-
+            
             // if this this the first MDA then if the NoMDALowMF indicator is 1 then we need to check the MF prevalence in the population
             // as if this is low then we wil not begin MDA. If the indicator is not 1 then we will do MDA even with low MF prevalence
             if(popln.totMDAs == 0){
                 if(popln.getNoMDALowMF() == 1){
                     mfprev = popln.getMFPrev(); 
                     if ((mfprev > popln.MFThreshold) && (MFlowNoMDA == 0)){
-                        popln.ApplyTreatmentUpdated(applyMDA, worms, sc, t, rep, folderName);
+
+                        popln.ApplyTreatmentUpdated(applyMDA, worms, sc, t, rep, DoMDA, folderName);
+
+                        //numMDADoses += result[0];
+                        //totalTargetPop += result[1];
                         popln.totMDAs += 1;
+                        mfprev_aimp_new = popln.getMFPrev(); 
+                        if (mfprev_aimp_new < mfprev_aimp_old){
+                            popln.aImp = popln.aImp * mfprev_aimp_new / mfprev_aimp_old;
+                            mfprev_aimp_old = popln.getMFPrev(); 
+                        }
                     }else{
                         MFlowNoMDA += 1;
                         if(MFlowNoMDA == popln.firstTASNumMDA){
                          nextSurveyTime = t + 6;
                         }
-                        sc.writeMDADataMissedYears(t, 0, 0, popln.getMinAgeMDA(), 100, rep,  folderName);
+                        //sc.writeMDADataMissedYears(t, 0, 0, popln.getMinAgeMDA(), 100, rep,  folderName);
                     }
                 }else{
-                    popln.ApplyTreatmentUpdated(applyMDA, worms, sc, t, rep, folderName);
+                    
+                    popln.ApplyTreatmentUpdated(applyMDA, worms, sc, t, rep, DoMDA, folderName);
+                    
+                    mfprev_aimp_new = popln.getMFPrev(); 
+                    if (mfprev_aimp_new < mfprev_aimp_old){
+                        popln.aImp = popln.aImp * mfprev_aimp_new / mfprev_aimp_old;
+                        mfprev_aimp_old = popln.getMFPrev(); 
+                    }
+                    //numMDADoses += result[0];
+                    //totalTargetPop += result[1];
                     popln.totMDAs += 1;
                 }  
              }else if(popln.totMDAs < popln.firstTASNumMDA){
                 //do mda
-                popln.ApplyTreatmentUpdated(applyMDA, worms, sc, t, rep, folderName);
+                
+                popln.ApplyTreatmentUpdated(applyMDA, worms, sc, t, rep, DoMDA, folderName);
+                
+                //numMDADoses += result[0];
+                //totalTargetPop += result[1];
                 popln.totMDAs += 1;
                 if(t >= 240){
                     popln.post2020MDAs += 1;
@@ -315,9 +367,13 @@ std::vector<double>& k_vals, std::vector<double>& v_to_h_vals, int updateParams,
                 }
             }else if(popln.totMDAs >= popln.firstTASNumMDA){
                 if((preTAS_Pass == 1) && (TAS_Pass >= 1)){
-                    sc.writeMDADataMissedYears(t, 0, 0, popln.getMinAgeMDA(), 100, rep,  folderName);
+                    //sc.writeMDADataMissedYears(t, 0, 0, popln.getMinAgeMDA(), 100, rep,  folderName);
                 }else{
-                    popln.ApplyTreatmentUpdated(applyMDA, worms, sc, t, rep, folderName); //treated set. alters M, WM, WF, using covMDA set above
+
+                    popln.ApplyTreatmentUpdated(applyMDA, worms, sc, t, rep, DoMDA, folderName);
+
+                    //numMDADoses += result[0];
+                    //totalTargetPop += result[1];//treated set. alters M, WM, WF, using covMDA set above
                     popln.totMDAs += 1;
                     if(t >= 240){
                         popln.post2020MDAs += 1;
@@ -353,8 +409,7 @@ std::vector<double>& k_vals, std::vector<double>& v_to_h_vals, int updateParams,
             
         }
         
-        if (outputPrev || applyMDA){
-            //std::cout << t << "," << popln.getMFPrev() << std::endl;
+        if ((t%12==0)){
             currentOutput.saveMonth(t, popln, outputPrev, prevalence, applyMDA);
         }
         

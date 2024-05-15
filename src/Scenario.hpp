@@ -178,6 +178,8 @@ public:
     void writeNumberByAge(Population& popln, int t, int rep, std::string folder);
     void writeSequelaeByAge(Population& popln, int t, int LymphodemaTotalWorms, double LymphodemaShape, int HydroceleTotalWorms, double HydroceleShape, int rep, std::string folder);
     void writeMDAData(int t, int MDATreatments, int MDAPopSize, int minAgeMDA, int maxAge, int rep, std::string type, std::string folder);
+    void writeMDADataAllTreated(int t, int* numTreat, int maxAge, int rep, std::string type, std::string folder);
+    void writeMDA(int t, int MDATreatments, int MDAPopSize, int minAgeMDA, int maxAge, int rep, std::string type, std::string folder);
     void writeMDADataMissedYears(int t, int MDATreatments, int MDAPopSize, int minAgeMDA, int maxAge, int rep,  std::string folder);
     void writeSurveyByAge(Population& popln, int t, int preTAS_Pass, int TAS_Pass, int rep, std::string folder);
     void writeL3(const Vector& vectors, int t, int preTAS_Pass, int TAS_Pass, int rep, std::string folder);

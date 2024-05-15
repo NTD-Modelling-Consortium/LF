@@ -94,16 +94,18 @@ public:
     double getNeverTreat();
     void evolve(double dt, const Vector& vectors, const Worm& worms);
     void ApplyTreatment(MDAEvent* mda,  Worm& worms, Scenario& sc, int t, int rep, std::string folderName);
-    void ApplyTreatmentUpdated(MDAEvent* mda,  Worm& worms, Scenario& sc, int t, int rep, std::string folderName);
+    void ApplyTreatmentUpdated(MDAEvent* mda,  Worm& worms, Scenario& sc, int t, int rep, int DoMDA, std::string folderName);
     void saveCurrentState(int month, std::string sname);
     void resetToMonth(int month);
     void clearSavedMonths();
     double getICSens();
     
     double getICSpec();
-   
+    std::string returnMDAType(MDAEvent* mda);
+    int returnMinAgeMDA(MDAEvent* mda);
     std::vector<std::string> printRandomVariableNames() const;
     std::vector<double> printRandomVariableValues() const;
+    int returnMaxAge();
     int getMinAgePrev() const;
     int getMinAgeMDA() const;
     int getUpdateParams() const;
