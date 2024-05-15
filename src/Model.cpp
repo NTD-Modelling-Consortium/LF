@@ -163,6 +163,9 @@ std::vector<double>& k_vals, std::vector<double>& v_to_h_vals, int updateParams,
     //advance to the next target month
     std::string folderName = opDir ;
     std::string MDAType;
+    int t_import_reduction;
+    int preTASSurveyTime = -1000;
+    int TASSurveyTime = -1000;
     int paramIndex = 0;
     int targetMonth = sc.getMonthToSave(y); //simulate to start of this month
     double mfprev = 1; //variable to check prevalence of mf for survey 
@@ -202,7 +205,7 @@ std::vector<double>& k_vals, std::vector<double>& v_to_h_vals, int updateParams,
     // This will be switched to 0 if preTAS is passed, then the MDA function will be called, but will not be done
     // We will still get the output of the MDA showing that no people were treated this year.
     // This is to keep the output of MDA's constant so that we can combine different runs even if they have different numbers of MDA's performed.
-    int DoMDA = 1;
+    int DoMDA = 0;
 
     for(int q = 0; q < popln.sensSpecChangeCount; q++)  {
         if(popln.sensSpecChangeName[q] == sc.getName()){
@@ -269,22 +272,36 @@ std::vector<double>& k_vals, std::vector<double>& v_to_h_vals, int updateParams,
            prevalence = popln.getPrevalence(outputPrev); //prev measured before mda done to kill mf in hosts
         
         // snippet to perform a survey
-        if(t == nextSurveyTime){
-            if((preTAS_Pass == 0) || (TAS_Pass < neededTASPass )){ // if we have passed pre-TAS and TAS stage, then don't do anything
-                // if yet to pass pre-TAS perform pre-TAS survey
-                preTAS_Pass = popln.PreTASSurvey();
-                if(preTAS_Pass == 1){ 
-                    // if we have passed the pre-TAS then do TAS 
-                    TAS_Pass = popln.TASSurvey(t);
-                }
-                if(TAS_Pass == 1){
-                    if(vec_control == 0){
-                        vec_control = 1;
-                    }
-                }
-                nextSurveyTime = t + popln.interSurveyPeriod;    
+        // snippet to perform a preTAS survey
+        if(t == preTASSurveyTime){
+            preTAS_Pass = popln.PreTASSurvey();
+            if(preTAS_Pass == 1){
+                TASSurveyTime = t + popln.interSurveyPeriod;
             }
- 
+            DoMDA = 0;
+        }
+
+        // snippet to perform a TAS survey
+        
+        if(t == TASSurveyTime){
+            int TAS_Pass_ind = popln.TASSurvey(t);
+            TAS_Pass += TAS_Pass_ind;
+            if(TAS_Pass_ind == 0){
+                // if failed, then reset TAS_PAss to 0 and set a time to do another preTAS survey
+                // also switch back on MDA's
+                TAS_Pass = 0;
+                preTASSurveyTime = t + popln.interSurveyPeriod;
+                DoMDA = 1;
+            }else if(TAS_Pass == neededTASPass){
+                // if we have passed a sufficient number of times, then make it so we won't do any more TAS surveys
+                TASSurveyTime = 99999999;
+            }else if(TAS_Pass < neededTASPass){
+                // if we have passed the survey, but need to pass more, then set a time for the next TAS survey
+                TASSurveyTime = t + popln.interSurveyPeriod;
+                if(vec_control == 0){
+                    vec_control = 1;
+                }
+            }
         }
 
         //std::cout << applyMDA->getMonth() << std::endl;
@@ -308,84 +325,41 @@ std::vector<double>& k_vals, std::vector<double>& v_to_h_vals, int updateParams,
             }
             // check for anyone with 0 probability of treatment, as these will be people who have not had this value initialised
             popln.checkForZeroPTreat(cov, rho);
-            
+
             // if this this the first MDA then if the NoMDALowMF indicator is 1 then we need to check the MF prevalence in the population
             // as if this is low then we wil not begin MDA. If the indicator is not 1 then we will do MDA even with low MF prevalence
             if(popln.totMDAs == 0){
                 if(popln.getNoMDALowMF() == 1){
-                    mfprev = popln.getMFPrev(); 
-                    if ((mfprev > popln.MFThreshold) && (MFlowNoMDA == 0)){
-
-                        popln.ApplyTreatmentUpdated(applyMDA, worms, sc, t, rep, DoMDA, folderName);
-
-                        //numMDADoses += result[0];
-                        //totalTargetPop += result[1];
-                        popln.totMDAs += 1;
-                        mfprev_aimp_new = popln.getMFPrev(); 
-                        if (mfprev_aimp_new < mfprev_aimp_old){
-                            popln.aImp = popln.aImp * mfprev_aimp_new / mfprev_aimp_old;
-                            mfprev_aimp_old = popln.getMFPrev(); 
-                        }
-                    }else{
-                        MFlowNoMDA += 1;
-                        if(MFlowNoMDA == popln.firstTASNumMDA){
-                         nextSurveyTime = t + 6;
-                        }
-                        //sc.writeMDADataMissedYears(t, 0, 0, popln.getMinAgeMDA(), 100, rep,  folderName);
+                    mfprev = popln.getMFPrev();
+                    if(mfprev <= popln.MFThreshold){
+                        DoMDA = 0;
                     }
-                }else{
-                    
-                    popln.ApplyTreatmentUpdated(applyMDA, worms, sc, t, rep, DoMDA, folderName);
-                    
-                    mfprev_aimp_new = popln.getMFPrev(); 
-                    if (mfprev_aimp_new < mfprev_aimp_old){
-                        popln.aImp = popln.aImp * mfprev_aimp_new / mfprev_aimp_old;
-                        mfprev_aimp_old = popln.getMFPrev(); 
-                    }
-                    //numMDADoses += result[0];
-                    //totalTargetPop += result[1];
-                    popln.totMDAs += 1;
-                }  
-             }else if(popln.totMDAs < popln.firstTASNumMDA){
-                //do mda
-                
-                popln.ApplyTreatmentUpdated(applyMDA, worms, sc, t, rep, DoMDA, folderName);
-                
-                //numMDADoses += result[0];
-                //totalTargetPop += result[1];
-                popln.totMDAs += 1;
-                if(t >= 240){
-                    popln.post2020MDAs += 1;
-                }
-                mfprev_aimp_new = popln.getMFPrev(); 
-                if (mfprev_aimp_new < mfprev_aimp_old){
-                    popln.aImp = popln.aImp * mfprev_aimp_new / mfprev_aimp_old;
-                    mfprev_aimp_old = popln.getMFPrev(); 
-                }
-                if (popln.totMDAs == popln.firstTASNumMDA ){
-                    nextSurveyTime = t + 6;
-                }
-            }else if(popln.totMDAs >= popln.firstTASNumMDA){
-                if((preTAS_Pass == 1) && (TAS_Pass >= 1)){
-                    //sc.writeMDADataMissedYears(t, 0, 0, popln.getMinAgeMDA(), 100, rep,  folderName);
-                }else{
-
-                    popln.ApplyTreatmentUpdated(applyMDA, worms, sc, t, rep, DoMDA, folderName);
-
-                    //numMDADoses += result[0];
-                    //totalTargetPop += result[1];//treated set. alters M, WM, WF, using covMDA set above
-                    popln.totMDAs += 1;
-                    if(t >= 240){
-                        popln.post2020MDAs += 1;
-                    }  
-                    mfprev_aimp_new = popln.getMFPrev(); 
-                    if (mfprev_aimp_new < mfprev_aimp_old){
-                        popln.aImp = popln.aImp * mfprev_aimp_new / mfprev_aimp_old;
-                        mfprev_aimp_old = popln.getMFPrev();
-                    } 
                 }
             }
+            
+            // apply the MDA. If DoMDA = 0, then we call this function, but don't do the MDA,
+            // we just write to the file showing that no people were treated.
+            popln.ApplyTreatmentUpdated(applyMDA, worms, sc, t, rep, DoMDA, folderName);
+            t_import_reduction = t + 6;
+            mfprev_aimp_old = popln.getMFPrev(); 
+            popln.totMDAs += 1; 
+          
+            if (popln.totMDAs == popln.firstTASNumMDA ){
+                    preTASSurveyTime = t + 6;
+            }
         }
+
+        // if it is the time to potentially reduce importation, then do so
+        if(t == t_import_reduction){
+            mfprev_aimp_new = popln.getMFPrev(); 
+            if (mfprev_aimp_old > mfprev_aimp_new){
+                popln.aImp = popln.aImp * mfprev_aimp_new / mfprev_aimp_old;
+            }
+            mfprev_aimp_old = popln.getMFPrev();
+        }
+
+
+
         if(t < popln.getNeverTreatChangeTime()){
             popln.neverTreatToOriginal();
         }

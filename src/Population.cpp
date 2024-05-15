@@ -1127,31 +1127,36 @@ void Population::ApplyTreatmentUpdated(MDAEvent* mda, Worm& worms, Scenario& sc,
         int hostsTreated = 0;
 
         std::string MDAtype = mda->getType();
-        std::cout << "MDA type = " << MDAtype << std::endl;
-        for(int i =0; i < size; i++){
-            
-            if(host_pop[i].age >= minAgeMDAinMonths){
-  
-                hostsOldEnough++;
-                float flooredAge = std::floor(host_pop[i].age/12);
-                int flooredAgeInt = static_cast<int>(flooredAge);
-                
-                //numOldEnough[flooredAgeInt] += 1;
-                if (stats.uniform_dist() < host_pop[i].pTreat){
-                    if(host_pop[i].neverTreat == 0){
-                        host_pop[i].getsTreated(worms, MDAtype);
+        //std::cout << "MDA type = " << MDAtype << std::endl;
 
-                        numTreat[flooredAgeInt] += 1;
-                        hostsTreated++;
-                    } 
+        if(DoMDA == 1){
+            for(int i =0; i < size; i++){
+                
+                if(host_pop[i].age >= minAgeMDAinMonths){
+    
+                    hostsOldEnough++;
+                    float flooredAge = std::floor(host_pop[i].age/12);
+                    int flooredAgeInt = static_cast<int>(flooredAge);
+                    
+                    //numOldEnough[flooredAgeInt] += 1;
+                    if (stats.uniform_dist() < host_pop[i].pTreat){
+                        if(host_pop[i].neverTreat == 0){
+                            host_pop[i].getsTreated(worms, MDAtype);
+
+                            numTreat[flooredAgeInt] += 1;
+                            hostsTreated++;
+                        } 
+                    }
                 }
+                
             }
-            
         }
 
+        
+       //std::cout << "Done MDA" << std::endl;
         //sc.writeMDAData(t, hostsTreated, hostsOldEnough, minAgeMDA, maxAge, rep, type, folderName);
         sc.writeMDADataAllTreated(t, numTreat, maxAge, rep, MDAtype, folderName);
-
+        //std::cout << "Done writing" << std::endl;
 
         // if(_DEBUG)
         //      std::cout << hostsTreated << "/" << hostsOldEnough << " " << double(hostsTreated)/hostsOldEnough * 100 << "%" << std::endl;
