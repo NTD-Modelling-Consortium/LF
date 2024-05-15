@@ -1098,50 +1098,29 @@ void Population::ApplyTreatment(MDAEvent* mda, Worm& worms, Scenario& sc, int t,
     
 }
 
-std::string Population::returnMDAType(MDAEvent* mda){
-    std::string MDAType = mda->getType();
-    return MDAType;
-}
 
-int Population::returnMinAgeMDA(MDAEvent* mda){
-    int minAge = (mda->getMinAge() >= 0)? mda->getMinAge() : minAgeMDA;
-    return minAge;
-}
 
-int Population::returnMaxAge(){
-    return maxAge;
-}
-
-void Population::ApplyTreatmentUpdated(MDAEvent* mda, Worm& worms, Scenario& sc, int t, int rep, int DoMDA, std::string folderName) {
+void Population::ApplyTreatmentUpdated(MDAEvent* mda, Worm& worms, Scenario& sc, int t, int rep, std::string folderName) {
     
 
         //apply
         int minAge = (mda->getMinAge() >= 0)? mda->getMinAge() : minAgeMDA;
         int minAgeMDAinMonths = minAge * 12;
-        // initialize an array to hold the number of people who are treated by age
-        int numTreat[maxAge];
-        for (int i = 0; i < maxAge; ++i) {
-            numTreat[i] = 0; // initialization
-        }
+      
+        
+         if(_DEBUG)
+             std::cout << "Coverage = " << mda->getCoverage() << ", Actual coverage=";
+        
         int hostsOldEnough = 0;
         int hostsTreated = 0;
 
-        std::string MDAtype = mda->getType();
-        std::cout << "MDA type = " << MDAtype << std::endl;
         for(int i =0; i < size; i++){
-            
+         
             if(host_pop[i].age >= minAgeMDAinMonths){
-  
                 hostsOldEnough++;
-                float flooredAge = std::floor(host_pop[i].age/12);
-                int flooredAgeInt = static_cast<int>(flooredAge);
-                
-                //numOldEnough[flooredAgeInt] += 1;
                 if (stats.uniform_dist() < host_pop[i].pTreat){
                     if(host_pop[i].neverTreat == 0){
-                        host_pop[i].getsTreated(worms, MDAtype);
-
-                        numTreat[flooredAgeInt] += 1;
+                        host_pop[i].getsTreated(worms, mda->getType());
                         hostsTreated++;
                     } 
                 }
@@ -1149,19 +1128,15 @@ void Population::ApplyTreatmentUpdated(MDAEvent* mda, Worm& worms, Scenario& sc,
             
         }
 
-        //sc.writeMDAData(t, hostsTreated, hostsOldEnough, minAgeMDA, maxAge, rep, type, folderName);
-        sc.writeMDADataAllTreated(t, numTreat, maxAge, rep, MDAtype, folderName);
-
-
-        // if(_DEBUG)
-        //      std::cout << hostsTreated << "/" << hostsOldEnough << " " << double(hostsTreated)/hostsOldEnough * 100 << "%" << std::endl;
-        // for(int i = 0; i < maxAge; i++){
-        //     std::cout << "i = " << i << " treated = " << numTreat[i] << std::endl;
-        // }
+       
+        std::string type = mda->getType();
+        //   std::cout << "Coverage = " << mda->getCoverage() << ", Actual coverage=" <<  double(hostsTreated)/hostsOldEnough <<std::endl ;
+        sc.writeMDAData(t, hostsTreated, hostsOldEnough, minAgeMDA, maxAge, rep, type, folderName);
+        
+         if(_DEBUG)
+             std::cout << hostsTreated << "/" << hostsOldEnough << " " << double(hostsTreated)/hostsOldEnough * 100 << "%" << std::endl;
         
 }
-
-
 
 
 
@@ -1334,6 +1309,5 @@ void Population::printMDAHistory() const {
         std::cout <<i<<" "<<bins[i]<<std::endl;
     
 }
-
 
 

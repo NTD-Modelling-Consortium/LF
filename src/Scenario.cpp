@@ -12,7 +12,7 @@
 #include <string> 
 #include <sys/stat.h>
 #include <filesystem>
-namespace fs = std::__fs::filesystem;
+namespace fs = std::filesystem;
 
 
 bool IsPathExist(const std::string &s)
@@ -733,67 +733,6 @@ void Scenario::writeMDAData(int t, int MDATreatments, int MDAPopSize, int minAge
         }
     
     }
-    
-   
-	outfile.close();
-}
-
-
-void Scenario::writeMDADataAllTreated(int t, int* numTreat, int maxAge, int rep, std::string type, std::string folder){
-    // get mf prevalence
-    std::ofstream outfile;
-    std::string fname;
-    std::string rep1 = std::to_string(rep);
-    std::size_t first_ = name.find("_");
-    std::string fol_n = name.substr(0,first_);
-    //fname = folder + "/IPM_scen" + fol_n + "/" + name +"/IPM_scen" + name +  "_rep_" + rep1  + ".csv";
-    fname = folder + "/IHME_scen" + fol_n + "/" + name +"/IHME_scen" + name +  "_rep_" + rep1  + ".csv";
-    int year = t/12 + 2000;
-
-    outfile.open(fname, std::ios::app);        
-    if(rep == 0){
-        for(int j =0; j < maxAge; j++){
-            outfile << name << ","  << year << "," << j <<"," << j+1 << "," << "MDA (" << type  << ")," << numTreat[j]<< "\n";
-        }
-    }else{
-        for(int j =0; j < maxAge; j++){
-            outfile <<  numTreat[j]<< "\n";
-        }
-        
-    }   
-   
-	outfile.close();
-}
-
-
-
-
-
-void Scenario::writeMDA(int t, int MDATreatments, int MDAPopSize, int minAgeMDA, int maxAge, int rep, std::string type, std::string folder){
-    // get mf prevalence
-    std::ofstream outfile;
-    std::string fname;
-    std::string rep1 = std::to_string(rep);
-    std::size_t first_ = name.find("_");
-    std::string fol_n = name.substr(0,first_);
-    fname = folder + "/IPM_scen" + fol_n + "/" + name +"/IPM_scen" + name +  "_rep_" + rep1  + ".csv";
-
-    int year = t/12 + 2000;
-
-    outfile.open(fname, std::ios::app);        
-    
-   
-    outfile << name << ","  << year << "," << minAgeMDA <<"," << maxAge << "," << type << " doses" << "," << MDATreatments << "\n";
-        //outfile << name << ","  << year << "," << minAgeMDA <<"," << maxAge << "," << "MDATreatments2" << "," << 0 << "\n";
-    if(MDAPopSize >0){
-        outfile << name << ","  << year << "," << minAgeMDA <<"," << maxAge << "," << type << " coverage" << "," << double(MDATreatments)/MDAPopSize << "\n"; 
-    }else{
-        outfile << name << ","  << year << "," << minAgeMDA <<"," << maxAge << "," << type << " coverage" << "," << 0 << "\n"; 
-    }
-        
-       // outfile << name << ","  << year << "," << minAgeMDA <<"," << maxAge << "," << "MDACoverage2" << "," << 0 << "\n";
-    
-    
     
    
 	outfile.close();
