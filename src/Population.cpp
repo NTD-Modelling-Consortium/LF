@@ -487,9 +487,9 @@ RecordedPrevalence Population:: getPrevalence(PrevalenceEvent* outputPrev) const
     
 }
 
-int Population::PreTASSurvey(Scenario& sc, int forPreTass, int t, int rep,  std::string folderName){
+int Population::PreTASSurvey(){
     int preTAS_Pass = 0;
-    double mfprev = getMFPrev(sc, forPreTass, t, rep, folderName); // find the mf prevalence
+    double mfprev = getMFPrev(); // find the mf prevalence
     numPreTASSurveys += 1; // increment number of pre-TAS tests by 1
     if(mfprev <= MFThreshold){ // if the mf prevalence is below threshold
         preTAS_Pass= 1; // set pre-TAS pass indicator to 1
@@ -497,38 +497,28 @@ int Population::PreTASSurvey(Scenario& sc, int forPreTass, int t, int rep,  std:
     return preTAS_Pass;
 }
 
-int Population::TASSurvey(Scenario& sc, int forTass, int t, int rep,  std::string folderName){
+int Population::TASSurvey(double t){
     int TAS_Pass = 0;
-   
-    double icprev = getICPrev(sc, forTass, t, rep, folderName); // find ic prevalence in specified age group
+    double mfprev = getMFPrev(); // find the mf prevalence
+    double icprev = getICPrev(); // find ic prevalence in specified age group
     numTASSurveys += 1; // increment number of TAS surveys by 1
-    if((icprev <= ICThreshold)){ // if the ic prevalence is below the threshold and mf prev also below threshold
+    if((icprev <= ICThreshold) && (mfprev <= MFThreshold)){ // if the ic prevalence is below the threshold and mf prev also below threshold
         TAS_Pass += 1; // set TAS pass indicator to 1
         t_TAS_Pass = t; // store the time of passing TAS
     }
     return TAS_Pass;
 }
 
-double Population::getMFPrev(Scenario& sc, int forPreTass, int t, int rep,  std::string folderName){
+double Population::getMFPrev(){
     // get mf prevalence
 
     double MFpos = 0; // number of people mf positive
     double numHosts = 0; // total number of hosts
     int maxAgeMonths = maxAgeMF*12;
     int minAgeMonths = minAgeMF*12;
-
-    int numSurvey[maxAge];
-    for (int i = 0; i < maxAge; ++i) {
-        numSurvey[i] = 0; // initialization
-    }
-        
-        
     for(int i =0; i < size; i++){
 
-        if((host_pop[i].age >= minAgeMonths ) && (host_pop[i].age <= maxAgeMonths )){
-            float flooredAge = std::floor(host_pop[i].age/12);
-            int flooredAgeInt = std::min(static_cast<int>(flooredAge), maxAge - 1);
-            numSurvey[flooredAgeInt] += 1;
+        if((host_pop[i].age >= minAgeMonths ) &&(host_pop[i].age <= maxAgeMonths )){
             bool infectedMF = ( stats.uniform_dist() <  (1 - exp(-1 * host_pop[i].M) ) );  //depends on how many mf present       
             numHosts++; // increment number of hosts by 1
             if (infectedMF) MFpos++; // if mf positive, increment MFpos by 1
@@ -540,10 +530,7 @@ double Population::getMFPrev(Scenario& sc, int forPreTass, int t, int rep,  std:
     if(numHosts > 0){
         MFpos /= numHosts; // convert to prevalence of mf positive hosts
     }
-
-    if(forPreTass == 1){
-        sc.writePreTAS(t, numSurvey, maxAge, rep, folderName);
-    }
+    
 
     return MFpos;
 }
@@ -599,7 +586,7 @@ double Population::getNumberByAge(double ageStart, double ageEnd){
     int minAgeMonths = ageStart*12;
     int maxAgeMonths = ageEnd*12;
     for(int i =0; i < size; i++){
-        if((host_pop[i].age >= minAgeMonths ) &&(host_pop[i].age < maxAgeMonths )){
+        if((host_pop[i].age >= minAgeMonths ) &&(host_pop[i].age <= maxAgeMonths )){
             numHosts++; // increment number of hosts by 1
         }
     }
@@ -662,9 +649,63 @@ double Population::LymphodemaTestByAge(int ageStart, int ageEnd, int LymphodemaT
 }
 
 
+void Population::saveTotalWorms(){
+    // get mf prevalence
+    std::ofstream outfile;
+    
+	outfile.open("total_worms.csv", std::ios::app);
+	for(int i =0; i < size; i++){
+        outfile<<host_pop[i].totalWorms<<",";
+    }
+    double prev = getMFPrev();
+    outfile << prev <<",";
+    prev = getICPrev();
+    outfile << prev << "\n";
+	outfile.close();
+   
+}
 
 
-double Population::getICPrev(Scenario& sc, int forTass, int t, int rep,  std::string folderName){
+
+void Population::saveTotalWormYears(){
+    // get mf prevalence
+    std::ofstream outfile;
+    
+	outfile.open("total_worm_years.csv", std::ios::app);
+	for(int i =0; i < size; i++){
+        outfile<<host_pop[i].totalWormYears<<",";
+    }
+    double prev = getMFPrev();
+    outfile << prev <<",";
+    prev = getICPrev();
+    outfile << prev << "\n";
+	outfile.close();
+   
+}
+
+
+
+
+void Population::saveAges(){
+    // get mf prevalence
+    
+    std::ofstream outfile;
+    
+	outfile.open("ages.csv", std::ios::app);
+	for(int i =0; i < size; i++){
+        outfile<< floor(host_pop[i].age / 12) <<",";
+    }
+    double prev = getMFPrev();
+    outfile << prev <<",";
+    prev = getICPrev();
+    outfile << prev << "\n";
+	outfile.close();
+   
+}
+
+
+
+double Population::getICPrev(){
     // get mf prevalence
 
     double ICpos = 0; // number of people ic positive
@@ -672,20 +713,14 @@ double Population::getICPrev(Scenario& sc, int forTass, int t, int rep,  std::st
     int maxAgeMonths = maxAgeIC*12;
     int minAgeMonths = minAgeIC*12;
     bool true_pos;
-    int numSurvey[maxAge];
-    for (int i = 0; i < maxAge; ++i) {
-        numSurvey[i] = 0; // initialization
-    }
     for(int i =0; i < size; i++){
-        if( (host_pop[i].age < maxAgeMonths) && (host_pop[i].age >= minAgeMonths)){
+        if( (host_pop[i].age <= maxAgeMonths) && (host_pop[i].age >= minAgeMonths)){
             if((host_pop[i].WF + host_pop[i].WM) > 0){
                 true_pos = 1;
             }else{
                 true_pos = 0;
             }
-            float flooredAge = std::floor(host_pop[i].age/12);
-            int flooredAgeInt = std::min(static_cast<int>(flooredAge), maxAge - 1);
-            numSurvey[flooredAgeInt] += 1;
+            
             bool infectedIC = ( stats.uniform_dist() <  (true_pos * ICsensitivity));  //depends on how many mf present       
             infectedIC = infectedIC + ( stats.uniform_dist() <  ((1-true_pos) * (1-ICspecificity)));  //depends on how many mf present       
             numHosts++; // increment number of hosts by 1
@@ -695,9 +730,7 @@ double Population::getICPrev(Scenario& sc, int forTass, int t, int rep,  std::st
         }
     }
     ICpos /= numHosts; // convert to prevalence of mf positive hosts
-    if(forTass == 1){
-        sc.writeTAS(t, numSurvey, maxAge, rep, folderName);
-    }
+
     return ICpos;
 }
 
@@ -750,7 +783,6 @@ int Population::getHydroceleTotalWorms()  {
     return HydroceleTotalWorms;
     
 }
-
 
 double Population::getLymphodemaShape()  {
     
@@ -1066,62 +1098,45 @@ void Population::ApplyTreatment(MDAEvent* mda, Worm& worms, Scenario& sc, int t,
     
 }
 
-std::string Population::returnMDAType(MDAEvent* mda){
-    std::string MDAType = mda->getType();
-    return MDAType;
-}
 
-int Population::returnMinAgeMDA(MDAEvent* mda){
-    int minAge = (mda->getMinAge() >= 0)? mda->getMinAge() : minAgeMDA;
-    return minAge;
-}
 
-int Population::returnMaxAge(){
-    return maxAge;
-}
+void Population::ApplyTreatmentUpdated(MDAEvent* mda, Worm& worms, Scenario& sc, int t, int rep, std::string folderName) {
+    
 
-void Population::ApplyTreatmentUpdated(MDAEvent* mda, Worm& worms, Scenario& sc, int t, int rep, int DoMDA, std::string folderName) {
-    int minAge = (mda->getMinAge() >= 0) ? mda->getMinAge() : minAgeMDA;
-    int minAgeMDAinMonths = minAge * 12;
+        //apply
+        int minAge = (mda->getMinAge() >= 0)? mda->getMinAge() : minAgeMDA;
+        int minAgeMDAinMonths = minAge * 12;
+      
+        
+         if(_DEBUG)
+             std::cout << "Coverage = " << mda->getCoverage() << ", Actual coverage=";
+        
+        int hostsOldEnough = 0;
+        int hostsTreated = 0;
 
-    if (maxAge <= 0 || size <= 0) {
-        std::cerr << "Invalid maxAge or size" << std::endl;
-        return;
-    }
-
-    int numTreat[maxAge];
-    for (int i = 0; i < maxAge; ++i) {
-        numTreat[i] = 0;
-    }
-    int hostsOldEnough = 0;
-    int hostsTreated = 0;
-
-    std::string MDAtype = mda->getType();
-
-    if (DoMDA == 1) {
-        for (int i = 0; i < size; i++) {
-            if (host_pop[i].age >= minAgeMDAinMonths) {
+        for(int i =0; i < size; i++){
+         
+            if(host_pop[i].age >= minAgeMDAinMonths){
                 hostsOldEnough++;
-                float flooredAge = std::floor(host_pop[i].age / 12);
-                int flooredAgeInt = std::min(static_cast<int>(flooredAge), maxAge - 1);
-                
-
-                if (stats.uniform_dist() < host_pop[i].pTreat) {
-                    if (host_pop[i].neverTreat == 0) {
-                        host_pop[i].getsTreated(worms, MDAtype);
-                        numTreat[flooredAgeInt] += 1;
+                if (stats.uniform_dist() < host_pop[i].pTreat){
+                    if(host_pop[i].neverTreat == 0){
+                        host_pop[i].getsTreated(worms, mda->getType());
                         hostsTreated++;
-                    }
+                    } 
                 }
             }
+            
         }
-    }
 
-    sc.writeMDADataAllTreated(t, numTreat, maxAge, rep, MDAtype, folderName);
+       
+        std::string type = mda->getType();
+        //   std::cout << "Coverage = " << mda->getCoverage() << ", Actual coverage=" <<  double(hostsTreated)/hostsOldEnough <<std::endl ;
+        sc.writeMDAData(t, hostsTreated, hostsOldEnough, minAgeMDA, maxAge, rep, type, folderName);
+        
+         if(_DEBUG)
+             std::cout << hostsTreated << "/" << hostsOldEnough << " " << double(hostsTreated)/hostsOldEnough * 100 << "%" << std::endl;
+        
 }
-
-
-
 
 
 
@@ -1294,6 +1309,5 @@ void Population::printMDAHistory() const {
         std::cout <<i<<" "<<bins[i]<<std::endl;
     
 }
-
 
 
