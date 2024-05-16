@@ -575,6 +575,66 @@ void Scenario::InitIHMEData(int rep,  std::string folder){
 }
 
 
+void Scenario::InitPreTASData(int rep,  std::string folder){
+    // get mf prevalence
+
+    struct stat buffer;
+
+    
+    
+    std::string fname;
+    std::string fname2;
+    std::string rep1 = std::to_string(rep);
+    std::size_t first_ = name.find("_");
+    std::string fol_n = name.substr(0,first_);
+    fname = folder + "/IHME_scen" + fol_n + "/" + name +"/PreTAS_scen" + name +  "_rep_" + rep1  + ".csv";
+    fname2 = folder + "/IHME_scen" + fol_n + "/" + name;
+    if (stat(fname2.c_str(), &buffer) != 0) {
+        fs::create_directories(fname2);
+    } 
+    std::ofstream outfile;
+    outfile.open(fname);
+    if(rep == 0){
+        outfile << "espen_loc" << ","  << "year_id" << "," << "age_start" <<"," << "age_end" << "," << "measure" << "," << "draw_0" << "\n";
+    }else{
+         outfile << "draw_0" << "\n";
+    }
+    
+    outfile.close();
+
+}
+
+
+void Scenario::InitTASData(int rep,  std::string folder){
+    // get mf prevalence
+
+    struct stat buffer;
+
+    
+    
+    std::string fname;
+    std::string fname2;
+    std::string rep1 = std::to_string(rep);
+    std::size_t first_ = name.find("_");
+    std::string fol_n = name.substr(0,first_);
+    fname = folder + "/IHME_scen" + fol_n + "/" + name +"/TAS_scen" + name +  "_rep_" + rep1  + ".csv";
+    fname2 = folder + "/IHME_scen" + fol_n + "/" + name;
+    if (stat(fname2.c_str(), &buffer) != 0) {
+        fs::create_directories(fname2);
+    } 
+    std::ofstream outfile;
+    outfile.open(fname);
+    if(rep == 0){
+        outfile << "espen_loc" << ","  << "year_id" << "," << "age_start" <<"," << "age_end" << "," << "measure" << "," << "draw_0" << "\n";
+    }else{
+         outfile << "draw_0" << "\n";
+    }
+    
+    outfile.close();
+
+}
+
+
 
 void Scenario::writePrevByAge(Population& popln, int t, int rep,  std::string folder){
     // get mf prevalence
@@ -607,7 +667,7 @@ void Scenario::writePrevByAge(Population& popln, int t, int rep,  std::string fo
 
 
 
-void Scenario::writeNumberByAge(Population& popln, int t, int rep,  std::string folder){
+void Scenario::writeNumberByAge(Population& popln, int t, int rep,  std::string folder, std::string surveyType){
     // get mf prevalence
     std::ofstream outfile;
     int maxAge = popln.getMaxAge();
@@ -615,13 +675,24 @@ void Scenario::writeNumberByAge(Population& popln, int t, int rep,  std::string 
     std::size_t first_ = name.find("_");
     std::string fol_n = name.substr(0,first_);
     std::string rep1 = std::to_string(rep);
-    fname = folder + "/IHME_scen" + fol_n + "/" + name +"/IHME_scen" + name +  "_rep_" + rep1  + ".csv";
+    std::string entry = "number";
+    if(surveyType == "PreTAS survey"){
+        fname = folder + "/IHME_scen" + fol_n + "/" + name +"/PreTAS_scen" + name +  "_rep_" + rep1  + ".csv";
+        entry = "Pre TAS number";
+    }else if(surveyType == "TAS survey"){
+        fname = folder + "/IHME_scen" + fol_n + "/" + name +"/TAS_scen" + name +  "_rep_" + rep1  + ".csv";
+        entry = "TAS number";
+    }else{
+        fname = folder + "/IHME_scen" + fol_n + "/" + name +"/IHME_scen" + name +  "_rep_" + rep1  + ".csv";
+        entry = "number";
+    }
+    
     int year = t/12 + 2000;
     
     outfile.open(fname, std::ios::app);     
     if(rep == 0){
         for(int j =0; j < maxAge; j++){
-           outfile << name << ","  << year << "," << j <<"," << j+1 << "," << "number" << "," << popln.getNumberByAge(j, j+1)<< "\n";
+           outfile << name << ","  << year << "," << j <<"," << j+1 << "," << entry << "," << popln.getNumberByAge(j, j+1)<< "\n";
         }
     }else{
         for(int j =0; j < maxAge; j++){
@@ -740,17 +811,21 @@ void Scenario::writeMDAData(int t, int MDATreatments, int MDAPopSize, int minAge
 
 
 void Scenario::writeMDADataAllTreated(int t, int* numTreat, int maxAge, int rep, std::string type, std::string folder){
-    // get mf prevalence
+
     std::ofstream outfile;
     std::string fname;
     std::string rep1 = std::to_string(rep);
     std::size_t first_ = name.find("_");
     std::string fol_n = name.substr(0,first_);
-    //fname = folder + "/IPM_scen" + fol_n + "/" + name +"/IPM_scen" + name +  "_rep_" + rep1  + ".csv";
+    
     fname = folder + "/IHME_scen" + fol_n + "/" + name +"/IHME_scen" + name +  "_rep_" + rep1  + ".csv";
     int year = t/12 + 2000;
 
     outfile.open(fname, std::ios::app);        
+    if (!outfile.is_open()) {
+        std::cerr << "Error: Unable to open file " << fname << " for writing." << std::endl;
+        return; // Or handle the error appropriately
+    }
     if(rep == 0){
         for(int j =0; j < maxAge; j++){
             outfile << name << ","  << year << "," << j <<"," << j+1 << "," << "MDA (" << type  << ")," << numTreat[j]<< "\n";
@@ -758,6 +833,101 @@ void Scenario::writeMDADataAllTreated(int t, int* numTreat, int maxAge, int rep,
     }else{
         for(int j =0; j < maxAge; j++){
             outfile <<  numTreat[j]<< "\n";
+        }
+        
+    }   
+   
+	outfile.close();
+}
+
+
+void Scenario::writePreTAS(int t, int*  numSurvey, int maxAge, int rep, std::string folder){
+    std::ofstream outfile;
+    std::string fname;
+    std::string rep1 = std::to_string(rep);
+    std::size_t first_ = name.find("_");
+    std::string fol_n = name.substr(0,first_);
+    
+    fname = folder + "/IHME_scen" + fol_n + "/" + name +"/PreTAS_scen" + name +  "_rep_" + rep1  + ".csv";
+    int year = t/12 + 2000;
+
+    outfile.open(fname, std::ios::app);        
+    if (!outfile.is_open()) {
+        std::cerr << "Error: Unable to open file " << fname << " for writing." << std::endl;
+        return; // Or handle the error appropriately
+    }
+    if(rep == 0){
+        for(int j =0; j < maxAge; j++){
+            outfile << name << ","  << year << "," << j <<"," << j+1 << "," << "PreTAS survey ," << numSurvey[j]<< "\n";
+        }
+    }else{
+        for(int j =0; j < maxAge; j++){
+            outfile <<  numSurvey[j]<< "\n";
+        }
+        
+    }   
+   
+	outfile.close();
+}
+
+
+void Scenario::writeTAS(int t, int*  numSurvey, int maxAge, int rep, std::string folder){
+    std::ofstream outfile;
+    std::string fname;
+    std::string rep1 = std::to_string(rep);
+    std::size_t first_ = name.find("_");
+    std::string fol_n = name.substr(0,first_);
+    
+    fname = folder + "/IHME_scen" + fol_n + "/" + name +"/TAS_scen" + name +  "_rep_" + rep1  + ".csv";
+    int year = t/12 + 2000;
+
+    outfile.open(fname, std::ios::app);        
+    if (!outfile.is_open()) {
+        std::cerr << "Error: Unable to open file " << fname << " for writing." << std::endl;
+        return; // Or handle the error appropriately
+    }
+    if(rep == 0){
+        for(int j =0; j < maxAge; j++){
+            outfile << name << ","  << year << "," << j <<"," << j+1 << "," << "TAS survey ," << numSurvey[j]<< "\n";
+        }
+    }else{
+        for(int j =0; j < maxAge; j++){
+            outfile <<  numSurvey[j]<< "\n";
+        }
+        
+    }   
+   
+	outfile.close();
+}
+
+void Scenario::writeEmptySurvey(int year, int maxAge, int rep, std::string surveyType,  std::string folder){
+    std::ofstream outfile;
+    std::string fname;
+    std::string rep1 = std::to_string(rep);
+    std::size_t first_ = name.find("_");
+    std::string fol_n = name.substr(0,first_);
+    
+    if(surveyType == "PreTAS survey"){
+        fname = folder + "/IHME_scen" + fol_n + "/" + name +"/PreTAS_scen" + name +  "_rep_" + rep1  + ".csv";
+    }
+    if(surveyType == "TAS survey"){
+        fname = folder + "/IHME_scen" + fol_n + "/" + name +"/TAS_scen" + name +  "_rep_" + rep1  + ".csv";
+    }
+    
+    //int year = t/12 + 2000;
+
+    outfile.open(fname, std::ios::app);        
+    if (!outfile.is_open()) {
+        std::cerr << "Error: Unable to open file " << fname << " for writing." << std::endl;
+        return; // Or handle the error appropriately
+    }
+    if(rep == 0){
+        for(int j =0; j < maxAge; j++){
+            outfile << name << ","  << year << "," << j <<"," << j+1 << "," << surveyType << "," << 0 << "\n";
+        }
+    }else{
+        for(int j =0; j < maxAge; j++){
+            outfile <<  0<< "\n";
         }
         
     }   

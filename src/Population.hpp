@@ -65,15 +65,15 @@ public:
     void saveAges();
     void saveTotalWormYears();
     void writePrevByAge();
-    int PreTASSurvey();
-    int TASSurvey(double t);
+    int PreTASSurvey(Scenario& sc, int forPreTass, int t, int rep,  std::string folderName);
+    int TASSurvey(Scenario& sc, int forTass, int t, int rep,  std::string folderName);
     RecordedPrevalence  getPrevalence(PrevalenceEvent* outputPrev)  const;
     
     double getLarvalUptakebyVector(double r1, double kappas1, Vector::vectorSpecies species) const;
     double getBedNetCoverage()  const;
     double getBedNetSysComp() const ;
     double getImportationRateFactor()  const;
-    double getMFPrev();
+    double getMFPrev(Scenario& sc, int forPreTass, int t, int rep,  std::string folderName);
     double getMFPrevByAge(double ageStart, double ageEnd);
     double getNumberByAge(double ageStart, double ageEnd);
     double HydroceleTestByAge(int ageStart, int ageEnd, int HydroceleTotalWorms, double HydroceleShape);
@@ -81,7 +81,7 @@ public:
     void initPTreat(double cov, double rho);
     void editPTreat(double cov, double rho);
     void checkForZeroPTreat(double cov, double rho);
-    double getICPrev();
+    double getICPrev(Scenario& sc, int forTass, int t, int rep,  std::string folderName);
     void changeNeverTreat();
     void changeICTest();
     void neverTreatToOriginal();
