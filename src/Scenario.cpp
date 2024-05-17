@@ -665,6 +665,36 @@ void Scenario::writePrevByAge(Population& popln, int t, int rep,  std::string fo
 
 
 
+void Scenario::writeIncidence(int t, int* incidence, int maxAge, int rep, std::string folder){
+    std::ofstream outfile;
+    std::string fname;
+    std::string rep1 = std::to_string(rep);
+    std::size_t first_ = name.find("_");
+    std::string fol_n = name.substr(0,first_);
+    
+    fname = folder + "/IHME_scen" + fol_n + "/" + name +"/IHME_scen" + name +  "_rep_" + rep1  + ".csv";
+    int year = t/12 + 2000;
+
+    outfile.open(fname, std::ios::app);        
+    if (!outfile.is_open()) {
+        std::cerr << "Error: Unable to open file " << fname << " for writing." << std::endl;
+        return; // Or handle the error appropriately
+    }
+    if(rep == 0){
+        for(int j =0; j < maxAge; j++){
+            outfile << name << ","  << year << "," << j <<"," << j+1 << "," << "Incidence ," << incidence[j]<< "\n";
+        }
+    }else{
+        for(int j =0; j < maxAge; j++){
+            outfile <<  incidence[j]<< "\n";
+        }
+        
+    }   
+   
+	outfile.close();
+}
+
+
 
 
 void Scenario::writeNumberByAge(Population& popln, int t, int rep,  std::string folder, std::string surveyType){

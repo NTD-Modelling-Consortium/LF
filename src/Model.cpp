@@ -164,7 +164,7 @@ std::vector<double>& k_vals, std::vector<double>& v_to_h_vals, int updateParams,
     std::string folderName = opDir ;
     std::string MDAType;
     int t_import_reduction;
-    int preTASSurveyTime = -1000;
+    int preTASSurveyTime = -1000; 
     int TASSurveyTime = -1000;
     int paramIndex = 0;
     int targetMonth = sc.getMonthToSave(y); //simulate to start of this month
@@ -238,13 +238,16 @@ std::vector<double>& k_vals, std::vector<double>& v_to_h_vals, int updateParams,
         //  }
         PrevalenceEvent* outputPrev = sc.prevalenceDue(t); //defines min age of host to include and method ic/mf
         MDAEvent* applyMDA = sc.treatmentDue(t);
+        // at the beginning of every year we record the prevalence of the population, along with the number of people
+        // in each age group and the sequelae prevalence in each age group
         if (t % 12 == 0 ){
 
             double MFPrev = popln.getMFPrev(sc, 0, t, rep, folderName);
             sc.writePrevByAge(popln, t, rep, folderName);
-            sc.writeNumberByAge(popln, t, rep, folderName, "not survey");
+            sc.writeNumberByAge(popln, t, rep, folderName, "not survey"); // "not survey" means that this isn't done for a preTAS
+            // or TAS survey. This alters the file the result is saved in
             sc.writeSequelaeByAge(popln, t, LymphodemaTotalWorms,  LymphodemaShape, HydroceleTotalWorms, HydroceleShape, rep, folderName);
-            
+            popln.getIncidence(sc, t, rep, folderName);
             sc.writeSurveyByAge(popln, t, preTAS_Pass, TAS_Pass, rep, folderName);
             // sc.writeL3(vectors, t, preTAS_Pass, TAS_Pass,rep, folderName);
             sc.writeMF(MFPrev, t,rep, folderName);
@@ -297,7 +300,6 @@ std::vector<double>& k_vals, std::vector<double>& v_to_h_vals, int updateParams,
         if(outputPrev)  //use alternative for of prevalence function as its required to return 2 values, but these must be calculated at the same time
            prevalence = popln.getPrevalence(outputPrev); //prev measured before mda done to kill mf in hosts
 
-        // snippet to perform a survey
         // snippet to perform a preTAS survey
         if(t == preTASSurveyTime){
             preTAS_Pass = popln.PreTASSurvey(sc, 1, t, rep, folderName);
@@ -364,7 +366,7 @@ std::vector<double>& k_vals, std::vector<double>& v_to_h_vals, int updateParams,
             popln.checkForZeroPTreat(cov, rho);
 
             // if this this the first MDA then if the NoMDALowMF indicator is 1 then we need to check the MF prevalence in the population
-            // as if this is low then we wil not begin MDA. If the indicator is not 1 then we will do MDA even with low MF prevalence
+            // as if this is low then we will not begin MDA. If the indicator is not 1 then we will do MDA even with low MF prevalence
             if(popln.totMDAs == 0){
                 if(popln.getNoMDALowMF() == 1){
                     mfprev = popln.getMFPrev(sc, 0, t, rep, folderName);
@@ -373,12 +375,15 @@ std::vector<double>& k_vals, std::vector<double>& v_to_h_vals, int updateParams,
                     }
                 }
             }
-            
+
+            // record prevalence before the MDA so that we can later assess the decrease in prevalence
+            // and reduce the importation inline with this decrease
+            mfprev_aimp_old = popln.getMFPrev(sc, 0, t, rep, folderName); 
             // apply the MDA. If DoMDA = 0, then we call this function, but don't do the MDA,
-            // we just write to the file showing that no people were treated.
+            // we just write to a file showing that no people were treated.
             popln.ApplyTreatmentUpdated(applyMDA, worms, sc, t, rep, DoMDA, folderName);
             t_import_reduction = t + 6;
-            mfprev_aimp_old = popln.getMFPrev(sc, 0, t, rep, folderName); 
+            
             popln.totMDAs += 1; 
           
             if (popln.totMDAs == numMDADoSurvey){

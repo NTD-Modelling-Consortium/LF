@@ -187,6 +187,7 @@ public:
     void writeTAS(int t, int*  numSurvey, int maxAge, int rep, std::string folder);
     void writeSurveyByAge(Population& popln, int t, int preTAS_Pass, int TAS_Pass, int rep, std::string folder);
     void writeEmptySurvey(int year, int maxAge, int rep, std::string surveyType, std::string folder);
+    void writeIncidence(int t, int*  numSurvey, int maxAge, int rep, std::string folder);
     void writeL3(const Vector& vectors, int t, int preTAS_Pass, int TAS_Pass, int rep, std::string folder);
     void writeMF(double MFPrev, int t,  int rep, std::string folder);
 protected:

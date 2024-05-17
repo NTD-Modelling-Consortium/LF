@@ -74,6 +74,7 @@ public:
     double getBedNetSysComp() const ;
     double getImportationRateFactor()  const;
     double getMFPrev(Scenario& sc, int forPreTass, int t, int rep,  std::string folderName);
+    void getIncidence(Scenario& sc,  int t, int rep,  std::string folderName);
     double getMFPrevByAge(double ageStart, double ageEnd);
     double getNumberByAge(double ageStart, double ageEnd);
     double HydroceleTestByAge(int ageStart, int ageEnd, int HydroceleTotalWorms, double HydroceleShape);

@@ -549,6 +549,36 @@ double Population::getMFPrev(Scenario& sc, int forPreTass, int t, int rep,  std:
 }
 
 
+void Population::getIncidence(Scenario& sc,  int t, int rep,  std::string folderName){
+    // get incidence
+
+    int incidence[maxAge];
+    for (int i = 0; i < maxAge; ++i) {
+        incidence[i] = 0; // initialization
+    }
+        
+        
+    for(int i =0; i < size; i++){
+        float flooredAge = std::floor(host_pop[i].age/12);
+        int flooredAgeInt = std::min(static_cast<int>(flooredAge), maxAge - 1);
+        bool infectedMF = ( stats.uniform_dist() <  (1 - exp(-1 * host_pop[i].M) ) );  //depends on how many mf present       
+        
+        if (infectedMF) {
+            if(host_pop[i].previouslyInfected == 0){ // if not previously infected then add to incidence
+                incidence[flooredAgeInt] += 1; // if mf positive, increment MFpos by 1
+            }
+            host_pop[i].previouslyInfected = 1; // change previously infected status to true
+        }
+        else{
+            host_pop[i].previouslyInfected = 0; //if not infected this time, then change previously infected status to false
+        }
+
+    }
+    sc.writeIncidence(t, incidence, maxAge, rep, folderName);
+    
+}
+
+
 double Population::getMFPrevByAge(double ageStart, double ageEnd){
     // get mf prevalence
 
@@ -558,24 +588,9 @@ double Population::getMFPrevByAge(double ageStart, double ageEnd){
     int maxAgeMonths = ageEnd*12;
     //double xx;
     for(int i =0; i < size; i++){
-        // xx = stats.uniform_dist();
-        // if(host_pop[i].neverTreat == 0){
-        //     if((host_pop[i].age >= minAgeMonths ) &&(host_pop[i].age <= maxAgeMonths )){
-        //         bool infectedMF = ( stats.uniform_dist() <  (1 - exp(-1 * host_pop[i].M) ) );  //depends on how many mf present       
-        //         numHosts++; // increment number of hosts by 1
-        //         if (infectedMF) MFpos++; // if mf positive, increment MFpos by 1
-        //     }
-        // }
-        // if((host_pop[i].neverTreat == 1) && (xx > 0.98)){
-        //     if((host_pop[i].age >= minAgeMonths ) &&(host_pop[i].age <= maxAgeMonths )){
-        //         bool infectedMF = ( stats.uniform_dist() <  (1 - exp(-1 * host_pop[i].M) ) );  //depends on how many mf present       
-        //         numHosts++; // increment number of hosts by 1
-        //         if (infectedMF) MFpos++; // if mf positive, increment MFpos by 1
-        //     }
-        // }
 
   
-        if((host_pop[i].age >= minAgeMonths ) &&(host_pop[i].age <= maxAgeMonths )){
+        if((host_pop[i].age >= minAgeMonths ) &&(host_pop[i].age < maxAgeMonths )){
                 bool infectedMF = ( stats.uniform_dist() <  (1 - exp(-1 * host_pop[i].M) ) );  //depends on how many mf present       
                 numHosts++; // increment number of hosts by 1
                 if (infectedMF) MFpos++; // if mf positive, increment MFpos by 1
