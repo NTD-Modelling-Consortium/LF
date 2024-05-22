@@ -206,10 +206,11 @@ std::vector<double>& k_vals, std::vector<double>& v_to_h_vals, int updateParams,
 
 
     for (int t = currentMonth; t < targetMonth; t += dt){
+        paramIndex = t / 12;
+        // if we are updating the k and v_to_h params, then do so if the time is right to do so
         if ((updateParams) && (t%12 == 0) && (paramIndex <= (k_vals.size()-1))){
             popln.updateKVal(k_vals[paramIndex]);
             vectors.updateVtoH(v_to_h_vals[paramIndex]);
-            paramIndex++;
         }
 
         PrevalenceEvent* outputPrev = sc.prevalenceDue(t); //defines min age of host to include and method ic/mf
