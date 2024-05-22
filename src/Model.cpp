@@ -226,16 +226,13 @@ std::vector<double>& k_vals, std::vector<double>& v_to_h_vals, int updateParams,
 
     for (int t = currentMonth; t < targetMonth; t += dt){
 
-
+        paramIndex = t / 12;
+        // if we are updating the k and v_to_h params, then do so if the time is right to do so
         if ((updateParams) && (t%12 == 0) && (paramIndex <= (k_vals.size()-1))){
             popln.updateKVal(k_vals[paramIndex]);
             vectors.updateVtoH(v_to_h_vals[paramIndex]);
-            paramIndex++;
         }
-        // if(t%12==0){
-        //      double MFPrev = popln.getMFPrev();
-        //      std::cout << "t = " << t << ", Mf prev = "<< MFPrev << std::endl;
-        //  }
+
         PrevalenceEvent* outputPrev = sc.prevalenceDue(t); //defines min age of host to include and method ic/mf
         MDAEvent* applyMDA = sc.treatmentDue(t);
         // at the beginning of every year we record the prevalence of the population, along with the number of people
@@ -244,8 +241,7 @@ std::vector<double>& k_vals, std::vector<double>& v_to_h_vals, int updateParams,
 
             double MFPrev = popln.getMFPrev(sc, 0, t, rep, folderName);
             sc.writePrevByAge(popln, t, rep, folderName);
-            sc.writeNumberByAge(popln, t, rep, folderName, "not survey"); // "not survey" means that this isn't done for a preTAS
-            // or TAS survey. This alters the file the result is saved in
+            sc.writeNumberByAge(popln, t, rep, folderName, "not survey");
             sc.writeSequelaeByAge(popln, t, LymphodemaTotalWorms,  LymphodemaShape, HydroceleTotalWorms, HydroceleShape, rep, folderName);
             popln.getIncidence(sc, t, rep, folderName);
             sc.writeSurveyByAge(popln, t, preTAS_Pass, TAS_Pass, rep, folderName);
