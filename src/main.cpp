@@ -67,7 +67,7 @@ int main(int argc, char **argv) {
     }else
         index = atoi(argv[1]); //used for labelling output files
     
-    for (int i = 1; i < (argc-1); i+=2){
+    for (int i = 2; i < (argc-1); i+=2){
         
         if (!strcmp(argv[i],  "-r")){
             if(!_DEBUG) replicates = atoi(argv[i+1]);
