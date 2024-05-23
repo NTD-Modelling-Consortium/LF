@@ -46,10 +46,6 @@ int main(int argc, char **argv) {
         std::cout << "transfil index -s <scenarios_file> -n <pop_file> -p <random_parameters_file> -r <replicates=1000> -t <timestep=1> -o <output_directory=\"./\">" << std::endl;
         return 1;
     }
-    std::ofstream output("total_worms.csv");
-    std::ofstream output2("ages.csv");
-    std::ofstream output3("total_worm_years.csv");
-    
     struct timeval tv1, tv2;
     gettimeofday(&tv1, NULL);
     
@@ -67,7 +63,7 @@ int main(int argc, char **argv) {
     }else
         index = atoi(argv[1]); //used for labelling output files
     
-    for (int i = 1; i < (argc-1); i+=2){
+    for (int i = 2; i < (argc-1); i+=2){
         
         if (!strcmp(argv[i],  "-r")){
             if(!_DEBUG) replicates = atoi(argv[i+1]);
