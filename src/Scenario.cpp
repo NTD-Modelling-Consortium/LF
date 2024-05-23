@@ -671,7 +671,7 @@ void Scenario::writeIncidence(int t, int* incidence, int maxAge, int rep, std::s
     std::string rep1 = std::to_string(rep);
     std::size_t first_ = name.find("_");
     std::string fol_n = name.substr(0,first_);
-    
+   // std::cout << "sfasdf" << std::endl;
     fname = folder + "/IHME_scen" + fol_n + "/" + name +"/IHME_scen" + name +  "_rep_" + rep1  + ".csv";
     int year = t/12 + 2000;
 
@@ -1038,16 +1038,24 @@ void Scenario::writeSurveyByAge(Population& popln, int t, int preTAS_Pass, int T
     std::string rep1 = std::to_string(rep);
     std::size_t first_ = name.find("_");
     std::string fol_n = name.substr(0,first_);
-    fname = folder + "/IPM_scen" + fol_n + "/" + name +"/IPM_scen" + name +  "_rep_" + rep1  + ".csv";
+    fname = folder + "/IHME_scen" + fol_n + "/" + name +"/IHME_scen" + name +  "_rep_" + rep1  + ".csv";
     int year = t/12 + 2000;
     
     outfile.open(fname, std::ios::app);         
-   
-    outfile << name << ","  << year << "," << "None" <<"," << "None" << "," << "numPreTASSurveys" << "," << popln.numPreTASSurveys<< "\n";
-    outfile << name << ","  << year << "," << "None" <<"," << "None" << "," << "TASSurveys" << "," << popln.numTASSurveys<< "\n";  
-    outfile << name << ","  << year << "," << "None" <<"," << "None" << "," << "PreTASPass" << "," << preTAS_Pass<< "\n";
-    outfile << name << ","  << year << "," << "None" <<"," << "None" << "," << "TASPass" << "," << TAS_Pass<< "\n";
-   
+
+
+    if(rep == 0){
+             outfile << name << ","  << year << "," << "None" <<"," << "None" << "," << "numPreTASSurveys" << "," << popln.numPreTASSurveys<< "\n";
+            outfile << name << ","  << year << "," << "None" <<"," << "None" << "," << "TASSurveys" << "," << popln.numTASSurveys<< "\n";  
+            outfile << name << ","  << year << "," << "None" <<"," << "None" << "," << "PreTASPass" << "," << preTAS_Pass<< "\n";
+            outfile << name << ","  << year << "," << "None" <<"," << "None" << "," << "TASPass" << "," << TAS_Pass<< "\n";
+    }else{
+             outfile <<  popln.numPreTASSurveys<< "\n";
+            outfile << popln.numTASSurveys<< "\n";  
+            outfile <<  preTAS_Pass<< "\n";
+            outfile <<  TAS_Pass<< "\n";
+    }   
+
 	outfile.close();
 }
 
