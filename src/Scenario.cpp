@@ -671,7 +671,7 @@ void Scenario::writeIncidence(int t, int* incidence, int maxAge, int rep, std::s
     std::string rep1 = std::to_string(rep);
     std::size_t first_ = name.find("_");
     std::string fol_n = name.substr(0,first_);
-   // std::cout << "sfasdf" << std::endl;
+
     fname = folder + "/IHME_scen" + fol_n + "/" + name +"/IHME_scen" + name +  "_rep_" + rep1  + ".csv";
     int year = t/12 + 2000;
 
