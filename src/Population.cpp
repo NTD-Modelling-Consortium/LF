@@ -584,7 +584,7 @@ void Population::getIncidence(Scenario& sc,  int t, int rep,  std::string folder
         float flooredAge = std::floor(host_pop[i].age/12);
         int flooredAgeInt = std::min(static_cast<int>(flooredAge), maxAge - 1);
         bool infectedMF = ( stats.uniform_dist() <  (1 - exp(-1 * host_pop[i].M) ) );  //depends on how many mf present       
-        host_pop[i].previouslyInfected = 0;
+
         if (infectedMF) {
             
             if(host_pop[i].previouslyInfected == 0){
