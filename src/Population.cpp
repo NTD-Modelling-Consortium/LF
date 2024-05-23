@@ -244,12 +244,16 @@ double Population::getPopSize() {
 
 
 void Population::initPTreat(double cov, double rho){
-
-    double alpha = cov * (1-rho)/rho;
-    double beta = (1-cov)*(1-rho)/rho;
-
-    for(int i =0; i < size; i++){
-        host_pop[i].initialisePTreat(alpha, beta);
+    if(rho > 0){
+        double alpha = cov * (1-rho)/rho;
+        double beta = (1-cov)*(1-rho)/rho;
+        for(int i =0; i < size; i++){
+            host_pop[i].initialisePTreat(alpha, beta);
+        }
+    }else{
+        for(int i =0; i < size; i++){
+            host_pop[i].pTreat = cov;
+        }
     }
 }
 
@@ -266,64 +270,80 @@ struct CompareArray {
 };
 
 void Population::editPTreat(double cov, double rho){
-    
+    if(rho > 0){
     // define the parameters for the probability of treatment
-    double alpha = cov * (1-rho)/rho;
-    double beta = (1-cov)*(1-rho)/rho;
-    // create array to hold these probabilities
-    double pTreats[size];
-    // draw probabilities from the beta distribution
-    for(int i = 0; i < size; i++){
-        pTreats[i] = stats.beta_dist(alpha, beta);
+        double alpha = cov * (1-rho)/rho;
+        double beta = (1-cov)*(1-rho)/rho;
+        // create array to hold these probabilities
+        double pTreats[size];
+        // draw probabilities from the beta distribution
+        for(int i = 0; i < size; i++){
+            pTreats[i] = stats.beta_dist(alpha, beta);
+        }
+        // sort these values so that they are in ascending order
+        std::sort(pTreats, pTreats + size);
+
+        // We want to know the rank of each of the host populations pTreat so that we
+        // can maintain the order of their probability of treatment under new coverage and rho values
+        // by assigning the newly drawn probabilities to the appropriate individual
+
+        // Create an array of indices
+        int indices[size];
+        
+        for (int i = 0; i < size; i++) {
+            indices[i] = i;
+        }
+        // store the current value of the pTreat in an array
+        double oldPTreat[size];
+        //std::cout << "OLDPtreat" << std::endl;
+        for (int i = 0; i < size; i++) {
+            oldPTreat[i] = host_pop[i].pTreat;
+        }
+
+        // Sort the indices array based on the values in oldPTreat
+        std::sort(indices, indices + size, CompareArray(oldPTreat));
+
+        // now assign the value from the newly drawn beta distribution stored in pTreats to
+        // the appropriate place in the host_pop based on the rank of the current values there
+        // which are stored in the oldPTreat array. This works as the entries in the pTreats
+        // array are already in ascending order.
+        //std::cout << "NEWPtreat" << std::endl;
+        // Assign the newly drawn treatment probabilities to the appropriate individuals
+        for (int i = 0; i < size; i++) {
+            host_pop[indices[i]].pTreat = pTreats[i];
+        }
+    }else{
+        for (int i = 0; i < size; i++) {
+            host_pop[i].pTreat = cov;
+        }
     }
-    // sort these values so that they are in ascending order
-    std::sort(pTreats, pTreats + size);
-
-    // We want to know the rank of each of the host populations pTreat so that we
-    // can maintain the order of their probability of treatment under new coverage and rho values
-    // by assigning the newly drawn probabilities to the appropriate individual
-
-    // Create an array of indices
-    int indices[size];
     
-    for (int i = 0; i < size; i++) {
-        indices[i] = i;
-    }
-    // store the current value of the pTreat in an array
-    double oldPTreat[size];
-    //std::cout << "OLDPtreat" << std::endl;
-    for (int i = 0; i < size; i++) {
-        oldPTreat[i] = host_pop[i].pTreat;
-    }
-
-    // Sort the indices array based on the values in oldPTreat
-    std::sort(indices, indices + size, CompareArray(oldPTreat));
-
-    // now assign the value from the newly drawn beta distribution stored in pTreats to
-    // the appropriate place in the host_pop based on the rank of the current values there
-    // which are stored in the oldPTreat array. This works as the entries in the pTreats
-    // array are already in ascending order.
-    //std::cout << "NEWPtreat" << std::endl;
-    // Assign the newly drawn treatment probabilities to the appropriate individuals
-    for (int i = 0; i < size; i++) {
-        host_pop[indices[i]].pTreat = pTreats[i];
-    }
 
 }
 
 void Population::checkForZeroPTreat(double cov, double rho){
    
     // define the parameters for the probability of treatment
-    double alpha = cov * (1-rho)/rho;
-    double beta = (1-cov)*(1-rho)/rho;
+    if(rho > 0){
+        double alpha = cov * (1-rho)/rho;
+        double beta = (1-cov)*(1-rho)/rho;
+        for (int i = 0; i < size; i++) {
+            if(host_pop[i].pTreat == 0){
+                host_pop[i].pTreat = stats.beta_dist(alpha, beta);
+            }
+        }
+    }else{
+        for (int i = 0; i < size; i++) {
+            if(host_pop[i].pTreat == 0){
+                host_pop[i].pTreat = cov;
+            }
+        }
+    }
+    
 
     // loop over pTreat values and if there are any zero values, then
     // draw from beta distribution to set the pTreat value.
-    for (int i = 0; i < size; i++) {
-        if(host_pop[i].pTreat == 0){
-            host_pop[i].pTreat = stats.beta_dist(alpha, beta);
-        }
-    }
+    
 }
 
 int Population::getUpdateParams() const{
@@ -333,6 +353,7 @@ int Population::getUpdateParams() const{
 int Population::getNoMDALowMF() const{
     return NoMDALowMF;
 }
+
 
 void  Population::initHosts(std::string distType, double k_val, double aImp_val){
     
@@ -492,7 +513,7 @@ int Population::PreTASSurvey(Scenario& sc, int forPreTass, int t, int rep,  std:
     double mfprev = getMFPrev(sc, forPreTass, t, rep, folderName); // find the mf prevalence
     numPreTASSurveys += 1; // increment number of pre-TAS tests by 1
     if(mfprev <= MFThreshold){ // if the mf prevalence is below threshold
-        preTAS_Pass= 1; // set pre-TAS pass indicator to 1
+        preTAS_Pass = 1; // set pre-TAS pass indicator to 1
     }
     return preTAS_Pass;
 }
@@ -503,7 +524,7 @@ int Population::TASSurvey(Scenario& sc, int forTass, int t, int rep,  std::strin
     double icprev = getICPrev(sc, forTass, t, rep, folderName); // find ic prevalence in specified age group
     numTASSurveys += 1; // increment number of TAS surveys by 1
     if((icprev <= ICThreshold)){ // if the ic prevalence is below the threshold and mf prev also below threshold
-        TAS_Pass += 1; // set TAS pass indicator to 1
+        TAS_Pass = 1; // set TAS pass indicator to 1
         t_TAS_Pass = t; // store the time of passing TAS
     }
     return TAS_Pass;
@@ -549,6 +570,7 @@ double Population::getMFPrev(Scenario& sc, int forPreTass, int t, int rep,  std:
 }
 
 
+
 void Population::getIncidence(Scenario& sc,  int t, int rep,  std::string folderName){
     // get incidence
 
@@ -562,15 +584,16 @@ void Population::getIncidence(Scenario& sc,  int t, int rep,  std::string folder
         float flooredAge = std::floor(host_pop[i].age/12);
         int flooredAgeInt = std::min(static_cast<int>(flooredAge), maxAge - 1);
         bool infectedMF = ( stats.uniform_dist() <  (1 - exp(-1 * host_pop[i].M) ) );  //depends on how many mf present       
-        
+        host_pop[i].previouslyInfected = 0;
         if (infectedMF) {
-            if(host_pop[i].previouslyInfected == 0){ // if not previously infected then add to incidence
+            
+            if(host_pop[i].previouslyInfected == 0){
                 incidence[flooredAgeInt] += 1; // if mf positive, increment MFpos by 1
+                host_pop[i].previouslyInfected = 1;
             }
-            host_pop[i].previouslyInfected = 1; // change previously infected status to true
         }
         else{
-            host_pop[i].previouslyInfected = 0; //if not infected this time, then change previously infected status to false
+            host_pop[i].previouslyInfected = 0;
         }
 
     }
@@ -701,8 +724,8 @@ double Population::getICPrev(Scenario& sc, int forTass, int t, int rep,  std::st
             float flooredAge = std::floor(host_pop[i].age/12);
             int flooredAgeInt = std::min(static_cast<int>(flooredAge), maxAge - 1);
             numSurvey[flooredAgeInt] += 1;
-            bool infectedIC = ( stats.uniform_dist() <  (true_pos * ICsensitivity));  //depends on how many mf present       
-            infectedIC = infectedIC + ( stats.uniform_dist() <  ((1-true_pos) * (1-ICspecificity)));  //depends on how many mf present       
+            bool infectedIC = ( stats.uniform_dist() <  (true_pos * ICsensitivity));         
+            infectedIC = infectedIC + ( stats.uniform_dist() <  ((1-true_pos) * (1-ICspecificity)));  
             numHosts++; // increment number of hosts by 1
             if (infectedIC) ICpos++; // if mf positive, increment MFpos by 1
             
@@ -1114,12 +1137,12 @@ void Population::ApplyTreatmentUpdated(MDAEvent* mda, Worm& worms, Scenario& sc,
     std::string MDAtype = mda->getType();
 
     if (DoMDA == 1) {
+        
         for (int i = 0; i < size; i++) {
             if (host_pop[i].age >= minAgeMDAinMonths) {
                 hostsOldEnough++;
                 float flooredAge = std::floor(host_pop[i].age / 12);
                 int flooredAgeInt = std::min(static_cast<int>(flooredAge), maxAge - 1);
-                
 
                 if (stats.uniform_dist() < host_pop[i].pTreat) {
                     if (host_pop[i].neverTreat == 0) {
@@ -1175,7 +1198,9 @@ void Population::updateImportationRate(double factor) {
     aImp_factor = factor; //just saved for output file
 }
 
-
+double Population::getaImp(){
+    return aImp;
+}
 
 void Population::clearSavedMonths(){
     
