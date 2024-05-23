@@ -370,10 +370,7 @@ std::vector<double>& k_vals, std::vector<double>& v_to_h_vals, int updateParams,
     //done
     currentMonth = targetMonth;
 
-    // double prev1 = popln.getMFPrev();
-    popln.saveTotalWorms();
-    popln.saveTotalWormYears();
-    popln.saveAges();
+
     if (y < (sc.getNumMonthsToSave()-1)){ //not finished this scenario
         popln.saveCurrentState(currentMonth, sc.getName()); //worms and importation rate. Scenario name just needed for debugging
         vectors.saveCurrentState(currentMonth); //larval density
