@@ -1118,7 +1118,7 @@ int Population::returnMaxAge(){
     return maxAge;
 }
 
-void Population::ApplyTreatmentUpdated(MDAEvent* mda, Worm& worms, Scenario& sc, int t, int rep, int DoMDA, std::string folderName) {
+void Population::ApplyTreatmentUpdated(MDAEvent* mda, Worm& worms, Scenario& sc, int t, int rep, int DoMDA, int outputEndgame, std::string folderName) {
     int minAge = (mda->getMinAge() >= 0) ? mda->getMinAge() : minAgeMDA;
     int minAgeMDAinMonths = minAge * 12;
 
@@ -1154,8 +1154,8 @@ void Population::ApplyTreatmentUpdated(MDAEvent* mda, Worm& worms, Scenario& sc,
             }
         }
     }
-
-    sc.writeMDADataAllTreated(t, numTreat, maxAge, rep, MDAtype, folderName);
+    if(outputEndgame == 1)
+        sc.writeMDADataAllTreated(t, numTreat, maxAge, rep, MDAtype, folderName);
 }
 
 
@@ -1198,9 +1198,6 @@ void Population::updateImportationRate(double factor) {
     aImp_factor = factor; //just saved for output file
 }
 
-double Population::getaImp(){
-    return aImp;
-}
 
 void Population::clearSavedMonths(){
     

@@ -95,7 +95,7 @@ public:
     double getNeverTreat();
     void evolve(double dt, const Vector& vectors, const Worm& worms);
     void ApplyTreatment(MDAEvent* mda,  Worm& worms, Scenario& sc, int t, int rep, std::string folderName);
-    void ApplyTreatmentUpdated(MDAEvent* mda,  Worm& worms, Scenario& sc, int t, int rep, int DoMDA, std::string folderName);
+    void ApplyTreatmentUpdated(MDAEvent* mda,  Worm& worms, Scenario& sc, int t, int rep, int DoMDA, int outputEndgame, std::string folderName);
     void saveCurrentState(int month, std::string sname);
     void resetToMonth(int month);
     void clearSavedMonths();
@@ -112,7 +112,6 @@ public:
     int getUpdateParams() const;
     int getNoMDALowMF() const;
     void printMDAHistory() const;
-    
     int surveyStartDate;
     double ICThreshold;
     double MFThreshold;
