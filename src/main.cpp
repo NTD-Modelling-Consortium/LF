@@ -43,10 +43,10 @@ int main(int argc, char **argv) {
     
     if (argc < 2){
 
-        std::cout << "transfil index -s <scenarios_file> -n <pop_file> -p <random_parameters_file> -r <replicates=1000> -t <timestep=1> -o <output_directory=\"./\">" << std::endl;
+        std::cout << "transfil index -s <scenarios_file> -n <pop_file> -p <random_parameters_file> -r <replicates=1000> -t <timestep=1> -o <output_directory=\"./\"> -g <random_seed=1> -e <output_endgame=1> -x <reduce_imp_via-xml=0>"  << std::endl;
         return 1;
     }
-
+   
     
     struct timeval tv1, tv2;
     gettimeofday(&tv1, NULL);
@@ -58,14 +58,29 @@ int main(int argc, char **argv) {
     std::string scenariosFile("");
     std::string opDir("");
 
+    // initialize random seed value, whether the endgame output will be done
+    // and whether the reduction in importation rate should be done via the 
+    // xml file rather than impact of MDA on the prevalence
+    int rseed = -1;
+    int outputEndgame = 1;
+    int reduceImpViaXml = 0;
+    
     int index = 0;
     if (!strcmp(argv[1], "DEBUG")){
         _DEBUG=true;
         replicates=1;
     }else
         index = atoi(argv[1]); //used for labelling output files
-    
-    for (int i = 2; i < (argc-1); i+=2){
+
+    int start_index = 2;
+    if((argc % 2) == 0){
+        start_index = 2;
+    }
+    if((argc % 2) == 1){
+        start_index = 1;
+    }
+    std::cout << "start_index = " << start_index << std::endl;
+    for (int i = start_index; i < (argc-1); i+=2){
         
         if (!strcmp(argv[i],  "-r")){
             if(!_DEBUG) replicates = atoi(argv[i+1]);
@@ -79,7 +94,13 @@ int main(int argc, char **argv) {
             dt = atof(argv[i+1]);
         else if (!strcmp(argv[i],  "-o"))
             opDir = argv[i+1];
-        else{
+        else if (!strcmp(argv[i],  "-g"))
+            rseed = atoi(argv[i+1]);
+        else if (!strcmp(argv[i],  "-e"))
+            outputEndgame = atoi(argv[i+1]);
+        else if (!strcmp(argv[i],  "-x"))
+            reduceImpViaXml = atoi(argv[i+1]);
+        else{   
             std::cout << "Error: unknown command line switch " << argv[i] << std::endl;
             return 1;
         }
@@ -115,6 +136,9 @@ int main(int argc, char **argv) {
         opDir = "./";
     else if(opDir.back() != '/')
         opDir = opDir + "/";
+    
+    
+    
     
     
     //Read the inputs
@@ -157,7 +181,7 @@ int main(int argc, char **argv) {
     
     //Run
     Model model;
-    model.runScenarios(Scenarios, hostPopulation, vectors, worms, replicates, dt, index, randParamsfile, opDir);
+    model.runScenarios(Scenarios, hostPopulation, vectors, worms, replicates, dt, index, outputEndgame, reduceImpViaXml, rseed, randParamsfile, opDir);
 
     
     gettimeofday(&tv2, NULL);
@@ -166,28 +190,3 @@ int main(int argc, char **argv) {
 
     return 0;
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

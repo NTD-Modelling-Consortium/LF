@@ -34,6 +34,7 @@ void Host::reset(int a, double HydroceleShape, double LymphodemaShape, double ne
     sex = (stats.uniform_dist() < 0.5) ? 0 : 1;
     neverTreat = (stats.uniform_dist() < neverTreated) ? 1 : 0;
     pTreat = 0;
+    previouslyInfected = -1;
 }
 
 
@@ -52,7 +53,7 @@ double HydroceleShape, double LymphodemaShape, double neverTreated){
     sex = (stats.uniform_dist() < 0.5) ? 0 : 1;
     reset(a, HydroceleShape, LymphodemaShape, neverTreated);
     pTreat = 0;
-    
+    previouslyInfected = -1;
     
 }
 

@@ -66,7 +66,10 @@ public:
     bool bedNet;                 //host uses bednet.
     double uCompBednets;              //THe hosts probability of using a bednet for a given overall coverage
     double uCompMDA;
-    
+    // indicator whether the individual was infected at last time checked.
+    // initialize at -1. Then will be set to 0 if uninfected and 1 if infected.
+    // done at the start of each year
+    int previouslyInfected;
      //operator to save a host
     operator hostState() const;
     

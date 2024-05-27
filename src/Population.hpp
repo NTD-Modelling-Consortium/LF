@@ -65,15 +65,16 @@ public:
     void saveAges();
     void saveTotalWormYears();
     void writePrevByAge();
-    int PreTASSurvey();
-    int TASSurvey(double t);
+    int PreTASSurvey(Scenario& sc, int forPreTass, int t, int rep,  std::string folderName);
+    int TASSurvey(Scenario& sc, int forTass, int t, int rep,  std::string folderName);
     RecordedPrevalence  getPrevalence(PrevalenceEvent* outputPrev)  const;
     
     double getLarvalUptakebyVector(double r1, double kappas1, Vector::vectorSpecies species) const;
     double getBedNetCoverage()  const;
     double getBedNetSysComp() const ;
     double getImportationRateFactor()  const;
-    double getMFPrev();
+    double getMFPrev(Scenario& sc, int forPreTass, int t, int rep,  std::string folderName);
+    void getIncidence(Scenario& sc,  int t, int rep,  std::string folderName);
     double getMFPrevByAge(double ageStart, double ageEnd);
     double getNumberByAge(double ageStart, double ageEnd);
     double HydroceleTestByAge(int ageStart, int ageEnd, int HydroceleTotalWorms, double HydroceleShape);
@@ -81,7 +82,7 @@ public:
     void initPTreat(double cov, double rho);
     void editPTreat(double cov, double rho);
     void checkForZeroPTreat(double cov, double rho);
-    double getICPrev();
+    double getICPrev(Scenario& sc, int forTass, int t, int rep,  std::string folderName);
     void changeNeverTreat();
     void changeICTest();
     void neverTreatToOriginal();
@@ -94,22 +95,23 @@ public:
     double getNeverTreat();
     void evolve(double dt, const Vector& vectors, const Worm& worms);
     void ApplyTreatment(MDAEvent* mda,  Worm& worms, Scenario& sc, int t, int rep, std::string folderName);
-    void ApplyTreatmentUpdated(MDAEvent* mda,  Worm& worms, Scenario& sc, int t, int rep, std::string folderName);
+    void ApplyTreatmentUpdated(MDAEvent* mda,  Worm& worms, Scenario& sc, int t, int rep, int DoMDA, int outputEndgame, std::string folderName);
     void saveCurrentState(int month, std::string sname);
     void resetToMonth(int month);
     void clearSavedMonths();
     double getICSens();
     
     double getICSpec();
-   
+    std::string returnMDAType(MDAEvent* mda);
+    int returnMinAgeMDA(MDAEvent* mda);
     std::vector<std::string> printRandomVariableNames() const;
     std::vector<double> printRandomVariableValues() const;
+    int returnMaxAge();
     int getMinAgePrev() const;
     int getMinAgeMDA() const;
     int getUpdateParams() const;
     int getNoMDALowMF() const;
     void printMDAHistory() const;
-    
     int surveyStartDate;
     double ICThreshold;
     double MFThreshold;
