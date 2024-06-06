@@ -235,7 +235,7 @@ std::vector<double>& k_vals, std::vector<double>& v_to_h_vals, int updateParams,
         
     }
     for (int t = currentMonth; t < targetMonth; t += dt){
-
+        
         paramIndex = t / 12;
         // if we are updating the k and v_to_h params, then do so if the time is right to do so
         if ((updateParams) && (t%12 == 0) && (paramIndex <= (k_vals.size()-1))){
@@ -311,7 +311,6 @@ std::vector<double>& k_vals, std::vector<double>& v_to_h_vals, int updateParams,
         
         // snippet to perform a preTAS survey
         if(t == preTASSurveyTime){
-            
             preTAS_Pass = popln.PreTASSurvey(sc, outputEndgame , t, rep, folderName);
             if(outputEndgame == 1){
                 sc.writeNumberByAge(popln, t, rep, folderName, "PreTAS survey");

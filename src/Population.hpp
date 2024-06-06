@@ -61,10 +61,6 @@ public:
     double getNeverTreatChangeTime();
     void initHosts(std::string distType, double k_val, double aImp_val);
     double getPopSize() ;
-    void saveTotalWorms();
-    void saveAges();
-    void saveTotalWormYears();
-    void writePrevByAge();
     int PreTASSurvey(Scenario& sc, int forPreTass, int t, int rep,  std::string folderName);
     int TASSurvey(Scenario& sc, int forTass, int t, int rep,  std::string folderName);
     RecordedPrevalence  getPrevalence(PrevalenceEvent* outputPrev)  const;

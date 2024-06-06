@@ -542,9 +542,18 @@ double Population::getMFPrev(Scenario& sc, int forPreTass, int t, int rep,  std:
     for (int i = 0; i < maxAge; ++i) {
         numSurvey[i] = 0; // initialization
     }
+    std::vector<int> indices(size);
+    std::iota(indices.begin(), indices.end(), 0); // fill indices with 0, 1, ..., size-1
+
+    // Shuffle the indices
+    std::random_device rd;
+    std::mt19937 g(rd());
+    std::shuffle(indices.begin(), indices.end(), g);
+
         
-        
-    for(int i =0; i < size; i++){
+    for(int i : indices){
+
+        if (numHosts >= 200) break; // Stop when numHosts reaches sample size
 
         if((host_pop[i].age >= minAgeMonths ) && (host_pop[i].age <= maxAgeMonths )){
             float flooredAge = std::floor(host_pop[i].age/12);
@@ -554,10 +563,8 @@ double Population::getMFPrev(Scenario& sc, int forPreTass, int t, int rep,  std:
             numHosts++; // increment number of hosts by 1
             if (infectedMF) MFpos++; // if mf positive, increment MFpos by 1
         }
-        
-        
-        
     }
+
     if(numHosts > 0){
         MFpos /= numHosts; // convert to prevalence of mf positive hosts
     }
