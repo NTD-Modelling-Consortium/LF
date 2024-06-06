@@ -184,8 +184,8 @@ std::vector<double>& k_vals, std::vector<double>& v_to_h_vals, int updateParams,
     popln.numPreTASSurveys = 0;
     popln.numTASSurveys = 0;
     popln.t_TAS_Pass = -1;
-   
-    double mfprev_aimp_old = popln.getMFPrev(sc, 0, 0, rep, folderName); 
+    int sampleSize = popln.getSampleSize();
+    double mfprev_aimp_old = popln.getMFPrev(sc, 0, 0, rep, popln.getPopSize(), folderName); 
     double mfprev_aimp_new = 0;
     bool preTAS_Pass = 0;
     int changeSensSpec = 0;
@@ -222,7 +222,7 @@ std::vector<double>& k_vals, std::vector<double>& v_to_h_vals, int updateParams,
     // We will still get the output of the MDA showing that no people were treated this year.
     // This is to keep the output of MDA's constant so that we can combine different runs even if they have different numbers of MDA's performed.
     int DoMDA = 1;
-
+    
     for(int q = 0; q < popln.sensSpecChangeCount; q++)  {
         if(popln.sensSpecChangeName[q] == sc.getName()){
             changeSensSpec = 1;
@@ -234,6 +234,8 @@ std::vector<double>& k_vals, std::vector<double>& v_to_h_vals, int updateParams,
         }
         
     }
+
+    
     for (int t = currentMonth; t < targetMonth; t += dt){
         
         paramIndex = t / 12;
@@ -249,7 +251,7 @@ std::vector<double>& k_vals, std::vector<double>& v_to_h_vals, int updateParams,
         // in each age group and the sequelae prevalence in each age group
         if ((t % 12 == 0) && (outputEndgame == 1) ){
 
-            double MFPrev = popln.getMFPrev(sc, 0, t, rep, folderName);
+            double MFPrev = popln.getMFPrev(sc, 0, t, rep, popln.getPopSize(), folderName);
             sc.writePrevByAge(popln, t, rep, folderName);
             sc.writeNumberByAge(popln, t, rep, folderName, "not survey");
             sc.writeSequelaeByAge(popln, t, LymphodemaTotalWorms,  LymphodemaShape, HydroceleTotalWorms, HydroceleShape, rep, folderName);
@@ -380,9 +382,10 @@ std::vector<double>& k_vals, std::vector<double>& v_to_h_vals, int updateParams,
 
             // if this this the first MDA then if the NoMDALowMF indicator is 1 then we need to check the MF prevalence in the population
             // as if this is low then we will not begin MDA. If the indicator is not 1 then we will do MDA even with low MF prevalence
+            // this uses the sampleSize input as this would be assessed via a survey
             if(popln.totMDAs == 0){
                 if(popln.getNoMDALowMF() == 1){
-                    mfprev = popln.getMFPrev(sc, 0, t, rep, folderName);
+                    mfprev = popln.getMFPrev(sc, 0, t, rep, sampleSize, folderName);
                     if(mfprev <= popln.MFThreshold){
                         DoMDA = 0;
                     }
@@ -391,7 +394,8 @@ std::vector<double>& k_vals, std::vector<double>& v_to_h_vals, int updateParams,
 
             // record prevalence before the MDA so that we can later assess the decrease in prevalence
             // and reduce the importation inline with this decrease
-            mfprev_aimp_old = popln.getMFPrev(sc, 0, t, rep, folderName); 
+            // this uses the whole population to get its value as it is used for an intrinsic property of the population
+            mfprev_aimp_old = popln.getMFPrev(sc, 0, t, rep, popln.getPopSize(), folderName); 
             // apply the MDA. If DoMDA = 0, then we call this function, but don't do the MDA,
             // we just write to a file showing that no people were treated.
             popln.ApplyTreatmentUpdated(applyMDA, worms, sc, t, rep, DoMDA, outputEndgame, folderName);
@@ -408,11 +412,11 @@ std::vector<double>& k_vals, std::vector<double>& v_to_h_vals, int updateParams,
         // if it is the time to potentially reduce importation using the simulation rather than externally input values, then do so
         if(reduceImpViaXml == 0){
             if(t == t_import_reduction){
-                mfprev_aimp_new = popln.getMFPrev(sc, 0, t, rep, folderName); 
+                mfprev_aimp_new = popln.getMFPrev(sc, 0, t, rep, popln.getPopSize(), folderName); 
                 if (mfprev_aimp_old > mfprev_aimp_new){
                     popln.aImp = popln.aImp * mfprev_aimp_new / mfprev_aimp_old;
                 }
-                mfprev_aimp_old = popln.getMFPrev(sc, 0, t, rep, folderName);            
+                mfprev_aimp_old = popln.getMFPrev(sc, 0, t, rep, popln.getPopSize(), folderName);            
             }
         }
 
@@ -460,10 +464,7 @@ std::vector<double>& k_vals, std::vector<double>& v_to_h_vals, int updateParams,
     //done
     currentMonth = targetMonth;
 
-    // double prev1 = popln.getMFPrev();
-    // popln.saveTotalWorms();
-    // popln.saveTotalWormYears();
-    // popln.saveAges();
+
     if (y < (sc.getNumMonthsToSave()-1)){ //not finished this scenario
         popln.saveCurrentState(currentMonth, sc.getName()); //worms and importation rate. Scenario name just needed for debugging
         vectors.saveCurrentState(currentMonth); //larval density
