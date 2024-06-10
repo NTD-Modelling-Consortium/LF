@@ -235,9 +235,8 @@ std::vector<double>& k_vals, std::vector<double>& v_to_h_vals, int updateParams,
         
     }
 
-    
     for (int t = currentMonth; t < targetMonth; t += dt){
-        
+
         paramIndex = t / 12;
         // if we are updating the k and v_to_h params, then do so if the time is right to do so
         if ((updateParams) && (t%12 == 0) && (paramIndex <= (k_vals.size()-1))){
@@ -313,6 +312,7 @@ std::vector<double>& k_vals, std::vector<double>& v_to_h_vals, int updateParams,
         
         // snippet to perform a preTAS survey
         if(t == preTASSurveyTime){
+
             preTAS_Pass = popln.PreTASSurvey(sc, outputEndgame , t, rep, folderName);
             if(outputEndgame == 1){
                 sc.writeNumberByAge(popln, t, rep, folderName, "PreTAS survey");
@@ -383,6 +383,7 @@ std::vector<double>& k_vals, std::vector<double>& v_to_h_vals, int updateParams,
             // if this this the first MDA then if the NoMDALowMF indicator is 1 then we need to check the MF prevalence in the population
             // as if this is low then we will not begin MDA. If the indicator is not 1 then we will do MDA even with low MF prevalence
             // this uses the sampleSize input as this would be assessed via a survey
+
             if(popln.totMDAs == 0){
                 if(popln.getNoMDALowMF() == 1){
                     mfprev = popln.getMFPrev(sc, 0, t, rep, sampleSize, folderName);
@@ -394,8 +395,10 @@ std::vector<double>& k_vals, std::vector<double>& v_to_h_vals, int updateParams,
 
             // record prevalence before the MDA so that we can later assess the decrease in prevalence
             // and reduce the importation inline with this decrease
+
             // this uses the whole population to get its value as it is used for an intrinsic property of the population
             mfprev_aimp_old = popln.getMFPrev(sc, 0, t, rep, popln.getPopSize(), folderName); 
+
             // apply the MDA. If DoMDA = 0, then we call this function, but don't do the MDA,
             // we just write to a file showing that no people were treated.
             popln.ApplyTreatmentUpdated(applyMDA, worms, sc, t, rep, DoMDA, outputEndgame, folderName);
@@ -412,11 +415,13 @@ std::vector<double>& k_vals, std::vector<double>& v_to_h_vals, int updateParams,
         // if it is the time to potentially reduce importation using the simulation rather than externally input values, then do so
         if(reduceImpViaXml == 0){
             if(t == t_import_reduction){
+
                 mfprev_aimp_new = popln.getMFPrev(sc, 0, t, rep, popln.getPopSize(), folderName); 
                 if (mfprev_aimp_old > mfprev_aimp_new){
                     popln.aImp = popln.aImp * mfprev_aimp_new / mfprev_aimp_old;
                 }
                 mfprev_aimp_old = popln.getMFPrev(sc, 0, t, rep, popln.getPopSize(), folderName);            
+
             }
         }
 
