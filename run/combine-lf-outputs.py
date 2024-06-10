@@ -24,11 +24,16 @@ scenario = matches[ 'scenario' ]
 iu = matches[ 'iu' ]
 institute = matches[ 'institute' ]
 
-print( f"-> processing {institute} outputs for scenario {scenario}, IU {iu}", file = sys.stderr )
+print( f"-> processing {institute} outputs for scenario {scenario}, IU {iu}" )
 
 institute_template = f"{model_file_path}/{institute}_scen{scenario}_{iu}_rep_%d.csv"
 pre_tas_template = f"{model_file_path}/PreTAS_scen{scenario}_{iu}_rep_%d.csv"
 tas_template = f"{model_file_path}/TAS_scen{scenario}_{iu}_rep_%d.csv"
+
+institute_column_indices = {
+    'IHME': 0,
+    'IPM': 5
+}
 
 file0 = institute_template % 0
 try:
@@ -38,12 +43,10 @@ try:
         next_file = institute_template % rep
         next_df = pd.read_csv( next_file )
 
-        iloc_idx = {
-            'IHME': 0,
-            'IPM': 5
-        }[ institute ]
+        institute_column_index = institute_column_indices[ institute ]
 
-        main_df[ f'draw_{rep}' ] = next_df.iloc[ :, iloc_idx ]
+        main_df[ f'draw_{rep}' ] = next_df.iloc[ :, institute_column_index ]
+        # this is to stop main_df getting fragmented when doing many insertions in a loop
         main_df = main_df.copy()
 
     if ( institute == 'IHME' ):
@@ -54,18 +57,15 @@ try:
             }[ survey_type ]
             survey_file0 = survey_template % 0
             survey_df = pd.read_csv( survey_file0 )
-            print( f"  -> adding {survey_type} outputs into IHME file for scenario {scenario}, IU {iu}", file = sys.stderr )
+            print( f"  -> adding {survey_type} outputs into IHME file for scenario {scenario}, IU {iu}" )
             for rep in range( 1, int( num_simulations ) ):
                 next_file = survey_template % rep
                 next_df = pd.read_csv( next_file )
 
-                # it's going to be IHME isn't it
-                iloc_idx = {
-                    'IHME': 0,
-                    'IPM': 5
-                }[ institute ]
+                institute_column_index = institute_column_indices[ institute ]
 
-                survey_df[ f'draw_{rep}' ] = next_df.iloc[ :, iloc_idx ]
+                survey_df[ f'draw_{rep}' ] = next_df.iloc[ :, institute_column_index ]
+                # see main_df.copy() above
                 survey_df = survey_df.copy()
 
             main_df = pd.concat( [ main_df, survey_df ] )
