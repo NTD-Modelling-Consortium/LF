@@ -58,7 +58,7 @@ NUM_SIMULATIONS=${NUM_SIMULATIONS:=5} \
 
 # clean up
 echo "== LF model run ${RUN_STAMP} removing intermediate model output files in $( get_abs_filename . )/{res_endgame,results}"
-#rm -rf res_endgame results/*
+rm -rf res_endgame results/*
 
 # indicate completion
 FINISH_STAMP=$( date +%Y%m%d%H%M%S )
