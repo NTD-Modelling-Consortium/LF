@@ -61,6 +61,10 @@ public:
     double getNeverTreatChangeTime();
     void initHosts(std::string distType, double k_val, double aImp_val);
     double getPopSize() ;
+    void saveTotalWorms();
+    void saveAges();
+    void saveTotalWormYears();
+    void writePrevByAge();
     int PreTASSurvey(Scenario& sc, int forPreTass, int t, int rep,  std::string folderName);
     int TASSurvey(Scenario& sc, int forTass, int t, int rep,  std::string folderName);
     RecordedPrevalence  getPrevalence(PrevalenceEvent* outputPrev)  const;
@@ -69,7 +73,7 @@ public:
     double getBedNetCoverage()  const;
     double getBedNetSysComp() const ;
     double getImportationRateFactor()  const;
-    double getMFPrev(Scenario& sc, int forPreTass, int t, int rep, int sampleSize, std::string folderName);
+    double getMFPrev(Scenario& sc, int forPreTass, int t, int rep,  std::string folderName);
     void getIncidence(Scenario& sc,  int t, int rep,  std::string folderName);
     double getMFPrevByAge(double ageStart, double ageEnd);
     double getNumberByAge(double ageStart, double ageEnd);
@@ -103,13 +107,11 @@ public:
     std::vector<std::string> printRandomVariableNames() const;
     std::vector<double> printRandomVariableValues() const;
     int returnMaxAge();
-    int getSampleSize();
     int getMinAgePrev() const;
     int getMinAgeMDA() const;
     int getUpdateParams() const;
     int getNoMDALowMF() const;
     void printMDAHistory() const;
-    
     int surveyStartDate;
     double ICThreshold;
     double MFThreshold;
@@ -202,8 +204,7 @@ private:
     double neverTreatedOriginal;
     double neverTreatedChange;
     double neverTreatedChangeTime;
-    int sampleSize = 250; // set a default sample size for pre tas survey. This can be changed in the xml file
-    // via a sampleSize param name in the population parameters
+  
     
     //saved months
     

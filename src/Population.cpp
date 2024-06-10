@@ -136,9 +136,6 @@ Population::Population(TiXmlElement* xmlParameters){
         }else if (name == "NoMDALowMF"){
             NoMDALowMF = value;
             gotAll++;
-        }else if (name == "sampleSize"){
-            sampleSize = value;
-            
         }
         else if (name == "sensSpecChangeScen"){
             sensSpecChangeName.push_back(std::to_string(int(value)));
@@ -513,9 +510,7 @@ RecordedPrevalence Population:: getPrevalence(PrevalenceEvent* outputPrev) const
 
 int Population::PreTASSurvey(Scenario& sc, int forPreTass, int t, int rep,  std::string folderName){
     int preTAS_Pass = 0;
-    // get the mfprevalence via a survey with sample size specified by sampleSize variable
-    // this is set to 250 by default, but can be changed via inputting a variable in the xml file
-    double mfprev = getMFPrev(sc, forPreTass, t, rep, sampleSize, folderName); // find the mf prevalence
+    double mfprev = getMFPrev(sc, forPreTass, t, rep, folderName); // find the mf prevalence
     numPreTASSurveys += 1; // increment number of pre-TAS tests by 1
     if(mfprev <= MFThreshold){ // if the mf prevalence is below threshold
         preTAS_Pass = 1; // set pre-TAS pass indicator to 1
@@ -535,7 +530,7 @@ int Population::TASSurvey(Scenario& sc, int forTass, int t, int rep,  std::strin
     return TAS_Pass;
 }
 
-double Population::getMFPrev(Scenario& sc, int forPreTass, int t, int rep, int sampleSize, std::string folderName){
+double Population::getMFPrev(Scenario& sc, int forPreTass, int t, int rep,  std::string folderName){
     // get mf prevalence
 
     double MFpos = 0; // number of people mf positive
@@ -547,18 +542,9 @@ double Population::getMFPrev(Scenario& sc, int forPreTass, int t, int rep, int s
     for (int i = 0; i < maxAge; ++i) {
         numSurvey[i] = 0; // initialization
     }
-    std::vector<int> indices(size);
-    std::iota(indices.begin(), indices.end(), 0); // fill indices with 0, 1, ..., size-1
-
-    // Shuffle the indices
-    std::random_device rd;
-    std::mt19937 g(rd());
-    std::shuffle(indices.begin(), indices.end(), g);
-
         
-    for(int i : indices){
-
-        if (numHosts >= sampleSize) break; // Stop when numHosts reaches sample size
+        
+    for(int i =0; i < size; i++){
 
         if((host_pop[i].age >= minAgeMonths ) && (host_pop[i].age <= maxAgeMonths )){
             float flooredAge = std::floor(host_pop[i].age/12);
@@ -568,8 +554,10 @@ double Population::getMFPrev(Scenario& sc, int forPreTass, int t, int rep, int s
             numHosts++; // increment number of hosts by 1
             if (infectedMF) MFpos++; // if mf positive, increment MFpos by 1
         }
+        
+        
+        
     }
-
     if(numHosts > 0){
         MFpos /= numHosts; // convert to prevalence of mf positive hosts
     }
@@ -781,10 +769,6 @@ void Population::evolve(double dt, const Vector& vectors, const Worm& worms){
         
         
     
-}
-
-int Population::getSampleSize(){
-    return sampleSize;
 }
 
  int Population::getMaxAge()  {
