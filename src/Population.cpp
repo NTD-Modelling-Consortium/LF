@@ -781,7 +781,7 @@ void Population::evolve(double dt, const Vector& vectors, const Worm& worms){
     
 }
 
-int Population::getSampleSize(){
+int Population::getSampleSize() const{
     return sampleSize;
 }
 
