@@ -30,6 +30,7 @@ public:
         gsl_rng_set(rando, seed); // set the seed
     }
 
+    void shuffle_indices(std::vector<int>& indices);
     double gamma_dist(double k);
     double normal_dist(double mean, double sd);
     double unit_normal_dist();

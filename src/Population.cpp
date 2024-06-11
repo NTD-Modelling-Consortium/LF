@@ -547,24 +547,22 @@ double Population::getMFPrev(Scenario& sc, int forPreTass, int t, int rep, int s
     for (int i = 0; i < maxAge; ++i) {
         numSurvey[i] = 0; // initialization
     }
-    std::vector<int> indices(size);
-    std::iota(indices.begin(), indices.end(), 0); // fill indices with 0, 1, ..., size-1
+    std::vector<int> people_indices(size);
+    std::iota(people_indices.begin(), people_indices.end(), 0); // fill indices with 0, 1, ..., size-1
+    stats.shuffle_indices(people_indices);
+   
+    for(int person_index : people_indices){
+        // Stop when we have surveyed the number of people specified by sampleSize, as this is the number of people we want to sample
+        if (numHosts >= sampleSize) break; 
 
-    // Shuffle the indices
-    std::random_device rd;
-    std::mt19937 g(rd());
-    std::shuffle(indices.begin(), indices.end(), g);
-
-        
-    for(int i : indices){
-
-        if (numHosts >= sampleSize) break; // Stop when numHosts reaches sample size
-
-        if((host_pop[i].age >= minAgeMonths ) && (host_pop[i].age <= maxAgeMonths )){
-            float flooredAge = std::floor(host_pop[i].age/12);
+        if((host_pop[person_index].age >= minAgeMonths ) && (host_pop[person_index].age <= maxAgeMonths )){
+            // we want to track the number of people of each age who are surveyed so that we can output this
+            // later if this is done for a pre TAS survey
+            float flooredAge = std::floor(host_pop[person_index].age/12);
             int flooredAgeInt = std::min(static_cast<int>(flooredAge), maxAge - 1);
             numSurvey[flooredAgeInt] += 1;
-            bool infectedMF = ( stats.uniform_dist() <  (1 - exp(-1 * host_pop[i].M) ) );  //depends on how many mf present       
+
+            bool infectedMF = ( stats.uniform_dist() <  (1 - exp(-1 * host_pop[person_index].M) ) );  //depends on how many mf present       
             numHosts++; // increment number of hosts by 1
             if (infectedMF) MFpos++; // if mf positive, increment MFpos by 1
         }
