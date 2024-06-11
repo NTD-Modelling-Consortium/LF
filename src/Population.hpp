@@ -105,7 +105,7 @@ public:
     std::vector<std::string> printRandomVariableNames() const;
     std::vector<double> printRandomVariableValues() const;
     int returnMaxAge();
-    int getSampleSize();
+    int getSampleSize() const;
     int getMinAgePrev() const;
     int getMinAgeMDA() const;
     int getUpdateParams() const;
