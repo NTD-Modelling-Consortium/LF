@@ -539,7 +539,7 @@ double Population::getMFPrev(Scenario& sc, int forPreTass, int t, int rep, int s
     // get mf prevalence
 
     double MFpos = 0; // number of people mf positive
-    double numHosts = 0; // total number of hosts
+    double numHostsSampled = 0; // total number of hosts sampled so far
     int maxAgeMonths = maxAgeMF*12;
     int minAgeMonths = minAgeMF*12;
 
@@ -553,7 +553,7 @@ double Population::getMFPrev(Scenario& sc, int forPreTass, int t, int rep, int s
    
     for(int person_index : people_indices){
         // Stop when we have surveyed the number of people specified by sampleSize, as this is the number of people we want to sample
-        if (numHosts >= sampleSize) break; 
+        if (numHostsSampled >= sampleSize) break; 
 
         if((host_pop[person_index].age >= minAgeMonths ) && (host_pop[person_index].age <= maxAgeMonths )){
             // we want to track the number of people of each age who are surveyed so that we can output this
@@ -562,14 +562,14 @@ double Population::getMFPrev(Scenario& sc, int forPreTass, int t, int rep, int s
             int flooredAgeInt = std::min(static_cast<int>(flooredAge), maxAge - 1);
             numSurvey[flooredAgeInt] += 1;
 
-            bool infectedMF = ( stats.uniform_dist() <  (1 - exp(-1 * host_pop[person_index].M) ) );  //depends on how many mf present       
-            numHosts++; // increment number of hosts by 1
+            bool infectedMF = ( stats.uniform_dist() <  (1 - exp(-1 * host_pop[person_index].M) ) );  // probability of being measured as infected depends on how many mf present       
+            numHostsSampled++; // increment number of hosts sampled by 1
             if (infectedMF) MFpos++; // if mf positive, increment MFpos by 1
         }
     }
 
-    if(numHosts > 0){
-        MFpos /= numHosts; // convert to prevalence of mf positive hosts
+    if(numHostsSampled > 0){
+        MFpos /= numHostsSampled; // convert to prevalence of mf positive hosts
     }
 
     if(forPreTass == 1){
@@ -616,7 +616,7 @@ double Population::getMFPrevByAge(double ageStart, double ageEnd){
     // get mf prevalence
 
     double MFpos = 0; // number of people mf positive
-    double numHosts = 0; // total number of hosts
+    double numHostsSampled = 0; // total number of hosts
     int minAgeMonths = ageStart*12;
     int maxAgeMonths = ageEnd*12;
     //double xx;
@@ -625,14 +625,14 @@ double Population::getMFPrevByAge(double ageStart, double ageEnd){
   
         if((host_pop[i].age >= minAgeMonths ) &&(host_pop[i].age < maxAgeMonths )){
                 bool infectedMF = ( stats.uniform_dist() <  (1 - exp(-1 * host_pop[i].M) ) );  //depends on how many mf present       
-                numHosts++; // increment number of hosts by 1
+                numHostsSampled++; // increment number of hosts by 1
                 if (infectedMF) MFpos++; // if mf positive, increment MFpos by 1
         }
         
         
     }
-    if(numHosts > 0){
-        MFpos /= numHosts; // convert to prevalence of mf positive hosts
+    if(numHostsSampled > 0){
+        MFpos /= numHostsSampled; // convert to prevalence of mf positive hosts
     }
     
 
@@ -661,7 +661,7 @@ double Population::HydroceleTestByAge(int ageStart, int ageEnd, int HydroceleTot
     // get proportion of people in a given age bracket who are hydrocele positive
 
     double HydroPos = 0; // number of people mf positive
-    double numHosts = 0; // total number of hosts
+    double numHostsSampled = 0; // total number of hosts
     int minAgeMonths = ageStart*12;
     int maxAgeMonths = ageEnd*12;
     double mult = 0;
@@ -670,13 +670,13 @@ double Population::HydroceleTestByAge(int ageStart, int ageEnd, int HydroceleTot
         if((host_pop[i].age >= minAgeMonths ) &&(host_pop[i].age <= maxAgeMonths ) && (host_pop[i].sex == 0)){ // only men can get hydrocele
             mult = host_pop[i].hydroMult;// draw random number from gamma distribution with appropriate shape which gives individual susceptibility to sequelae
             bool Hydro = ( (mult * host_pop[i].totalWorms) >  HydroceleTotalWorms );  // individual susceptibility * total worms > threshold or not 
-            numHosts++; // increment number of hosts by 1
+            numHostsSampled++; // increment number of hosts by 1
             if (Hydro) HydroPos++; // if hydrocele positive, increment hydrocelePos by 1
         }
         
     }
-    if(numHosts > 0){
-        HydroPos /= numHosts; // convert to prevalence of hydrocele positive hosts
+    if(numHostsSampled > 0){
+        HydroPos /= numHostsSampled; // convert to prevalence of hydrocele positive hosts
     }
     
 
@@ -687,7 +687,7 @@ double Population::LymphodemaTestByAge(int ageStart, int ageEnd, int LymphodemaT
     // get proportion of people in a given age bracket who are lymphodema positive
 
     double LymphodemaPos = 0; // number of people mf positive
-    double numHosts = 0; // total number of hosts
+    double numHostsSampled = 0; // total number of hosts
     int minAgeMonths = ageStart*12;
     int maxAgeMonths = ageEnd*12;
     double mult = 0;
@@ -696,13 +696,13 @@ double Population::LymphodemaTestByAge(int ageStart, int ageEnd, int LymphodemaT
         if((host_pop[i].age >= minAgeMonths ) && (host_pop[i].age <= maxAgeMonths )){ // only men can get hydrocele
             mult = host_pop[i].lymphoMult; // draw random number from gamma distribution with appropriate shape which gives individual susceptibility to sequelae
             bool Lymphodema = ( (mult * host_pop[i].totalWorms) >  LymphodemaTotalWorms ); // individual susceptibility * total worms > threshold or not
-            numHosts++; // increment number of hosts by 1
+            numHostsSampled++; // increment number of hosts by 1
             if (Lymphodema) LymphodemaPos++; // if lymphodema positive, increment LymphodemaPos by 1
         }
         
     }
-    if(numHosts > 0){
-        LymphodemaPos /= numHosts; // convert to prevalence of hydrocele positive hosts
+    if(numHostsSampled > 0){
+        LymphodemaPos /= numHostsSampled; // convert to prevalence of hydrocele positive hosts
     }
     
 
@@ -716,7 +716,7 @@ double Population::getICPrev(Scenario& sc, int forTass, int t, int rep,  std::st
     // get mf prevalence
 
     double ICpos = 0; // number of people ic positive
-    double numHosts = 0; // total number of hosts
+    double numHostsSampled = 0; // total number of hosts
     int maxAgeMonths = maxAgeIC*12;
     int minAgeMonths = minAgeIC*12;
     bool true_pos;
@@ -736,13 +736,13 @@ double Population::getICPrev(Scenario& sc, int forTass, int t, int rep,  std::st
             numSurvey[flooredAgeInt] += 1;
             bool infectedIC = ( stats.uniform_dist() <  (true_pos * ICsensitivity));         
             infectedIC = infectedIC + ( stats.uniform_dist() <  ((1-true_pos) * (1-ICspecificity)));  
-            numHosts++; // increment number of hosts by 1
+            numHostsSampled++; // increment number of hosts by 1
             if (infectedIC) ICpos++; // if mf positive, increment MFpos by 1
             
             
         }
     }
-    ICpos /= numHosts; // convert to prevalence of mf positive hosts
+    ICpos /= numHostsSampled; // convert to prevalence of mf positive hosts
     if(forTass == 1){
         sc.writeTAS(t, numSurvey, maxAge, rep, folderName);
     }
