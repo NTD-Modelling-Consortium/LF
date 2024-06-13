@@ -156,7 +156,7 @@ select CHOICE in yes no ; do
 			REAL_LOG_PATH=$( realpath ${PROJECT_ROOT_DIR}/${LOG_FILE} )
 			info "LF model is running in a detached shell."
 			echo "Log output is being saved to file: ${REAL_LOG_PATH}"
-			echo "When the model runs have finished, the file $( realpath ${PROJECT_ROOT_DIR}/${FINISH_FILE} ) will be created."
+			echo "When the model runs have finished, the file $( realpath ${PROJECT_ROOT_DIR} )/${FINISH_FILE} ) will be created."
 
 			exit 0
 			;;

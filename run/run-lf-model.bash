@@ -31,24 +31,25 @@ function run_ID () {
 		-r "${NUM_SIMULATIONS}"
 
 	echo "== combining output files for IHME & IPM using output folder ${output_folder_name}"
-	( time do_file_combinations "${id}" "${output_folder_name}" ) 2>&1
+	( time do_file_combinations "${id}" "${output_folder_name}" "${RESULTS}" ) 2>&1
 
 	echo "== clearing out model 'result' files"
-	rm -rf "${RESULTS}"
+#	rm -rf "${RESULTS}"
 }
 
 function do_file_combinations () {
 
 	id=${1}
 	output_folder_name=${2}
+    result_folder_path=${3}
 
 	for scen_iu in $( xmllint --xpath "/Model/ScenarioList/scenario/@name" <( tail -n +2 ${SCENARIO_ROOT}/scenariosNoImp${id}.xml ) | sed 's/name="\([^"]*\)"/\1/g' ) ; do
 
 		scen=$( echo $scen_iu | cut -f 1 -d _ )
 		iu=$( echo $scen_iu | cut -f 2 -d _ )
 
-		combine_output_files "${scen}" "${iu}" IHME "${output_folder_name}"
-		combine_output_files "${scen}" "${iu}" IPM "${output_folder_name}"
+		combine_output_files "${scen}" "${iu}" IHME "${output_folder_name}" "${result_folder_path}"
+		combine_output_files "${scen}" "${iu}" IPM "${output_folder_name}" "${result_folder_path}"
 
 	done
 
@@ -61,11 +62,12 @@ function combine_output_files () {
 	iu=${2}
 	inst=${3^^}
 	output_folder_name=${4}
+    result_folder_path=${5}
 
 	echo "== combining ${inst} files for IU ${iu} scenario ${scen}"
 
 	# where does the model write its output
-	MODEL_OUTPUT_FILE_ROOT=res_endgame/${inst}_scen${scen}/${scen}_${iu}
+	MODEL_OUTPUT_FILE_ROOT=${result_folder_path}/${inst}_scen${scen}/${scen}_${iu}
 
 	# where do we want to put the combined file
 	IU_OUTPUT_PATH="${output_folder_name}/lf/scenario_${scen}/${iu:0:3}/${iu}"

@@ -7,6 +7,7 @@
 //
 
 #include <string>
+#include <vector>
 #include "Statistics.hpp"
 
 
@@ -84,4 +85,7 @@ std::string Statistics::selectDistribType(){
 }
 
 
+void Statistics::shuffle_indices(std::vector<int>& indices) {
+    gsl_ran_shuffle(rando, indices.data(), indices.size(), sizeof(int));
+}
 
