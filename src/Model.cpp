@@ -322,7 +322,7 @@ std::vector<double>& k_vals, std::vector<double>& v_to_h_vals, int updateParams,
             if(preTAS_Pass == 1){
                 // if we pass the preTAS survey then we set a time for the TASsurvey
                 // we also stop doing MDA
-                TASSurveyTime = t + popln.interSurveyPeriod;
+                TASSurveyTime = t ;
                 DoMDA = 0;
             }else{
                 preTASSurveyTime = t + popln.interSurveyPeriod;
