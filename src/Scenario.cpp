@@ -664,6 +664,33 @@ void Scenario::writePrevByAge(Population& popln, int t, int rep,  std::string fo
 }
 
 
+void Scenario::writeRoadmapTarget(Population& popln, int t, int rep,  std::string folder){
+    // we want to write whether the population has reached the 2030 roadmap target for each year
+    // for LF this is to have microfilaria prevalence below 1% in people 5 years and older
+    std::ofstream outfile;
+    int maxAge = popln.getMaxAge();
+    std::string fname;
+    std::size_t first_ = name.find("_");
+    std::string fol_n = name.substr(0,first_);
+    std::string rep1 = std::to_string(rep);
+    fname = folder + "/IHME_scen" + fol_n + "/" + name +"/IHME_scen" + name +  "_rep_" + rep1  + ".csv";
+    int year = t/12 + 2000;
+	outfile.open(fname, std::ios::app);
+    
+    int roadmapTargetMet = popln.getMFPrevByAge(5, maxAge) <= 0.01 ? 1 : 0;
+
+    if(rep == 0){
+        outfile << name << ","  << year << "," << 5 <<"," << maxAge << "," << "metRoadmapTarget" << "," << roadmapTargetMet << "\n";
+    }else{
+        outfile << roadmapTargetMet << "\n";
+    }
+   
+   
+	outfile.close();
+}
+
+
+
 
 void Scenario::writeIncidence(int t, int* incidence, int maxAge, int rep, std::string folder){
     std::ofstream outfile;

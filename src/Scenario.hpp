@@ -177,6 +177,7 @@ public:
     void InitPreTASData(int rep,  std::string folder);
     void InitTASData(int rep,  std::string folder);
     void writePrevByAge(Population& popln, int t, int rep, std::string folder);
+    void writeRoadmapTarget(Population& popln, int t, int rep, std::string folder);
     void writeNumberByAge(Population& popln, int t, int rep, std::string folder, std::string surveyType);
     void writeSequelaeByAge(Population& popln, int t, int LymphodemaTotalWorms, double LymphodemaShape, int HydroceleTotalWorms, double HydroceleShape, int rep, std::string folder);
     void writeMDAData(int t, int MDATreatments, int MDAPopSize, int minAgeMDA, int maxAge, int rep, std::string type, std::string folder);
