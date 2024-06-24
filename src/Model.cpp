@@ -252,7 +252,7 @@ std::vector<double>& k_vals, std::vector<double>& v_to_h_vals, int updateParams,
 
             double MFPrev = popln.getMFPrev(sc, 0, t, rep, popln.getPopSize(), folderName);
             sc.writePrevByAge(popln, t, rep, folderName);
-            sc.writeRoadmapTarget(popln, t, rep, folderName);
+            sc.writeRoadmapTarget(popln, t, rep, DoMDA, TAS_Pass, folderName);
             sc.writeNumberByAge(popln, t, rep, folderName, "not survey");
             sc.writeSequelaeByAge(popln, t, LymphodemaTotalWorms,  LymphodemaShape, HydroceleTotalWorms, HydroceleShape, rep, folderName);
             popln.getIncidence(sc, t, rep, folderName);

@@ -664,7 +664,7 @@ void Scenario::writePrevByAge(Population& popln, int t, int rep,  std::string fo
 }
 
 
-void Scenario::writeRoadmapTarget(Population& popln, int t, int rep,  std::string folder){
+void Scenario::writeRoadmapTarget(Population& popln, int t, int rep, int DoMDA, int TAS_Pass, std::string folder){
     // we want to write whether the population has reached the 2030 roadmap target for each year
     // for LF this is to have microfilaria prevalence below 1% in people 5 years and older
     std::ofstream outfile;
@@ -677,18 +677,24 @@ void Scenario::writeRoadmapTarget(Population& popln, int t, int rep,  std::strin
     int year = t/12 + 2000;
 	outfile.open(fname, std::ios::app);
     
-    int roadmapTargetMet = popln.getMFPrevByAge(5, maxAge) <= 0.01 ? 1 : 0;
-
+    float mfprev = popln.getMFPrevByAge(5, maxAge);
+    int roadmapTargetMet = mfprev <= 0.01 ? 1 : 0;
+    int achieveEPHP = TAS_Pass > 0 ? 1 : 0;
     if(rep == 0){
+        outfile << name << ","  << year << "," << 5 <<"," << maxAge << "," << "mf prevalence" << "," << mfprev << "\n";
         outfile << name << ","  << year << "," << 5 <<"," << maxAge << "," << "metRoadmapTarget" << "," << roadmapTargetMet << "\n";
+        outfile << name << ","  << year << "," << "None" <<"," << "None" << "," << "MDA ceased" << "," << 1-DoMDA << "\n";
+        outfile << name << ","  << year << "," << "None" <<"," << "None" << "," << "achieve EPHP" << "," << achieveEPHP << "\n";
     }else{
+        outfile << mfprev << "\n";
         outfile << roadmapTargetMet << "\n";
+        outfile << 1-DoMDA << "\n";
+        outfile << achieveEPHP << "\n";
     }
    
    
 	outfile.close();
 }
-
 
 
 
@@ -720,6 +726,8 @@ void Scenario::writeIncidence(int t, int* incidence, int maxAge, int rep, std::s
    
 	outfile.close();
 }
+
+
 
 
 
