@@ -664,9 +664,12 @@ void Scenario::writePrevByAge(Population& popln, int t, int rep,  std::string fo
 }
 
 
-void Scenario::writeRoadmapTarget(Population& popln, int t, int rep, int DoMDA, int TAS_Pass, std::string folder){
+void Scenario::writeRoadmapTarget(Population& popln, int t, int rep, int DoMDA, int TAS_Pass, int neededTASPass, std::string folder){
     // we want to write whether the population has reached the 2030 roadmap target for each year
     // for LF this is to have microfilaria prevalence below 1% in people 5 years and older
+    // we also write the mf prevalence for people 5 years and older, whether we have ceased MDA or not and whether we
+    // have achieved eliminated the disease as a public health problem, which is done when we have passed the TAS survey as many times as 
+    // stated by neededTASPass. This is all done so that there are some easy to use values for each year that can be used for making plots.
     std::ofstream outfile;
     int maxAge = popln.getMaxAge();
     std::string fname;
@@ -679,7 +682,7 @@ void Scenario::writeRoadmapTarget(Population& popln, int t, int rep, int DoMDA, 
     
     float mfprev = popln.getMFPrevByAge(5, maxAge);
     int roadmapTargetMet = mfprev <= 0.01 ? 1 : 0;
-    int achieveEPHP = TAS_Pass > 0 ? 1 : 0;
+    int achieveEPHP = TAS_Pass == neededTASPass ? 1 : 0;
     if(rep == 0){
         outfile << name << ","  << year << "," << 5 <<"," << maxAge << "," << "mf prevalence" << "," << mfprev << "\n";
         outfile << name << ","  << year << "," << 5 <<"," << maxAge << "," << "metRoadmapTarget" << "," << roadmapTargetMet << "\n";
