@@ -773,6 +773,7 @@ double Population::getICPrevForOutput(bool sample){
     // get IC prevalence. This is modelled by sensing the presence of any adult worms
 
     double ICpos = 0; // number of people ic positive
+    bool infectedIC;
     double numHostsSampled = 0; // total number of hosts
     int maxAgeMonths = maxAgeIC*12;
     int minAgeMonths = minAgeIC*12;
@@ -786,10 +787,10 @@ double Population::getICPrevForOutput(bool sample){
                 true_pos = 0;
             }
             if (sample){
-                bool infectedIC = ( stats.uniform_dist() <  (true_pos * ICsensitivity));         
+                infectedIC = ( stats.uniform_dist() <  (true_pos * ICsensitivity));         
                 infectedIC = infectedIC + ( stats.uniform_dist() <  ((1-true_pos) * (1-ICspecificity)));  
             }else{
-                bool infectedIC = true_pos;         
+                infectedIC = true_pos;         
             }
             numHostsSampled++; // increment number of hosts by 1
             if (infectedIC) ICpos++; // if mf positive, increment MFpos by 1          
