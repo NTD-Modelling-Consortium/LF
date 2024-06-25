@@ -1158,7 +1158,7 @@ void Population::ApplyTreatment(MDAEvent* mda, Worm& worms, Scenario& sc, int t,
        
         std::string type = mda->getType();
         //   std::cout << "Coverage = " << mda->getCoverage() << ", Actual coverage=" <<  double(hostsTreated)/hostsOldEnough <<std::endl ;
-        sc.writeMDAData(t, hostsTreated, hostsOldEnough, minAgeMDA, maxAge, rep, type, folderName);
+       
         
          if(_DEBUG)
              std::cout << hostsTreated << "/" << hostsOldEnough << " " << double(hostsTreated)/hostsOldEnough * 100 << "%" << std::endl;
