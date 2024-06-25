@@ -640,6 +640,35 @@ double Population::getMFPrevByAge(double ageStart, double ageEnd){
 }
 
 
+double Population::getTrueMFPrevByAge(double ageStart, double ageEnd){
+    // get mf prevalence
+
+    double MFpos = 0; // number of people mf positive
+    double numHostsSampled = 0; // total number of hosts
+    int minAgeMonths = ageStart*12;
+    int maxAgeMonths = ageEnd*12;
+    //double xx;
+    for(int i =0; i < size; i++){
+
+  
+        if((host_pop[i].age >= minAgeMonths ) &&(host_pop[i].age < maxAgeMonths )){
+                bool infectedMF = host_pop[i].M > 0;  //depends on how many mf present       
+                numHostsSampled++; // increment number of hosts by 1
+                if (infectedMF) MFpos++; // if mf positive, increment MFpos by 1
+        }
+        
+        
+    }
+    if(numHostsSampled > 0){
+        MFpos /= numHostsSampled; // convert to prevalence of mf positive hosts
+    }
+    
+
+    return MFpos;
+}
+
+
+
 double Population::getNumberByAge(double ageStart, double ageEnd){
     // get mf prevalence
 
@@ -713,7 +742,7 @@ double Population::LymphodemaTestByAge(int ageStart, int ageEnd, int LymphodemaT
 
 
 double Population::getICPrev(Scenario& sc, int forTass, int t, int rep,  std::string folderName){
-    // get mf prevalence
+    // get IC prevalence. This is modelled by sensing the presence of any adult worms
 
     double ICpos = 0; // number of people ic positive
     double numHostsSampled = 0; // total number of hosts
@@ -748,6 +777,39 @@ double Population::getICPrev(Scenario& sc, int forTass, int t, int rep,  std::st
     }
     return ICpos;
 }
+
+
+double Population::getICPrevForOutput(bool sample){
+    // get IC prevalence. This is modelled by sensing the presence of any adult worms
+
+    double ICpos = 0; // number of people ic positive
+    double numHostsSampled = 0; // total number of hosts
+    int maxAgeMonths = maxAgeIC*12;
+    int minAgeMonths = minAgeIC*12;
+    bool true_pos;
+    
+    for(int i =0; i < size; i++){
+        if( (host_pop[i].age < maxAgeMonths) && (host_pop[i].age >= minAgeMonths)){
+            if((host_pop[i].WF + host_pop[i].WM) > 0){
+                true_pos = 1;
+            }else{
+                true_pos = 0;
+            }
+            if (sample){
+                bool infectedIC = ( stats.uniform_dist() <  (true_pos * ICsensitivity));         
+                infectedIC = infectedIC + ( stats.uniform_dist() <  ((1-true_pos) * (1-ICspecificity)));  
+            }else{
+                bool infectedIC = true_pos;         
+            }
+            numHostsSampled++; // increment number of hosts by 1
+            if (infectedIC) ICpos++; // if mf positive, increment MFpos by 1          
+        }
+    }
+    ICpos /= numHostsSampled; // convert to prevalence of mf positive hosts
+   
+    return ICpos;
+}
+
 
 double Population::getLarvalUptakebyVector(double r1, double kappas1, Vector::vectorSpecies species) const {
     

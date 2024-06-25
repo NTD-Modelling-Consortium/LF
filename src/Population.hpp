@@ -74,6 +74,7 @@ public:
 
     void getIncidence(Scenario& sc,  int t, int rep,  std::string folderName);
     double getMFPrevByAge(double ageStart, double ageEnd);
+    double getTrueMFPrevByAge(double ageStart, double ageEnd);
     double getNumberByAge(double ageStart, double ageEnd);
     double HydroceleTestByAge(int ageStart, int ageEnd, int HydroceleTotalWorms, double HydroceleShape);
     double LymphodemaTestByAge(int ageStart, int ageEnd, int LymphodemaTotalWorms, double LymphodemaShape);
@@ -81,6 +82,7 @@ public:
     void editPTreat(double cov, double rho);
     void checkForZeroPTreat(double cov, double rho);
     double getICPrev(Scenario& sc, int forTass, int t, int rep,  std::string folderName);
+    double getICPrevForOutput(bool sample);
     void changeNeverTreat();
     void changeICTest();
     void neverTreatToOriginal();
