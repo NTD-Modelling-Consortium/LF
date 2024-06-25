@@ -197,15 +197,13 @@ std::vector<double>& k_vals, std::vector<double>& v_to_h_vals, int updateParams,
     //int outputTime = 0;
     int LymphodemaTotalWorms = popln.getLymphodemaTotalWorms();
     int HydroceleTotalWorms = popln.getHydroceleTotalWorms();
-    int numMDADoses = 0; // number of MDA doses given out in a year
-    int totalTargetPop = 0;
     double LymphodemaShape = popln.getLymphodemaShape();
     double HydroceleShape = popln.getHydroceleShape();
 
 
     if(outputEndgame == 1){
         sc.InitIHMEData(rep, folderName);
-        sc.InitIPMData(rep, folderName);
+        sc.InitNTDMCData(rep, folderName);
         sc.InitPreTASData(rep, folderName);
         sc.InitTASData(rep, folderName);
     }
@@ -249,28 +247,12 @@ std::vector<double>& k_vals, std::vector<double>& v_to_h_vals, int updateParams,
         // at the beginning of every year we record the prevalence of the population, along with the number of people
         // in each age group and the sequelae prevalence in each age group
         if ((t % 12 == 0) && (outputEndgame == 1) ){
-
-            double MFPrev = popln.getMFPrev(sc, 0, t, rep, popln.getPopSize(), folderName);
             sc.writePrevByAge(popln, t, rep, folderName);
             sc.writeRoadmapTarget(popln, t, rep, DoMDA, TAS_Pass, neededTASPass, folderName);
             sc.writeNumberByAge(popln, t, rep, folderName, "not survey");
             sc.writeSequelaeByAge(popln, t, LymphodemaTotalWorms,  LymphodemaShape, HydroceleTotalWorms, HydroceleShape, rep, folderName);
             popln.getIncidence(sc, t, rep, folderName);
             sc.writeSurveyByAge(popln, t, preTAS_Pass, TAS_Pass, rep, folderName);
-            // sc.writeL3(vectors, t, preTAS_Pass, TAS_Pass,rep, folderName);
-            sc.writeMF(MFPrev, t,rep, folderName);
-            if(numMDADoses == 0){
-                MDAType = "None";
-  
-                sc.writeMDA(t, numMDADoses,totalTargetPop, -1, -1, rep, MDAType, folderName);
-            }else{
-                sc.writeMDA(t, numMDADoses,totalTargetPop, minAge, maxAge, rep, MDAType, folderName);
-            }
-            
-            
-            
-            numMDADoses = 0;
-            totalTargetPop = 0;
         }
 
         if(((t+1)%12 == 0) && (outputEndgame == 1)){
