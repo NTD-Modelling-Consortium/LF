@@ -684,7 +684,7 @@ void Scenario::writeRoadmapTarget(Population& popln, int t, int rep, int DoMDA, 
     float mfprevTrue = popln.getTrueMFPrevByAge(5, maxAge);
     float ICprevSample = popln.getICPrevForOutput(1);
     float ICprevTrue = popln.getICPrevForOutput(0);
-    int roadmapTargetMet = mfprev <= 0.01 ? 1 : 0;
+    int roadmapTargetMet = mfprevSample <= 0.01 ? 1 : 0;
     int achieveEPHP = TAS_Pass == neededTASPass ? 1 : 0;
     if(rep == 0){
         outfile << name << ","  << year << "," << 5 <<"," << maxAge << "," << "sampled mf prevalence (all pop)" << "," << mfprevSample << "\n";
