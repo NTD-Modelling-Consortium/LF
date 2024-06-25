@@ -680,16 +680,25 @@ void Scenario::writeRoadmapTarget(Population& popln, int t, int rep, int DoMDA, 
     int year = t/12 + 2000;
 	outfile.open(fname, std::ios::app);
     
-    float mfprev = popln.getMFPrevByAge(5, maxAge);
+    float mfprevSample = popln.getMFPrevByAge(5, maxAge);
+    float mfprevTrue = popln.getTrueMFPrevByAge(5, maxAge);
+    float ICprevSample = popln.getICPrevForOutput(1);
+    float ICprevTrue = popln.getICPrevForOutput(0);
     int roadmapTargetMet = mfprev <= 0.01 ? 1 : 0;
     int achieveEPHP = TAS_Pass == neededTASPass ? 1 : 0;
     if(rep == 0){
-        outfile << name << ","  << year << "," << 5 <<"," << maxAge << "," << "mf prevalence" << "," << mfprev << "\n";
+        outfile << name << ","  << year << "," << 5 <<"," << maxAge << "," << "sampled mf prevalence (all pop)" << "," << mfprevSample << "\n";
+        outfile << name << ","  << year << "," << 5 <<"," << maxAge << "," << "true mf prevalence (all pop)" << "," << mfprevTrue << "\n";
+        outfile << name << ","  << year << "," << 6 <<"," << 7 << "," << "sampled IC prevalence (all pop)" << "," << ICprevSample << "\n";
+        outfile << name << ","  << year << "," << 6 <<"," << 7 << "," << "true IC prevalence (all pop)" << "," << ICprevTrue << "\n";
         outfile << name << ","  << year << "," << 5 <<"," << maxAge << "," << "metRoadmapTarget" << "," << roadmapTargetMet << "\n";
         outfile << name << ","  << year << "," << "None" <<"," << "None" << "," << "MDA ceased" << "," << 1-DoMDA << "\n";
         outfile << name << ","  << year << "," << "None" <<"," << "None" << "," << "achieve EPHP" << "," << achieveEPHP << "\n";
     }else{
-        outfile << mfprev << "\n";
+        outfile << mfprevSample << "\n";
+        outfile << mfprevTrue << "\n";
+        outfile << ICprevSample << "\n";
+        outfile << ICprevTrue << "\n";
         outfile << roadmapTargetMet << "\n";
         outfile << 1-DoMDA << "\n";
         outfile << achieveEPHP << "\n";
