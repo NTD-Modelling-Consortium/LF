@@ -619,17 +619,12 @@ double Population::getMFPrevByAge(double ageStart, double ageEnd){
     double numHostsSampled = 0; // total number of hosts
     int minAgeMonths = ageStart*12;
     int maxAgeMonths = ageEnd*12;
-    //double xx;
     for(int i =0; i < size; i++){
-
-  
         if((host_pop[i].age >= minAgeMonths ) &&(host_pop[i].age < maxAgeMonths )){
                 bool infectedMF = ( stats.uniform_dist() <  (1 - exp(-1 * host_pop[i].M) ) );  //depends on how many mf present       
                 numHostsSampled++; // increment number of hosts by 1
                 if (infectedMF) MFpos++; // if mf positive, increment MFpos by 1
-        }
-        
-        
+        }   
     }
     if(numHostsSampled > 0){
         MFpos /= numHostsSampled; // convert to prevalence of mf positive hosts
@@ -647,17 +642,12 @@ double Population::getTrueMFPrevByAge(double ageStart, double ageEnd){
     double numHostsSampled = 0; // total number of hosts
     int minAgeMonths = ageStart*12;
     int maxAgeMonths = ageEnd*12;
-    //double xx;
     for(int i =0; i < size; i++){
-
-  
         if((host_pop[i].age >= minAgeMonths ) &&(host_pop[i].age < maxAgeMonths )){
-                bool infectedMF = host_pop[i].M > 0;  //depends on how many mf present       
+                bool infectedMF = host_pop[i].M > 0;  // as true prev, we just report if there are any mf present at all
                 numHostsSampled++; // increment number of hosts by 1
                 if (infectedMF) MFpos++; // if mf positive, increment MFpos by 1
-        }
-        
-        
+        }   
     }
     if(numHostsSampled > 0){
         MFpos /= numHostsSampled; // convert to prevalence of mf positive hosts
