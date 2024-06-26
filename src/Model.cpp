@@ -31,7 +31,7 @@ void Model::runScenarios(ScenariosList& scenarios, Population& popln, Vector& ve
 int index, int outputEndgame, int reduceImpViaXml, int rseed, std::string randParamsfile, std::string opDir){
 
     std::cout << std::endl << "Index " << index << " running " << scenarios.getName() << " with " << scenarios.getNumScenarios() << " scenarios" << std::endl;
-    
+    int baseYear = scenarios.getBaseYear();
     std::cout << std::unitbuf;
     std::cout << "Progress:  0%";
     
@@ -115,7 +115,7 @@ int index, int outputEndgame, int reduceImpViaXml, int rseed, std::string randPa
           
             //evolve, saving any specified months along the way
             for (int y = 0; y < sc.getNumMonthsToSave(); y++)
-                evolveAndSave(y, popln, vectors, worms, sc, currentOutput, rep, k_vals, v_to_h_vals, popln.getUpdateParams(), outputEndgame, reduceImpViaXml, opDir);
+                evolveAndSave(y, popln, vectors, worms, sc, currentOutput, rep, baseYear, k_vals, v_to_h_vals, popln.getUpdateParams(), outputEndgame, reduceImpViaXml, opDir);
             
             //done for this scenario, save the prevalence values for this replicate
             if(!_DEBUG) sc.printResults(rep, currentOutput, popln);
@@ -165,7 +165,7 @@ void Model::burnIn(Population& popln, Vector& vectors, const Worm& worms, Output
 }
 
 
-void Model::evolveAndSave(int y, Population& popln, Vector& vectors, Worm& worms, Scenario& sc, Output& currentOutput, int rep,
+void Model::evolveAndSave(int y, Population& popln, Vector& vectors, Worm& worms, Scenario& sc, Output& currentOutput, int rep, int baseYear,
 std::vector<double>& k_vals, std::vector<double>& v_to_h_vals, int updateParams, int outputEndgame, int reduceImpViaXml, std::string opDir){
     
     //advance to the next target month
@@ -276,7 +276,7 @@ std::vector<double>& k_vals, std::vector<double>& v_to_h_vals, int updateParams,
             
             if(donePreTAS == 0){
                 
-                int year = (t+1)/12 + 1999;
+                int year = (t+1)/12 + (baseYear - 1);
                 sc.writeEmptySurvey(year, maxAge, rep, "PreTAS survey", folderName);
                 sc.writeNumberByAge(popln, t, rep, folderName, "PreTAS survey");
             }
@@ -284,7 +284,7 @@ std::vector<double>& k_vals, std::vector<double>& v_to_h_vals, int updateParams,
 
             if(doneTAS == 0){
                 
-                int year = (t+1)/12 + 1999;
+                int year = (t+1)/12 + (baseYear - 1);
                 sc.writeEmptySurvey(year, maxAge, rep, "TAS survey", folderName);
                 sc.writeNumberByAge(popln, t, rep, folderName, "TAS survey");
             }
@@ -407,8 +407,9 @@ std::vector<double>& k_vals, std::vector<double>& v_to_h_vals, int updateParams,
             popln.totMDAs += 1; 
           
             if (popln.totMDAs == numMDADoSurvey){
-                    preTASSurveyTime = t + 6;
-                    TASSurveyTime = t + 6;
+                    int firstPostDataYear = (2022 - baseYear) * 12;
+                    preTASSurveyTime = ((firstPostDataYear + 6) > t + 6) ? (firstPostDataYear + 6) : (t + 6);
+                    TASSurveyTime = ((firstPostDataYear + 6) > t + 6) ? (firstPostDataYear + 6) : (t + 6);
             }
         }
 
