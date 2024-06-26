@@ -192,7 +192,7 @@ std::vector<double>& k_vals, std::vector<double>& v_to_h_vals, int updateParams,
     int changeNeverTreat = 0;
    // int maxAge = popln.getMaxAge();
     int TAS_Pass = 0;
-    int neededTASPass = 3;
+    int neededTASPass = 2;
     // int outputTime = floor(currentMonth/12);
     //int outputTime = 0;
     int LymphodemaTotalWorms = popln.getLymphodemaTotalWorms();
