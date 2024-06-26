@@ -142,8 +142,8 @@ int Worm::wormsTreated(int W, std::string type) {
         propWormsKilled = (wPropMDA >=0)?wPropMDA:0.59;
         fecRed = 10;
     }else if (type=="ma1"){
-        propWormsKilled = (wPropMDA >=0)?wPropMDA:0.9;
-        fecRed = 9;
+        propWormsKilled = (wPropMDA >=0)?wPropMDA:0.82;
+        fecRed = 18;
     }else if (type=="ma2"){
         propWormsKilled = (wPropMDA >=0)?wPropMDA:0.9;
         fecRed = 18;
@@ -176,7 +176,7 @@ double Worm::mfTreated(double M, std::string type) {
         fecRed = 10;
     }else if (type=="ma1"){
         mfPropMDA = 1-1;
-        fecRed = 9;
+        fecRed = 18;
     }else if (type=="ma2"){
         mfPropMDA = 1-1;
         fecRed = 18;
