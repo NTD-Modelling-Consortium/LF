@@ -771,6 +771,8 @@ double Population::getICPrev(Scenario& sc, int forTass, int t, int rep,  std::st
 
 double Population::getICPrevForOutput(bool sample){
     // get IC prevalence. This is modelled by sensing the presence of any adult worms
+    // sample is true if we want to take a sample of the population by including specificity and sensitivity of the test
+    // sample is false if we want to give the actual prevalence of the population
 
     double ICpos = 0; // number of people ic positive
     bool infectedIC;
