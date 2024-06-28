@@ -71,10 +71,9 @@ public:
     double getImportationRateFactor()  const;
 
     double getMFPrev(Scenario& sc, int forPreTass, int t, int rep, int sampleSize, std::string folderName);
-
+    bool test_for_infection(bool is_infected, float ICsensitivity, float ICspecificity);
     void getIncidence(Scenario& sc,  int t, int rep,  std::string folderName);
-    double getMFPrevByAge(double ageStart, double ageEnd);
-    double getTrueMFPrevByAge(double ageStart, double ageEnd);
+    double getMFPrevByAge(double ageStart, double ageEnd, bool sample);
     double getNumberByAge(double ageStart, double ageEnd);
     double HydroceleTestByAge(int ageStart, int ageEnd, int HydroceleTotalWorms, double HydroceleShape);
     double LymphodemaTestByAge(int ageStart, int ageEnd, int LymphodemaTotalWorms, double LymphodemaShape);

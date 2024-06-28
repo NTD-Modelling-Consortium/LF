@@ -648,14 +648,14 @@ void Scenario::writePrevByAge(Population& popln, int t, int rep,  std::string fo
     int year = t/12 + 2000;
 	outfile.open(fname, std::ios::app);
 
-                
+    bool sample = true;
    if(rep == 0){
         for(int j = 0; j < maxAge; j++){
-            outfile << name << ","  << year << "," << j <<"," << j+1 << "," << "prevalence" << "," << popln.getMFPrevByAge(j, j+1) << "\n";
+            outfile << name << ","  << year << "," << j <<"," << j+1 << "," << "prevalence" << "," << popln.getMFPrevByAge(j, j+1, sample) << "\n";
         }
    }else{
         for(int j = 0; j < maxAge; j++){
-            outfile << popln.getMFPrevByAge(j, j+1)<< "\n";
+            outfile << popln.getMFPrevByAge(j, j+1,sample)<< "\n";
         }
    }
    
@@ -672,20 +672,23 @@ void Scenario::writeRoadmapTarget(Population& popln, int t, int rep, int DoMDA, 
     // stated by neededTASPass. This is all done so that there are some easy to use values for each year that can be used for making plots.
     std::ofstream outfile;
     int maxAge = popln.getMaxAge();
-    std::string fname;
     std::size_t first_ = name.find("_");
     std::string fol_n = name.substr(0,first_);
     std::string rep1 = std::to_string(rep);
-    fname = folder + "/NTDMC_scen" + fol_n + "/" + name +"/NTDMC_scen" + name +  "_rep_" + rep1  + ".csv";
+    std::string fname = folder + "/NTDMC_scen" + fol_n + "/" + name +"/NTDMC_scen" + name +  "_rep_" + rep1  + ".csv";
     int year = t/12 + 2000;
 	outfile.open(fname, std::ios::app);
+    bool sample=true;
+    float mfprevSample = popln.getMFPrevByAge(5, maxAge, sample);
+    float ICprevSample = popln.getICPrevForOutput(sample);
     
-    float mfprevSample = popln.getMFPrevByAge(5, maxAge);
-    float mfprevTrue = popln.getTrueMFPrevByAge(5, maxAge);
-    float ICprevSample = popln.getICPrevForOutput(1);
-    float ICprevTrue = popln.getICPrevForOutput(0);
+    sample=false;
+    float mfprevTrue = popln.getMFPrevByAge(5, maxAge, sample);
+    float ICprevTrue = popln.getICPrevForOutput(sample);
+    
     int roadmapTargetMet = mfprevSample <= 0.01 ? 1 : 0;
     int achieveEPHP = TAS_Pass == neededTASPass ? 1 : 0;
+    
     if(rep == 0){
         outfile << name << ","  << year << "," << 5 <<"," << maxAge << "," << "sampled mf prevalence (all pop)" << "," << mfprevSample << "\n";
         outfile << name << ","  << year << "," << 5 <<"," << maxAge << "," << "true mf prevalence (all pop)" << "," << mfprevTrue << "\n";
