@@ -357,6 +357,9 @@ int Population::getNoMDALowMF() const{
     return NoMDALowMF;
 }
 
+int Population::getSurveyStartDate() const{
+    return surveyStartDate;
+}
 
 void  Population::initHosts(std::string distType, double k_val, double aImp_val){
     
