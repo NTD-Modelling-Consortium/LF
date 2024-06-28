@@ -175,16 +175,16 @@ public:
     void InitNTDMCData(int rep, std::string folder);
     void InitPreTASData(int rep,  std::string folder);
     void InitTASData(int rep,  std::string folder);
-    void writePrevByAge(Population& popln, int t, int rep, std::string folder);
-    void writeRoadmapTarget(Population& popln, int t, int rep, int DoMDA, int TAS_Pass, int neededTASPass, std::string folder);
-    void writeNumberByAge(Population& popln, int t, int rep, std::string folder, std::string surveyType);
-    void writeSequelaeByAge(Population& popln, int t, int LymphodemaTotalWorms, double LymphodemaShape, int HydroceleTotalWorms, double HydroceleShape, int rep, std::string folder);
-    void writeMDADataAllTreated(int t, int* numTreat, int maxAge, int rep, std::string type, std::string folder);
-    void writePreTAS(int t, int*  numSurvey, int maxAge, int rep, std::string folderName);
-    void writeTAS(int t, int*  numSurvey, int maxAge, int rep, std::string folder);
-    void writeSurveyByAge(Population& popln, int t, int preTAS_Pass, int TAS_Pass, int rep, std::string folder);
+    void writePrevByAge(Population& popln, int t, int baseYear, int rep, std::string folder);
+    void writeRoadmapTarget(Population& popln, int t, int baseYear, int rep, int DoMDA, int TAS_Pass, int neededTASPass, std::string folder);
+    void writeNumberByAge(Population& popln, int t, int baseYear, int rep, std::string folder, std::string surveyType);
+    void writeSequelaeByAge(Population& popln, int t, int baseYear, int LymphodemaTotalWorms, double LymphodemaShape, int HydroceleTotalWorms, double HydroceleShape, int rep, std::string folder);
+    void writeMDADataAllTreated(int t, int baseYear, int* numTreat, int maxAge, int rep, std::string type, std::string folder);
+    void writePreTAS(int t, int baseYear, int*  numSurvey, int maxAge, int rep, std::string folderName);
+    void writeTAS(int t, int baseYear, int*  numSurvey, int maxAge, int rep, std::string folder);
+    void writeSurveyByAge(Population& popln, int t, int baseYear, int preTAS_Pass, int TAS_Pass, int rep, std::string folder);
     void writeEmptySurvey(int year, int maxAge, int rep, std::string surveyType, std::string folder);
-    void writeIncidence(int t, int*  numSurvey, int maxAge, int rep, std::string folder);
+    void writeIncidence(int t, int baseYear, int*  numSurvey, int maxAge, int rep, std::string folder);
 protected:
     
     

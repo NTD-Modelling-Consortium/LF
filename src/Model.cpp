@@ -34,7 +34,7 @@ int index, int outputEndgame, int reduceImpViaXml, int rseed, std::string randPa
     
     std::cout << std::unitbuf;
     std::cout << "Progress:  0%";
-    
+    int baseYear = scenarios.getBaseYear();
     Output currentOutput(scenarios.getBaseYear());
     currentOutput.saveRandomNames(popln.printRandomVariableNames());
     currentOutput.saveRandomNames(vectors.printRandomVariableNames()); //names of random vars to be printed
@@ -115,7 +115,7 @@ int index, int outputEndgame, int reduceImpViaXml, int rseed, std::string randPa
           
             //evolve, saving any specified months along the way
             for (int y = 0; y < sc.getNumMonthsToSave(); y++)
-                evolveAndSave(y, popln, vectors, worms, sc, currentOutput, rep, k_vals, v_to_h_vals, popln.getUpdateParams(), outputEndgame, reduceImpViaXml, opDir);
+                evolveAndSave(y, popln, vectors, worms, sc, currentOutput, rep, baseYear, k_vals, v_to_h_vals, popln.getUpdateParams(), outputEndgame, reduceImpViaXml, opDir);
             
             //done for this scenario, save the prevalence values for this replicate
             if(!_DEBUG) sc.printResults(rep, currentOutput, popln);
@@ -165,7 +165,7 @@ void Model::burnIn(Population& popln, Vector& vectors, const Worm& worms, Output
 }
 
 
-void Model::evolveAndSave(int y, Population& popln, Vector& vectors, Worm& worms, Scenario& sc, Output& currentOutput, int rep,
+void Model::evolveAndSave(int y, Population& popln, Vector& vectors, Worm& worms, Scenario& sc, Output& currentOutput, int rep, int baseYear,
 std::vector<double>& k_vals, std::vector<double>& v_to_h_vals, int updateParams, int outputEndgame, int reduceImpViaXml, std::string opDir){
 
     //advance to the next target month
@@ -185,7 +185,7 @@ std::vector<double>& k_vals, std::vector<double>& v_to_h_vals, int updateParams,
     popln.numTASSurveys = 0;
     popln.t_TAS_Pass = -1;
     int sampleSize = popln.getSampleSize();
-    double mfprev_aimp_old = popln.getMFPrev(sc, 0, 0, rep, popln.getPopSize(), folderName); 
+    double mfprev_aimp_old = popln.getMFPrev(sc, 0, 0, baseYear,rep, popln.getPopSize(), folderName); 
     double mfprev_aimp_new = 0;
     bool preTAS_Pass = 0;
     int changeSensSpec = 0;
@@ -247,29 +247,29 @@ std::vector<double>& k_vals, std::vector<double>& v_to_h_vals, int updateParams,
         // at the beginning of every year we record the prevalence of the population, along with the number of people
         // in each age group and the sequelae prevalence in each age group
         if ((t % 12 == 0) && (outputEndgame == 1) ){
-            sc.writePrevByAge(popln, t, rep, folderName);
-            sc.writeRoadmapTarget(popln, t, rep, DoMDA, TAS_Pass, neededTASPass, folderName);
-            sc.writeNumberByAge(popln, t, rep, folderName, "not survey");
-            sc.writeSequelaeByAge(popln, t, LymphodemaTotalWorms,  LymphodemaShape, HydroceleTotalWorms, HydroceleShape, rep, folderName);
-            popln.getIncidence(sc, t, rep, folderName);
-            sc.writeSurveyByAge(popln, t, preTAS_Pass, TAS_Pass, rep, folderName);
+            sc.writePrevByAge(popln, t, baseYear, rep, folderName);
+            sc.writeRoadmapTarget(popln, t, baseYear, rep, DoMDA, TAS_Pass, neededTASPass, folderName);
+            sc.writeNumberByAge(popln, t, baseYear, rep, folderName, "not survey");
+            sc.writeSequelaeByAge(popln, t, baseYear, LymphodemaTotalWorms,  LymphodemaShape, HydroceleTotalWorms, HydroceleShape, rep, folderName);
+            popln.getIncidence(sc, t, baseYear, rep, folderName);
+            sc.writeSurveyByAge(popln, t, baseYear, preTAS_Pass, TAS_Pass, rep, folderName);
         }
 
         if(((t+1)%12 == 0) && (outputEndgame == 1)){
             
             if(donePreTAS == 0){
                 
-                int year = (t+1)/12 + 1999;
+                int year = (t+1)/12 + (baseYear-1);
                 sc.writeEmptySurvey(year, maxAge, rep, "PreTAS survey", folderName);
-                sc.writeNumberByAge(popln, t, rep, folderName, "PreTAS survey");
+                sc.writeNumberByAge(popln, t, baseYear, rep, folderName, "PreTAS survey");
             }
             donePreTAS = 0;
 
             if(doneTAS == 0){
                 
-                int year = (t+1)/12 + 1999;
+                int year = (t+1)/12 + (baseYear - 1);
                 sc.writeEmptySurvey(year, maxAge, rep, "TAS survey", folderName);
-                sc.writeNumberByAge(popln, t, rep, folderName, "TAS survey");
+                sc.writeNumberByAge(popln, t, baseYear, rep, folderName, "TAS survey");
             }
             doneTAS = 0;
         }
@@ -296,9 +296,9 @@ std::vector<double>& k_vals, std::vector<double>& v_to_h_vals, int updateParams,
         // snippet to perform a preTAS survey
         if(t == preTASSurveyTime){
 
-            preTAS_Pass = popln.PreTASSurvey(sc, outputEndgame , t, rep, folderName);
+            preTAS_Pass = popln.PreTASSurvey(sc, outputEndgame , t, baseYear, rep, folderName);
             if(outputEndgame == 1){
-                sc.writeNumberByAge(popln, t, rep, folderName, "PreTAS survey");
+                sc.writeNumberByAge(popln, t, baseYear, rep, folderName, "PreTAS survey");
             }
             
             donePreTAS = 1;
@@ -316,9 +316,9 @@ std::vector<double>& k_vals, std::vector<double>& v_to_h_vals, int updateParams,
         // snippet to perform a TAS survey
         
         if(t == TASSurveyTime){
-            int TAS_Pass_ind = popln.TASSurvey(sc, outputEndgame , t, rep, folderName);
+            int TAS_Pass_ind = popln.TASSurvey(sc, outputEndgame , t, baseYear, rep, folderName);
             if(outputEndgame == 1){
-                sc.writeNumberByAge(popln, t, rep, folderName, "TAS survey");
+                sc.writeNumberByAge(popln, t, baseYear, rep, folderName, "TAS survey");
             }
             doneTAS = 1;
             TAS_Pass += TAS_Pass_ind;
@@ -369,7 +369,7 @@ std::vector<double>& k_vals, std::vector<double>& v_to_h_vals, int updateParams,
 
             if(popln.totMDAs == 0){
                 if(popln.getNoMDALowMF() == 1){
-                    mfprev = popln.getMFPrev(sc, 0, t, rep, sampleSize, folderName);
+                    mfprev = popln.getMFPrev(sc, 0, t, baseYear, rep, sampleSize, folderName);
                     if(mfprev <= popln.MFThreshold){
                         DoMDA = 0;
                     }
@@ -380,11 +380,11 @@ std::vector<double>& k_vals, std::vector<double>& v_to_h_vals, int updateParams,
             // and reduce the importation inline with this decrease
 
             // this uses the whole population to get its value as it is used for an intrinsic property of the population
-            mfprev_aimp_old = popln.getMFPrev(sc, 0, t, rep, popln.getPopSize(), folderName); 
+            mfprev_aimp_old = popln.getMFPrev(sc, 0, t, baseYear, rep, popln.getPopSize(), folderName); 
 
             // apply the MDA. If DoMDA = 0, then we call this function, but don't do the MDA,
             // we just write to a file showing that no people were treated.
-            popln.ApplyTreatmentUpdated(applyMDA, worms, sc, t, rep, DoMDA, outputEndgame, folderName);
+            popln.ApplyTreatmentUpdated(applyMDA, worms, sc, t, baseYear, rep, DoMDA, outputEndgame, folderName);
             t_import_reduction = t + 6;
             
             popln.totMDAs += 1; 
@@ -399,11 +399,11 @@ std::vector<double>& k_vals, std::vector<double>& v_to_h_vals, int updateParams,
         if(reduceImpViaXml == 0){
             if(t == t_import_reduction){
 
-                mfprev_aimp_new = popln.getMFPrev(sc, 0, t, rep, popln.getPopSize(), folderName); 
+                mfprev_aimp_new = popln.getMFPrev(sc, 0, t, baseYear, rep, popln.getPopSize(), folderName); 
                 if (mfprev_aimp_old > mfprev_aimp_new){
                     popln.aImp = popln.aImp * mfprev_aimp_new / mfprev_aimp_old;
                 }
-                mfprev_aimp_old = popln.getMFPrev(sc, 0, t, rep, popln.getPopSize(), folderName);            
+                mfprev_aimp_old = popln.getMFPrev(sc, 0, t, baseYear, rep, popln.getPopSize(), folderName);            
 
             }
         }

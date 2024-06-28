@@ -636,7 +636,7 @@ void Scenario::InitTASData(int rep,  std::string folder){
 
 
 
-void Scenario::writePrevByAge(Population& popln, int t, int rep,  std::string folder){
+void Scenario::writePrevByAge(Population& popln, int t, int baseYear, int rep,  std::string folder){
     // get mf prevalence
     std::ofstream outfile;
     int maxAge = popln.getMaxAge();
@@ -645,7 +645,7 @@ void Scenario::writePrevByAge(Population& popln, int t, int rep,  std::string fo
     std::string fol_n = name.substr(0,first_);
     std::string rep1 = std::to_string(rep);
     fname = folder + "/IHME_scen" + fol_n + "/" + name +"/IHME_scen" + name +  "_rep_" + rep1  + ".csv";
-    int year = t/12 + 2000;
+    int year = t/12 + baseYear;
 	outfile.open(fname, std::ios::app);
 
     bool sample = true;
@@ -664,7 +664,7 @@ void Scenario::writePrevByAge(Population& popln, int t, int rep,  std::string fo
 }
 
 
-void Scenario::writeRoadmapTarget(Population& popln, int t, int rep, int DoMDA, int TAS_Pass, int neededTASPass, std::string folder){
+void Scenario::writeRoadmapTarget(Population& popln, int t, int baseYear, int rep, int DoMDA, int TAS_Pass, int neededTASPass, std::string folder){
     // we want to write whether the population has reached the 2030 roadmap target for each year
     // for LF this is to have microfilaria prevalence below 1% in people 5 years and older
     // we also write the mf prevalence for people 5 years and older, whether we have ceased MDA or not and whether we
@@ -676,7 +676,7 @@ void Scenario::writeRoadmapTarget(Population& popln, int t, int rep, int DoMDA, 
     std::string fol_n = name.substr(0,first_);
     std::string rep1 = std::to_string(rep);
     std::string fname = folder + "/NTDMC_scen" + fol_n + "/" + name +"/NTDMC_scen" + name +  "_rep_" + rep1  + ".csv";
-    int year = t/12 + 2000;
+    int year = t/12 + baseYear;
 	outfile.open(fname, std::ios::app);
     bool sample=true;
     float mfprevSample = popln.getMFPrevByAge(5, maxAge, sample);
@@ -713,7 +713,7 @@ void Scenario::writeRoadmapTarget(Population& popln, int t, int rep, int DoMDA, 
 
 
 
-void Scenario::writeIncidence(int t, int* incidence, int maxAge, int rep, std::string folder){
+void Scenario::writeIncidence(int t, int baseYear, int* incidence, int maxAge, int rep, std::string folder){
     std::ofstream outfile;
     std::string fname;
     std::string rep1 = std::to_string(rep);
@@ -721,7 +721,7 @@ void Scenario::writeIncidence(int t, int* incidence, int maxAge, int rep, std::s
     std::string fol_n = name.substr(0,first_);
 
     fname = folder + "/IHME_scen" + fol_n + "/" + name +"/IHME_scen" + name +  "_rep_" + rep1  + ".csv";
-    int year = t/12 + 2000;
+    int year = t/12 + baseYear;
 
     outfile.open(fname, std::ios::app);        
     if (!outfile.is_open()) {
@@ -747,7 +747,7 @@ void Scenario::writeIncidence(int t, int* incidence, int maxAge, int rep, std::s
 
 
 
-void Scenario::writeNumberByAge(Population& popln, int t, int rep,  std::string folder, std::string surveyType){
+void Scenario::writeNumberByAge(Population& popln, int t, int baseYear, int rep,  std::string folder, std::string surveyType){
     // get mf prevalence
     std::ofstream outfile;
     int maxAge = popln.getMaxAge();
@@ -767,7 +767,7 @@ void Scenario::writeNumberByAge(Population& popln, int t, int rep,  std::string 
         entry = "number";
     }
     
-    int year = t/12 + 2000;
+    int year = t/12 + baseYear;
     
     outfile.open(fname, std::ios::app);     
     if(rep == 0){
@@ -789,7 +789,7 @@ void Scenario::writeNumberByAge(Population& popln, int t, int rep,  std::string 
 
 
 
-void Scenario::writeSequelaeByAge(Population& popln, int t, int LymphodemaTotalWorms, double LymphodemaShape, int HydroceleTotalWorms, double HydroceleShape, int rep,  std::string folder){
+void Scenario::writeSequelaeByAge(Population& popln, int t, int baseYear, int LymphodemaTotalWorms, double LymphodemaShape, int HydroceleTotalWorms, double HydroceleShape, int rep,  std::string folder){
     // get mf prevalence
     std::ofstream outfile;
     int maxAge = popln.getMaxAge();
@@ -800,7 +800,7 @@ void Scenario::writeSequelaeByAge(Population& popln, int t, int LymphodemaTotalW
     std::string rep1 = std::to_string(rep);
     fname = folder + "/IHME_scen" + fol_n + "/" + name +"/IHME_scen" + name +  "_rep_" + rep1  + ".csv";
   
-    int year = t/12 + 2000;
+    int year = t/12 + baseYear;
     
     outfile.open(fname, std::ios::app);   
     if(rep == 0){
@@ -850,7 +850,7 @@ void Scenario::InitNTDMCData(int rep, std::string folder){
 
 
 
-void Scenario::writeMDADataAllTreated(int t, int* numTreat, int maxAge, int rep, std::string type, std::string folder){
+void Scenario::writeMDADataAllTreated(int t, int baseYear, int* numTreat, int maxAge, int rep, std::string type, std::string folder){
 
     std::ofstream outfile;
     std::string fname;
@@ -859,7 +859,7 @@ void Scenario::writeMDADataAllTreated(int t, int* numTreat, int maxAge, int rep,
     std::string fol_n = name.substr(0,first_);
     
     fname = folder + "/IHME_scen" + fol_n + "/" + name +"/IHME_scen" + name +  "_rep_" + rep1  + ".csv";
-    int year = t/12 + 2000;
+    int year = t/12 + baseYear;
 
     outfile.open(fname, std::ios::app);        
     if (!outfile.is_open()) {
@@ -881,7 +881,7 @@ void Scenario::writeMDADataAllTreated(int t, int* numTreat, int maxAge, int rep,
 }
 
 
-void Scenario::writePreTAS(int t, int*  numSurvey, int maxAge, int rep, std::string folder){
+void Scenario::writePreTAS(int t, int baseYear, int*  numSurvey, int maxAge, int rep, std::string folder){
     std::ofstream outfile;
     std::string fname;
     std::string rep1 = std::to_string(rep);
@@ -889,7 +889,7 @@ void Scenario::writePreTAS(int t, int*  numSurvey, int maxAge, int rep, std::str
     std::string fol_n = name.substr(0,first_);
     
     fname = folder + "/IHME_scen" + fol_n + "/" + name +"/PreTAS_scen" + name +  "_rep_" + rep1  + ".csv";
-    int year = t/12 + 2000;
+    int year = t/12 + baseYear;
 
     outfile.open(fname, std::ios::app);        
     if (!outfile.is_open()) {
@@ -911,7 +911,7 @@ void Scenario::writePreTAS(int t, int*  numSurvey, int maxAge, int rep, std::str
 }
 
 
-void Scenario::writeTAS(int t, int*  numSurvey, int maxAge, int rep, std::string folder){
+void Scenario::writeTAS(int t, int baseYear, int*  numSurvey, int maxAge, int rep, std::string folder){
     std::ofstream outfile;
     std::string fname;
     std::string rep1 = std::to_string(rep);
@@ -919,7 +919,7 @@ void Scenario::writeTAS(int t, int*  numSurvey, int maxAge, int rep, std::string
     std::string fol_n = name.substr(0,first_);
     
     fname = folder + "/IHME_scen" + fol_n + "/" + name +"/TAS_scen" + name +  "_rep_" + rep1  + ".csv";
-    int year = t/12 + 2000;
+    int year = t/12 + baseYear;
 
     outfile.open(fname, std::ios::app);        
     if (!outfile.is_open()) {
@@ -953,8 +953,6 @@ void Scenario::writeEmptySurvey(int year, int maxAge, int rep, std::string surve
     if(surveyType == "TAS survey"){
         fname = folder + "/IHME_scen" + fol_n + "/" + name +"/TAS_scen" + name +  "_rep_" + rep1  + ".csv";
     }
-    
-    //int year = t/12 + 2000;
 
     outfile.open(fname, std::ios::app);        
     if (!outfile.is_open()) {
@@ -980,7 +978,7 @@ void Scenario::writeEmptySurvey(int year, int maxAge, int rep, std::string surve
 
 
 
-void Scenario::writeSurveyByAge(Population& popln, int t, int preTAS_Pass, int TAS_Pass, int rep, std::string folder){
+void Scenario::writeSurveyByAge(Population& popln, int t, int baseYear, int preTAS_Pass, int TAS_Pass, int rep, std::string folder){
     // get mf prevalence
     std::ofstream outfile;
     
@@ -989,7 +987,7 @@ void Scenario::writeSurveyByAge(Population& popln, int t, int preTAS_Pass, int T
     std::size_t first_ = name.find("_");
     std::string fol_n = name.substr(0,first_);
     fname = folder + "/IHME_scen" + fol_n + "/" + name +"/IHME_scen" + name +  "_rep_" + rep1  + ".csv";
-    int year = t/12 + 2000;
+    int year = t/12 + baseYear;
     
     outfile.open(fname, std::ios::app);         
 
