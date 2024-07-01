@@ -192,7 +192,7 @@ std::vector<double>& k_vals, std::vector<double>& v_to_h_vals, int updateParams,
     int changeNeverTreat = 0;
    // int maxAge = popln.getMaxAge();
     int TAS_Pass = 0;
-    int neededTASPass = 2;
+    int neededTASPass = 3; // number of times TAS must be passed to reached WHO target (https://www.who.int/publications/i/item/9789241501484)
     // int outputTime = floor(currentMonth/12);
     //int outputTime = 0;
     int LymphodemaTotalWorms = popln.getLymphodemaTotalWorms();
