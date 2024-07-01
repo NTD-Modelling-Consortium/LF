@@ -168,28 +168,23 @@ public:
     void printColumnTitles(std::ofstream& of, Output& results, bool extra = false) const;
     void printResults(int repnum, Output& results, Population& popln);
     void printReplicate(std::ofstream& of, Output& results, int repnum, Population& popln) const;
-    void printSurveysMDAs(std::ofstream& of, Output& results, int repnum, Population& popln) const;
     void closeFile();
     std::string getName();
 
     void InitIHMEData(int rep, std::string folder);
-    void InitIPMData(int rep, std::string folder);
+    void InitNTDMCData(int rep, std::string folder);
     void InitPreTASData(int rep,  std::string folder);
     void InitTASData(int rep,  std::string folder);
     void writePrevByAge(Population& popln, int t, int rep, std::string folder);
+    void writeRoadmapTarget(Population& popln, int t, int rep, int DoMDA, int TAS_Pass, int neededTASPass, std::string folder);
     void writeNumberByAge(Population& popln, int t, int rep, std::string folder, std::string surveyType);
     void writeSequelaeByAge(Population& popln, int t, int LymphodemaTotalWorms, double LymphodemaShape, int HydroceleTotalWorms, double HydroceleShape, int rep, std::string folder);
-    void writeMDAData(int t, int MDATreatments, int MDAPopSize, int minAgeMDA, int maxAge, int rep, std::string type, std::string folder);
     void writeMDADataAllTreated(int t, int* numTreat, int maxAge, int rep, std::string type, std::string folder);
-    void writeMDA(int t, int MDATreatments, int MDAPopSize, int minAgeMDA, int maxAge, int rep, std::string type, std::string folder);
-    void writeMDADataMissedYears(int t, int MDATreatments, int MDAPopSize, int minAgeMDA, int maxAge, int rep,  std::string folder);
     void writePreTAS(int t, int*  numSurvey, int maxAge, int rep, std::string folderName);
     void writeTAS(int t, int*  numSurvey, int maxAge, int rep, std::string folder);
     void writeSurveyByAge(Population& popln, int t, int preTAS_Pass, int TAS_Pass, int rep, std::string folder);
     void writeEmptySurvey(int year, int maxAge, int rep, std::string surveyType, std::string folder);
     void writeIncidence(int t, int*  numSurvey, int maxAge, int rep, std::string folder);
-    void writeL3(const Vector& vectors, int t, int preTAS_Pass, int TAS_Pass, int rep, std::string folder);
-    void writeMF(double MFPrev, int t,  int rep, std::string folder);
 protected:
     
     

@@ -79,7 +79,6 @@ int main(int argc, char **argv) {
     if((argc % 2) == 1){
         start_index = 1;
     }
-    std::cout << "start_index = " << start_index << std::endl;
     for (int i = start_index; i < (argc-1); i+=2){
         
         if (!strcmp(argv[i],  "-r")){

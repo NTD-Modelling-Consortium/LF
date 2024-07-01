@@ -648,16 +648,64 @@ void Scenario::writePrevByAge(Population& popln, int t, int rep,  std::string fo
     int year = t/12 + 2000;
 	outfile.open(fname, std::ios::app);
 
-                
+    bool sample = true;
    if(rep == 0){
         for(int j = 0; j < maxAge; j++){
-            outfile << name << ","  << year << "," << j <<"," << j+1 << "," << "prevalence" << "," << popln.getMFPrevByAge(j, j+1) << "\n";
+            outfile << name << ","  << year << "," << j <<"," << j+1 << "," << "prevalence" << "," << popln.getMFPrevByAge(j, j+1, sample) << "\n";
         }
    }else{
         for(int j = 0; j < maxAge; j++){
-            outfile << popln.getMFPrevByAge(j, j+1)<< "\n";
+            outfile << popln.getMFPrevByAge(j, j+1,sample)<< "\n";
         }
    }
+   
+   
+	outfile.close();
+}
+
+
+void Scenario::writeRoadmapTarget(Population& popln, int t, int rep, int DoMDA, int TAS_Pass, int neededTASPass, std::string folder){
+    // we want to write whether the population has reached the 2030 roadmap target for each year
+    // for LF this is to have microfilaria prevalence below 1% in people 5 years and older
+    // we also write the mf prevalence for people 5 years and older, whether we have ceased MDA or not and whether we
+    // have achieved eliminated the disease as a public health problem, which is done when we have passed the TAS survey as many times as 
+    // stated by neededTASPass. This is all done so that there are some easy to use values for each year that can be used for making plots.
+    std::ofstream outfile;
+    int maxAge = popln.getMaxAge();
+    std::size_t first_ = name.find("_");
+    std::string fol_n = name.substr(0,first_);
+    std::string rep1 = std::to_string(rep);
+    std::string fname = folder + "/NTDMC_scen" + fol_n + "/" + name +"/NTDMC_scen" + name +  "_rep_" + rep1  + ".csv";
+    int year = t/12 + 2000;
+	outfile.open(fname, std::ios::app);
+    bool sample=true;
+    float mfprevSample = popln.getMFPrevByAge(5, maxAge, sample);
+    float ICprevSample = popln.getICPrevForOutput(sample);
+    
+    sample=false;
+    float mfprevTrue = popln.getMFPrevByAge(5, maxAge, sample);
+    float ICprevTrue = popln.getICPrevForOutput(sample);
+    
+    int roadmapTargetMet = mfprevSample <= 0.01 ? 1 : 0;
+    int achieveEPHP = TAS_Pass == neededTASPass ? 1 : 0;
+    
+    if(rep == 0){
+        outfile << name << ","  << year << "," << 5 <<"," << maxAge << "," << "sampled mf prevalence (all pop)" << "," << mfprevSample << "\n";
+        outfile << name << ","  << year << "," << 5 <<"," << maxAge << "," << "true mf prevalence (all pop)" << "," << mfprevTrue << "\n";
+        outfile << name << ","  << year << "," << 6 <<"," << 7 << "," << "sampled IC prevalence (all pop)" << "," << ICprevSample << "\n";
+        outfile << name << ","  << year << "," << 6 <<"," << 7 << "," << "true IC prevalence (all pop)" << "," << ICprevTrue << "\n";
+        outfile << name << ","  << year << "," << 5 <<"," << maxAge << "," << "metRoadmapTarget" << "," << roadmapTargetMet << "\n";
+        outfile << name << ","  << year << "," << "None" <<"," << "None" << "," << "MDA ceased" << "," << 1-DoMDA << "\n";
+        outfile << name << ","  << year << "," << "None" <<"," << "None" << "," << "achieve EPHP" << "," << achieveEPHP << "\n";
+    }else{
+        outfile << mfprevSample << "\n";
+        outfile << mfprevTrue << "\n";
+        outfile << ICprevSample << "\n";
+        outfile << ICprevTrue << "\n";
+        outfile << roadmapTargetMet << "\n";
+        outfile << 1-DoMDA << "\n";
+        outfile << achieveEPHP << "\n";
+    }
    
    
 	outfile.close();
@@ -693,6 +741,8 @@ void Scenario::writeIncidence(int t, int* incidence, int maxAge, int rep, std::s
    
 	outfile.close();
 }
+
+
 
 
 
@@ -775,7 +825,7 @@ void Scenario::writeSequelaeByAge(Population& popln, int t, int LymphodemaTotalW
 
 
 
-void Scenario::InitIPMData(int rep, std::string folder){
+void Scenario::InitNTDMCData(int rep, std::string folder){
     // get mf prevalence
     struct stat buffer;
 
@@ -786,8 +836,8 @@ void Scenario::InitIPMData(int rep, std::string folder){
     std::string rep1 = std::to_string(rep);
     std::size_t first_ = name.find("_");
     std::string fol_n = name.substr(0,first_);
-    fname = folder + "/IPM_scen" + fol_n + "/" + name +"/IPM_scen" + name +  "_rep_" + rep1  + ".csv";
-    fname2 = folder + "/IPM_scen" + fol_n + "/" + name;
+    fname = folder + "/NTDMC_scen" + fol_n + "/" + name +"/NTDMC_scen" + name +  "_rep_" + rep1  + ".csv";
+    fname2 = folder + "/NTDMC_scen" + fol_n + "/" + name;
     if (stat(fname2.c_str(), &buffer) != 0) {
         fs::create_directories(fname2);
     } 
@@ -798,46 +848,6 @@ void Scenario::InitIPMData(int rep, std::string folder){
 
 }
 
-
-
-void Scenario::writeMDAData(int t, int MDATreatments, int MDAPopSize, int minAgeMDA, int maxAge, int rep, std::string type, std::string folder){
-    // get mf prevalence
-    std::ofstream outfile;
-    std::string fname;
-    std::string rep1 = std::to_string(rep);
-    std::size_t first_ = name.find("_");
-    std::string fol_n = name.substr(0,first_);
-    fname = folder + "/IPM_scen" + fol_n + "/" + name +"/IPM_scen" + name +  "_rep_" + rep1  + ".csv";
-
-    int year = t/12 + 2000;
-
-    outfile.open(fname, std::ios::app);        
-    
-    if(type != "ma1" ){
-        outfile << name << ","  << year << "," << minAgeMDA <<"," << maxAge << "," << "MDATreatments1" << "," << MDATreatments << "\n";
-        outfile << name << ","  << year << "," << minAgeMDA <<"," << maxAge << "," << "MDATreatments2" << "," << 0 << "\n";
-        if(MDAPopSize >0){
-           outfile << name << ","  << year << "," << minAgeMDA <<"," << maxAge << "," << "MDACoverage1" << "," << double(MDATreatments)/MDAPopSize << "\n"; 
-        }else{
-            outfile << name << ","  << year << "," << minAgeMDA <<"," << maxAge << "," << "MDACoverage1" << "," << 0 << "\n"; 
-        }
-        
-        outfile << name << ","  << year << "," << minAgeMDA <<"," << maxAge << "," << "MDACoverage2" << "," << 0 << "\n";
-    }else{
-        outfile << name << ","  << year << "," << minAgeMDA <<"," << maxAge << "," << "MDATreatments1" << "," << 0 << "\n";
-        outfile << name << ","  << year << "," << minAgeMDA <<"," << maxAge << "," << "MDATreatments2" << "," << MDATreatments << "\n";
-        outfile << name << ","  << year << "," << minAgeMDA <<"," << maxAge << "," << "MDACoverage1" << "," << 0 << "\n";
-         if(MDAPopSize >0){
-           outfile << name << ","  << year << "," << minAgeMDA <<"," << maxAge << "," << "MDACoverage2" << "," << double(MDATreatments)/MDAPopSize << "\n"; 
-        }else{
-            outfile << name << ","  << year << "," << minAgeMDA <<"," << maxAge << "," << "MDACoverage2" << "," << 0 << "\n"; 
-        }
-    
-    }
-    
-   
-	outfile.close();
-}
 
 
 void Scenario::writeMDADataAllTreated(int t, int* numTreat, int maxAge, int rep, std::string type, std::string folder){
@@ -969,66 +979,6 @@ void Scenario::writeEmptySurvey(int year, int maxAge, int rep, std::string surve
 
 
 
-void Scenario::writeMDA(int t, int MDATreatments, int MDAPopSize, int minAgeMDA, int maxAge, int rep, std::string type, std::string folder){
-    // get mf prevalence
-    std::ofstream outfile;
-    std::string fname;
-    std::string rep1 = std::to_string(rep);
-    std::size_t first_ = name.find("_");
-    std::string fol_n = name.substr(0,first_);
-    fname = folder + "/IPM_scen" + fol_n + "/" + name +"/IPM_scen" + name +  "_rep_" + rep1  + ".csv";
-
-    int year = t/12 + 2000;
-
-    outfile.open(fname, std::ios::app);        
-    
-   
-    outfile << name << ","  << year << "," << minAgeMDA <<"," << maxAge << "," << type << " doses" << "," << MDATreatments << "\n";
-        //outfile << name << ","  << year << "," << minAgeMDA <<"," << maxAge << "," << "MDATreatments2" << "," << 0 << "\n";
-    if(MDAPopSize >0){
-        outfile << name << ","  << year << "," << minAgeMDA <<"," << maxAge << "," << type << " coverage" << "," << double(MDATreatments)/MDAPopSize << "\n"; 
-    }else{
-        outfile << name << ","  << year << "," << minAgeMDA <<"," << maxAge << "," << type << " coverage" << "," << 0 << "\n"; 
-    }
-        
-       // outfile << name << ","  << year << "," << minAgeMDA <<"," << maxAge << "," << "MDACoverage2" << "," << 0 << "\n";
-    
-    
-    
-   
-	outfile.close();
-}
-
-
-
-
-void Scenario::writeMDADataMissedYears(int t, int MDATreatments, int MDAPopSize, int minAgeMDA, int maxAge, int rep, std::string folder){
-    // get mf prevalence
-    std::ofstream outfile;
-    std::string fname;
-    std::string rep1 = std::to_string(rep);
-    std::size_t first_ = name.find("_");
-    std::string fol_n = name.substr(0,first_);
-    fname = folder + "/IPM_scen" + fol_n + "/" + name +"/IPM_scen" + name +  "_rep_" + rep1  + ".csv";
-
-    int year = t/12 + 2000;
-
-    outfile.open(fname, std::ios::app);        
-    
-    
-    outfile << name << ","  << year << "," << minAgeMDA <<"," << maxAge << "," << "MDATreatments1" << "," << 0 << "\n";
-
-    outfile << name << ","  << year << "," << minAgeMDA <<"," << maxAge << "," << "MDATreatments2" << "," << 0 << "\n";
-
-    outfile << name << ","  << year << "," << minAgeMDA <<"," << maxAge << "," << "MDACoverage1" << "," << 0 << "\n";   
-
-    outfile << name << ","  << year << "," << minAgeMDA <<"," << maxAge << "," << "MDACoverage2" << "," << 0 << "\n";
-   
-	outfile.close();
-}
-
-
-
 
 void Scenario::writeSurveyByAge(Population& popln, int t, int preTAS_Pass, int TAS_Pass, int rep, std::string folder){
     // get mf prevalence
@@ -1058,49 +1008,6 @@ void Scenario::writeSurveyByAge(Population& popln, int t, int preTAS_Pass, int T
 
 	outfile.close();
 }
-
-
-
-void Scenario::writeL3(const Vector& vectors, int t, int preTAS_Pass, int TAS_Pass, int rep, std::string folder){
-    // get mf prevalence
-    std::ofstream outfile;
-    
-    std::string fname;
-    std::string rep1 = std::to_string(rep);
-    std::size_t first_ = name.find("_");
-    std::string fol_n = name.substr(0,first_);
-    fname = folder + "/IPM_scen" + fol_n + "/" + name +"/IPM_scen" + name +  "_rep_" + rep1  + ".csv";
-    int year = t/12 + 2000;
-    
-    outfile.open(fname, std::ios::app);         
-   
-    outfile << name << ","  << year << "," << "None" <<"," << "None" << "," << "L3" << "," << vectors.L3 << "\n";
-    
-	outfile.close();
-}
-
-
-
-
-void Scenario::writeMF(double mfPrev, int t,  int rep, std::string folder){
-    // get mf prevalence
-    std::ofstream outfile;
-    
-    std::string fname;
-    std::string rep1 = std::to_string(rep);
-    std::size_t first_ = name.find("_");
-    std::string fol_n = name.substr(0,first_);
-    fname = folder + "/IPM_scen" + fol_n + "/" + name +"/IPM_scen" + name +  "_rep_" + rep1  + ".csv";
-    int year = t/12 + 2000;
-    
-    outfile.open(fname, std::ios::app);         
-   
-    outfile << name << ","  << year << "," << "None" <<"," << "None" << "," << "MF" << "," << mfPrev << "\n";
-    
-	outfile.close();
-}
-
-
 
 std::string Scenario::getName(){
     std::size_t first_ = name.find("_");
