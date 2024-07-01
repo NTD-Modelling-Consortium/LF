@@ -406,7 +406,14 @@ std::vector<double>& k_vals, std::vector<double>& v_to_h_vals, int updateParams,
             popln.totMDAs += 1; 
           
             if (popln.totMDAs == numMDADoSurvey){
-                    preTASSurveyTime = ((popln.getSurveyStartDate()) > t + 6) ? (popln.getSurveyStartDate()) : (t + 6);
+                // following the document at https://www.who.int/publications/i/item/9789241501484 the pre TAS survey must be at least 6 months after the 5th effective MDA.
+                // We also do not want the surveys to begin too early into the simulation, as the first survey was done around 2012,
+                // so we don't want surveys to begin as early as the above condition is passed in some cases.
+                // Hence we set the time for the pre TAS survey to be the maximum of a specified date given by popln.getSurveyStartDate()
+                // and t + minNumberMonthsBeforeSurvey, which is minNumberMonthsBeforeSurvey from now.
+                // We will set the time for the TAS survey if the pre TAS survey is passed.
+                int minNumberMonthsBeforeSurvey = 6;
+                preTASSurveyTime = std::max(popln.getSurveyStartDate(), t + minNumberMonthsBeforeSurvey);
             }
         }
 
