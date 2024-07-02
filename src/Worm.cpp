@@ -142,8 +142,9 @@ int Worm::wormsTreated(int W, std::string type) {
         propWormsKilled = (wPropMDA >=0)?wPropMDA:0.59;
         fecRed = 10;
     }else if (type=="ma1"){
-        propWormsKilled = (wPropMDA >=0)?wPropMDA:0.9;
-        fecRed = 9;
+        // efficacy of using moxidectin in line with the latest parameters from the business case work
+        propWormsKilled = (wPropMDA >=0)?wPropMDA:0.82;
+        fecRed = 18;
     }else if (type=="ma2"){
         propWormsKilled = (wPropMDA >=0)?wPropMDA:0.9;
         fecRed = 18;
@@ -175,8 +176,9 @@ double Worm::mfTreated(double M, std::string type) {
         mfPropMDA = 1-0.86;
         fecRed = 10;
     }else if (type=="ma1"){
+        // efficacy of using moxidectin in line with the latest parameters from the business case work
         mfPropMDA = 1-1;
-        fecRed = 9;
+        fecRed = 18;
     }else if (type=="ma2"){
         mfPropMDA = 1-1;
         fecRed = 18;
