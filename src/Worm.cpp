@@ -136,6 +136,7 @@ int Worm::wormsTreated(int W, std::string type) {
         propWormsKilled = (wPropMDA >=0)?wPropMDA:0.35;
         fecRed = 0;
     }else if (type=="ia"){
+        // efficacy of using IA in line with original parameters from the business case work
         propWormsKilled = (wPropMDA >=0)?wPropMDA:0.35;
         fecRed = 9;
     }else if (type=="ia2"){
@@ -174,6 +175,7 @@ double Worm::mfTreated(double M, std::string type) {
         mfPropMDA = 1-0;
         fecRed = 0;
     }else if (type=="ia"){
+        // efficacy of using IA in line with original parameters from the business case work
         mfPropMDA = 1-0.99;
         fecRed = 9;
     }else if (type=="ia2"){
