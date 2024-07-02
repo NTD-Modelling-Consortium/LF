@@ -111,8 +111,8 @@ public:
     int getMinAgeMDA() const;
     int getUpdateParams() const;
     int getNoMDALowMF() const;
+    int getSurveyStartDate() const;
     void printMDAHistory() const;
-    int surveyStartDate;
     double ICThreshold;
     double MFThreshold;
     int interSurveyPeriod;
@@ -204,6 +204,7 @@ private:
     double neverTreatedOriginal;
     double neverTreatedChange;
     double neverTreatedChangeTime;
+    int surveyStartDate;
     int sampleSize = 250; // set a default sample size for pre tas survey. This can be changed in the xml file
     // via a sampleSize param name in the population parameters
     
