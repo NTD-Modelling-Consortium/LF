@@ -36,6 +36,7 @@ int index, int outputEndgame, int reduceImpViaXml, std::string randParamsfile, s
     std::cout << "Progress:  0%";
     
     Output currentOutput(scenarios.getBaseYear());
+    currentOutput.saveRandomNames(printSeedName());
     currentOutput.saveRandomNames(popln.printRandomVariableNames());
     currentOutput.saveRandomNames(vectors.printRandomVariableNames()); //names of random vars to be printed
     currentOutput.saveRandomNames(worms.printRandomVariableNames());
@@ -52,17 +53,18 @@ int index, int outputEndgame, int reduceImpViaXml, std::string randParamsfile, s
     std::vector<double> v_to_h_vals;
     std::vector<double> aImp_vals;
     std::vector<double> wPropMDA;
-    std::vector<int> seeds;
+    std::vector<double> seeds;
     getRandomSeeds(seeds, unsigned (replicates), RandomSeedFile);
     
     for (int rep = 0; rep < replicates; rep++){
         // Read the seed from the seeds vector if has been generated
         // othewise we set a random seed
+        double rseed;
         if(seeds.size() >  0){
-            int rseed = seeds[rep];
+            rseed = seeds[rep];
             stats.set_seed(rseed);
         }else{
-            int rseed = (unsigned)std::chrono::system_clock::now().time_since_epoch().count();
+            rseed = (unsigned)std::chrono::system_clock::now().time_since_epoch().count();
             stats.set_seed(rseed);
         }
         getRandomParametersMultiplePerLine(rep+1, k_vals, v_to_h_vals, aImp_vals, wPropMDA, unsigned (replicates), randParamsfile) ;
@@ -89,6 +91,7 @@ int index, int outputEndgame, int reduceImpViaXml, std::string randParamsfile, s
         //save these values for printing later
         currentOutput.clearRandomValues();
         //MUST be cvalled i nsame order as saveRandomNames above
+        currentOutput.saveRandomValues(printSeedValue(rseed ));
         currentOutput.saveRandomValues(popln.printRandomVariableValues());
         currentOutput.saveRandomValues(vectors.printRandomVariableValues());
         currentOutput.saveRandomValues(worms.printRandomVariableValues());
@@ -579,7 +582,7 @@ void Model::getRandomParametersMultiplePerLine(int index, std::vector<double>& k
 }
 
 
-void Model::getRandomSeeds( std::vector<int>& seeds, unsigned replicates, std::string fname){
+void Model::getRandomSeeds( std::vector<double>& seeds, unsigned replicates, std::string fname){
     // We retrieve the random seeds from the input seed file. The line on which the
     // seed is on will correspond to the set of parameters on the same line of the 
     // input parameters file.
@@ -607,3 +610,23 @@ void Model::getRandomSeeds( std::vector<int>& seeds, unsigned replicates, std::s
     }
 }
 
+
+
+std::vector<std::string> Model::printSeedName() const {
+    
+    //outputs a list of name/value pairs of any length. These are passed to output object to be printed to file
+    
+    std::vector<std::string> names = {"seed"};
+    return names;
+    
+}
+
+
+std::vector<double> Model::printSeedValue(double rseed ) const {
+    
+    //outputs a list of name/value pairs of any length. These are passed to output object to be printed to file
+    
+    std::vector<double> values = {rseed};
+    return values;
+    
+}
