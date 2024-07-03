@@ -28,9 +28,10 @@ extern Statistics stats;
 
 
 void Model::runScenarios(ScenariosList& scenarios, Population& popln, Vector& vectors, Worm& worms, int replicates, double timestep, 
-int index, int outputEndgame, int reduceImpViaXml, int rseed, std::string randParamsfile, std::string opDir){
+int index, int outputEndgame, int reduceImpViaXml, std::string randParamsfile, std::string RandomSeedFile, std::string opDir){
 
     std::cout << std::endl << "Index " << index << " running " << scenarios.getName() << " with " << scenarios.getNumScenarios() << " scenarios" << std::endl;
+    
     std::cout << std::unitbuf;
     std::cout << "Progress:  0%";
     
@@ -51,16 +52,18 @@ int index, int outputEndgame, int reduceImpViaXml, int rseed, std::string randPa
     std::vector<double> v_to_h_vals;
     std::vector<double> aImp_vals;
     std::vector<double> wPropMDA;
-    
-    //getRandomParameters(index, k_vals, v_to_h_vals, aImp_vals, wPropMDA, unsigned(replicates), randParamsfile);
+    std::vector<int> seeds;
+    getRandomSeeds(seeds, unsigned (replicates), RandomSeedFile);
     
     for (int rep = 0; rep < replicates; rep++){
-        // Set the seed for the random number generator. If no seed is input, then rseed will still be -1 from
-    // initialization. In this case, we set a random seed. Else we set the seed to be what is input.
-        if(rseed == -1){
-            stats.set_seed((unsigned)std::chrono::system_clock::now().time_since_epoch().count());
+        // Read the seed from the seeds vector if has been generated
+        // othewise we set a random seed
+        if(seeds.size() >  0){
+            int rseed = seeds[rep];
+            stats.set_seed(rseed);
         }else{
-            stats.set_seed(rseed + rep);
+            int rseed = (unsigned)std::chrono::system_clock::now().time_since_epoch().count();
+            stats.set_seed(rseed);
         }
         getRandomParametersMultiplePerLine(rep+1, k_vals, v_to_h_vals, aImp_vals, wPropMDA, unsigned (replicates), randParamsfile) ;
         currentMonth = 0;
@@ -164,7 +167,7 @@ void Model::burnIn(Population& popln, Vector& vectors, const Worm& worms, Output
 }
 
 
-void Model::evolveAndSave(int y, Population& popln, Vector& vectors, Worm& worms, Scenario& sc, Output& currentOutput, int rep, 
+void Model::evolveAndSave(int y, Population& popln, Vector& vectors, Worm& worms, Scenario& sc, Output& currentOutput, int rep,
 std::vector<double>& k_vals, std::vector<double>& v_to_h_vals, int updateParams, int outputEndgame, int reduceImpViaXml, std::string opDir){
 
     //advance to the next target month
@@ -191,7 +194,7 @@ std::vector<double>& k_vals, std::vector<double>& v_to_h_vals, int updateParams,
     int changeNeverTreat = 0;
    // int maxAge = popln.getMaxAge();
     int TAS_Pass = 0;
-    int neededTASPass = 3; // number of times TAS must be passed to reached WHO target (https://www.who.int/publications/i/item/9789241501484)
+    int neededTASPass = 2;
     // int outputTime = floor(currentMonth/12);
     //int outputTime = 0;
     int LymphodemaTotalWorms = popln.getLymphodemaTotalWorms();
@@ -315,7 +318,7 @@ std::vector<double>& k_vals, std::vector<double>& v_to_h_vals, int updateParams,
         // snippet to perform a TAS survey
         
         if(t == TASSurveyTime){
-            int TAS_Pass_ind = popln.TASSurvey(sc, outputEndgame , t, rep, folderName);
+            int TAS_Pass_ind = popln.TASSurvey(sc, outputEndgame , t,rep, folderName);
             if(outputEndgame == 1){
                 sc.writeNumberByAge(popln, t, rep, folderName, "TAS survey");
             }
@@ -389,14 +392,8 @@ std::vector<double>& k_vals, std::vector<double>& v_to_h_vals, int updateParams,
             popln.totMDAs += 1; 
           
             if (popln.totMDAs == numMDADoSurvey){
-                // following the document at https://www.who.int/publications/i/item/9789241501484 the pre TAS survey must be at least 6 months after the 5th effective MDA.
-                // We also do not want the surveys to begin too early into the simulation, as the first survey was done around 2012,
-                // so we don't want surveys to begin as early as the above condition is passed in some cases.
-                // Hence we set the time for the pre TAS survey to be the maximum of a specified date given by popln.getSurveyStartDate()
-                // and t + minNumberMonthsBeforeSurvey, which is minNumberMonthsBeforeSurvey from now.
-                // We will set the time for the TAS survey if the pre TAS survey is passed.
-                int minNumberMonthsBeforeSurvey = 6;
-                preTASSurveyTime = std::max(popln.getSurveyStartDate(), t + minNumberMonthsBeforeSurvey);
+                    preTASSurveyTime = t + 6;
+                    TASSurveyTime = t + 6;
             }
         }
 
@@ -580,3 +577,33 @@ void Model::getRandomParametersMultiplePerLine(int index, std::vector<double>& k
 
     ProcessLine(line, k_vals, v_to_h_vals, aImp_vals, wProp_vals);
 }
+
+
+void Model::getRandomSeeds( std::vector<int>& seeds, unsigned replicates, std::string fname){
+    // We retrieve the random seeds from the input seed file. The line on which the
+    // seed is on will correspond to the set of parameters on the same line of the 
+    // input parameters file.
+    // If there is no seed file input we don't do anything and will later set the seed randomly.
+    if (fname.length() > 0){
+        std::ifstream infile(fname, std::ios_base::in);
+        int seed;
+        if(!infile.is_open()){
+            std::cout << "Error in getting seeds. Cannot read file " << fname << std::endl;
+            exit(1);
+        }
+        std::string line;
+        while (getline(infile, line)){
+            std::istringstream linestream(line);
+            linestream >> seed;
+            seeds.push_back(seed);   
+        }
+        // if we haven't input enough seeds based on how many runs we want to make
+        // then we will abort the run as at some point we will run out of seeds and the simulations will crash.
+        if(seeds.size() < replicates){
+            exit(1);
+            std::cout << "Error in Model::runScenarios. " << fname << " is too short for " << replicates << " replicates" << std::endl;
+        }
+        infile.close();   
+    }
+}
+

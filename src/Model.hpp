@@ -31,8 +31,7 @@ class Model {
 public:
 
     void runScenarios( ScenariosList& scenarios, Population& popln, Vector& vectors, Worm& worms, int replicates, 
-        double timestep, int index, int outputEndgame, int reduceImpViaXml, int rseed, std::string randParamsfile, std::string opDir);
-   
+        double timestep, int index, int outputEndgame, int reduceImpViaXml, std::string randParamsfile, std::string RandomSeedFile, std::string opDir);
 protected:
     
     void burnIn(Population& popln, Vector& vectors, const Worm& worms, Output& currentOutput, PrevalenceEvent* pe);
@@ -40,6 +39,7 @@ protected:
      std::vector<double>& k_vals, std::vector<double>& v_to_h_vals, int updateParams, int outputEndgame, int reduceImpViaXml, std::string opDir);
     void getRandomParameters(int index, std::vector<double>& k_vals, std::vector<double>& v_to_h_vals, std::vector<double>& aImp_vals, std::vector<double>& wPropMDA, unsigned replicates, std::string fname);
     void getRandomParametersMultiplePerLine(int index, std::vector<double>& k_vals, std::vector<double>& v_to_h_vals, std::vector<double>& aImp_vals, std::vector<double>& wProp_vals, unsigned replicates, std::string fname);
+    void getRandomSeeds( std::vector<int>& seeds, unsigned replicates, std::string fname);
     void ProcessLine(const std::string &line, std::vector<double>& k_vals, std::vector<double>& v_to_h_vals, std::vector<double>& aImp_vals, std::vector<double>& wProp_vals);
     int currentMonth;
     double dt;
