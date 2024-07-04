@@ -80,7 +80,7 @@ public:
     void initPTreat(double cov, double rho);
     void editPTreat(double cov, double rho);
     void checkForZeroPTreat(double cov, double rho);
-    double getICPrev(Scenario& sc, int forTass, int t, int outputEndgameDate, int rep,  std::string folderName);
+    double getICPrev(Scenario& sc, int t, int outputEndgameDate, int rep,  std::string folderName);
     double getICPrevForOutput(bool sample);
     void changeNeverTreat();
     void changeICTest();
