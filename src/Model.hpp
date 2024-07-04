@@ -44,7 +44,7 @@ protected:
     int currentMonth;
     double dt;
     std::vector<std::string> printSeedName() const;
-    std::vector<double> printSeedValue(double rseed ) const ;
+
     
 
     

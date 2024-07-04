@@ -626,13 +626,3 @@ std::vector<std::string> Model::printSeedName() const {
     return names;
     
 }
-
-
-std::vector<double> Model::printSeedValue(double rseed ) const {
-    
-    //prints the value of the seed that was used for each run to the fitting output file
-    
-    std::vector<double> values = {rseed};
-    return values;
-    
-}
