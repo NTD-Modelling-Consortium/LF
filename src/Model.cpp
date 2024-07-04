@@ -196,7 +196,7 @@ std::vector<double>& k_vals, std::vector<double>& v_to_h_vals, int updateParams,
     int changeNeverTreat = 0;
    // int maxAge = popln.getMaxAge();
     int TAS_Pass = 0;
-    int neededTASPass = 3; // number of times TAS must be passed to reached WHO target (https://www.who.int/publications/i/item/9789241501484)
+    int neededTASPass = 2;
     // int outputTime = floor(currentMonth/12);
     //int outputTime = 0;
     int LymphodemaTotalWorms = popln.getLymphodemaTotalWorms();
@@ -400,14 +400,8 @@ std::vector<double>& k_vals, std::vector<double>& v_to_h_vals, int updateParams,
             popln.totMDAs += 1; 
           
             if (popln.totMDAs == numMDADoSurvey){
-                // following the document at https://www.who.int/publications/i/item/9789241501484 the pre TAS survey must be at least 6 months after the 5th effective MDA.
-                // We also do not want the surveys to begin too early into the simulation, as the first survey was done around 2012,
-                // so we don't want surveys to begin as early as the above condition is passed in some cases.
-                // Hence we set the time for the pre TAS survey to be the maximum of a specified date given by popln.getSurveyStartDate()
-                // and t + minNumberMonthsBeforeSurvey, which is minNumberMonthsBeforeSurvey from now.
-                // We will set the time for the TAS survey if the pre TAS survey is passed.
-                int minNumberMonthsBeforeSurvey = 6;
-                preTASSurveyTime = std::max(popln.getSurveyStartDate(), t + minNumberMonthsBeforeSurvey);
+                preTASSurveyTime = t + 6;
+                TASSurveyTime = t + 6;
             }
         }
 
