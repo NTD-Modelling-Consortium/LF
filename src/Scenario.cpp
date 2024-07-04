@@ -14,8 +14,7 @@
 #include <sys/stat.h>
 namespace fs = std::__fs::filesystem;
 
-bool IsPathExist(const std::string &s) {
-  struct stat buffer;
+bool IsPathExist(const std::string &s) {struct stat buffer;
   return (stat(s.c_str(), &buffer) == 0);
 }
 
