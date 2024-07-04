@@ -58,5 +58,52 @@ The gsl calls will need to be changed to where gsl library is installed on your 
 
 
 
-**Note**: Additional files runIU.csv, dummy_visualizations.R and vis_functions.R were previously used for post-processing of results and can be safely ignored 
+**Note**: Additional files runIU.csv, dummy_visualizations.R and vis_functions.R were previously used for post-processing of results and can be safely ignored
+
+## Contributing
+
+### File formatting
+
+This repository uses clang-format-18 to format files and this is checked on each pull request. Ideally, files should be formatted before each commit.
+
+#### Download clang-format 18
+
+MacOS: `brew install clang-format` At the time of writing, brew defaults to clang-format-18.
+
+Linux: Run
+```
+sudo apt update
+wget https://apt.llvm.org/llvm.sh
+chmod +x llvm.sh
+sudo ./llvm.sh 18
+sudo apt install clang-format-18
+```
+
+Windows: `choco install llvm` At the time of writing, chocolatey defaults to clang-format-18.
+
+#### Running clang-format
+
+Note that on Linux, as installed above, `clang-format` should be replaced with `clang-format-18`
+
+To run clang-format on a single file and update the file with changes:
+```
+clang-format -i path/to/file.cpp
+```
+
+To preview changes first:
+```
+clang-format --dry-run path/to/file.cpp
+```
+
+To run clang-format and update all cpp, h and hpp files on Mac/Linux or Windows with git bash:
+```
+find . -iname '*.h' -o -iname '*.cpp' -o -iname '*.hpp'| xargs clang-format -i
+```
+
+On Windows powershell (unverified)
+```
+$files=(git ls-files --exclude-standard); foreach ($file in $files) { if ((get-item $file).Extension -in ".cpp", ".hpp", ".h") { clang-format $file } }
+```
+
+If you have made very large changes, it is possible that clang-format may need to be run more than once.
 
