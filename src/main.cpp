@@ -43,7 +43,7 @@ int main(int argc, char **argv) {
     
     if (argc < 2){
 
-        std::cout << "transfil index -s <scenarios_file> -n <pop_file> -p <random_parameters_file> -r <replicates=1000> -t <timestep=1> -o <output_directory=\"./\"> -g <random_seed=1> -e <output_endgame=1> -x <reduce_imp_via-xml=0>"  << std::endl;
+        std::cout << "transfil index -s <scenarios_file> -n <pop_file> -p <random_parameters_file> -r <replicates=1000> -t <timestep=1> -o <output_directory=\"./\"> -g <random_seed=1> -e <output_endgame=1> -x <reduce_imp_via-xml=0> -D <outputEndgameDate=2000>"   << std::endl;
         return 1;
     }
    
@@ -63,6 +63,7 @@ int main(int argc, char **argv) {
     // xml file rather than impact of MDA on the prevalence
     int rseed = -1;
     int outputEndgame = 1;
+    int outputEndgameDate = 2000;
     int reduceImpViaXml = 0;
     
     int index = 0;
@@ -97,6 +98,8 @@ int main(int argc, char **argv) {
             rseed = atoi(argv[i+1]);
         else if (!strcmp(argv[i],  "-e"))
             outputEndgame = atoi(argv[i+1]);
+        else if (!strcmp(argv[i],  "-D"))
+            outputEndgameDate = atoi(argv[i+1]);
         else if (!strcmp(argv[i],  "-x"))
             reduceImpViaXml = atoi(argv[i+1]);
         else{   
@@ -180,7 +183,7 @@ int main(int argc, char **argv) {
     
     //Run
     Model model;
-    model.runScenarios(Scenarios, hostPopulation, vectors, worms, replicates, dt, index, outputEndgame, reduceImpViaXml, rseed, randParamsfile, opDir);
+    model.runScenarios(Scenarios, hostPopulation, vectors, worms, replicates, dt, index, outputEndgame, outputEndgameDate, reduceImpViaXml, rseed, randParamsfile, opDir);
 
     
     gettimeofday(&tv2, NULL);
