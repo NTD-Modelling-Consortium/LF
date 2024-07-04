@@ -523,10 +523,10 @@ int Population::PreTASSurvey(Scenario& sc, int forPreTass, int t, int outputEndg
     return preTAS_Pass;
 }
 
-int Population::TASSurvey(Scenario& sc, int forTass, int t, int outputEndgameDate, int rep,  std::string folderName){
+int Population::TASSurvey(Scenario& sc, int t, int outputEndgameDate, int rep,  std::string folderName){
     int TAS_Pass = 0;
    
-    double icprev = getICPrev(sc, forTass, t, outputEndgameDate, rep, folderName); // find ic prevalence in specified age group
+    double icprev = getICPrev(sc, t, outputEndgameDate, rep, folderName); // find ic prevalence in specified age group
     numTASSurveys += 1; // increment number of TAS surveys by 1
     if((icprev <= ICThreshold)){ // if the ic prevalence is below the threshold and mf prev also below threshold
         TAS_Pass = 1; // set TAS pass indicator to 1
@@ -726,7 +726,7 @@ bool Population::test_for_infection(bool is_infected, float ICsensitivity, float
 }
 
 
-double Population::getICPrev(Scenario& sc, int forTass, int t, int outputEndgameDate, int rep,  std::string folderName){
+double Population::getICPrev(Scenario& sc,  int t, int outputEndgameDate, int rep,  std::string folderName){
     // get IC prevalence. This is modelled by sensing the presence of any adult worms
     // we also store the number of people who are surveyed in each age group 
     // as this may be output for IHME to use
@@ -753,7 +753,7 @@ double Population::getICPrev(Scenario& sc, int forTass, int t, int outputEndgame
     // If we are getting the IC prevalence for the TAS survey then we want to ouptut this to the endgame outputs.
     // However if we are before the date of the earliest date of outputs for endgame then we don't want the output
     // as we may do this survey at an earlier date than we are interested outputting.
-    if((forTass == 1) && (t>= outputEndgameDate)){
+    if(t>= outputEndgameDate){
         sc.writeTAS(t, numSurvey, maxAge, rep, folderName);
     }
     if(numHostsSampled > 0){

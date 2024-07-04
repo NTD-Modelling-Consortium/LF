@@ -326,7 +326,7 @@ std::vector<double>& k_vals, std::vector<double>& v_to_h_vals, int updateParams,
         // snippet to perform a TAS survey
         
         if(t == TASSurveyTime){
-            int TAS_Pass_ind = popln.TASSurvey(sc, outputEndgame , t, outputEndgameDate, rep, folderName);
+            int TAS_Pass_ind = popln.TASSurvey(sc, t, outputEndgameDate, rep, folderName);
             if((outputEndgame == 1) && (t >= outputEndgameDate)){
                 sc.writeNumberByAge(popln, t, rep, folderName, "TAS survey");
             }
