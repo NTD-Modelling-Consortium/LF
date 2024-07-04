@@ -136,14 +136,20 @@ int Worm::wormsTreated(int W, std::string type) {
         propWormsKilled = (wPropMDA >=0)?wPropMDA:0.35;
         fecRed = 0;
     }else if (type=="ia"){
-        propWormsKilled = (wPropMDA >=0)?wPropMDA:0.55;
+        // efficacy of using IA in line with original parameters from the business case work
+        propWormsKilled = (wPropMDA >=0)?wPropMDA:0.35;
         fecRed = 9;
+    }else if (type=="ia2"){
+        // efficacy of using IA in line with more pessimistic parameters from the business case work
+        propWormsKilled = (wPropMDA >=0)?wPropMDA:0.32;
+        fecRed = 6;
     }else if (type=="ds"){
         propWormsKilled = (wPropMDA >=0)?wPropMDA:0.59;
         fecRed = 10;
     }else if (type=="ma1"){
-        propWormsKilled = (wPropMDA >=0)?wPropMDA:0.9;
-        fecRed = 9;
+        // efficacy of using moxidectin in line with the latest parameters from the business case work
+        propWormsKilled = (wPropMDA >=0)?wPropMDA:0.82;
+        fecRed = 18;
     }else if (type=="ma2"){
         propWormsKilled = (wPropMDA >=0)?wPropMDA:0.9;
         fecRed = 18;
@@ -169,14 +175,20 @@ double Worm::mfTreated(double M, std::string type) {
         mfPropMDA = 1-0;
         fecRed = 0;
     }else if (type=="ia"){
-        mfPropMDA = 1-1;
+        // efficacy of using IA in line with original parameters from the business case work
+        mfPropMDA = 1-0.99;
         fecRed = 9;
+    }else if (type=="ia2"){
+        // efficacy of using IA in line with more pessimistic parameters from the business case work
+        mfPropMDA = 1-0.99;
+        fecRed = 6;
     }else if (type=="ds"){
         mfPropMDA = 1-0.86;
         fecRed = 10;
     }else if (type=="ma1"){
+        // efficacy of using moxidectin in line with the latest parameters from the business case work
         mfPropMDA = 1-1;
-        fecRed = 9;
+        fecRed = 18;
     }else if (type=="ma2"){
         mfPropMDA = 1-1;
         fecRed = 18;

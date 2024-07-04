@@ -357,6 +357,9 @@ int Population::getNoMDALowMF() const{
     return NoMDALowMF;
 }
 
+int Population::getSurveyStartDate() const{
+    return surveyStartDate;
+}
 
 void  Population::initHosts(std::string distType, double k_val, double aImp_val){
     
@@ -578,7 +581,7 @@ double Population::getMFPrev(Scenario& sc, int forPreTass, int t, int outputEndg
     }
 
     if(numHostsSampled > 0){
-        return MFpos /= numHostsSampled; // convert to prevalence of mf positive hosts
+        return MFpos / numHostsSampled; // convert to prevalence of mf positive hosts
     }else{
         return 0.0;
     }
@@ -638,7 +641,7 @@ double Population::getMFPrevByAge(double ageStart, double ageEnd, bool sample){
         }   
     }
     if(numHostsSampled > 0){
-        return MFpos /= numHostsSampled; // convert to prevalence of mf positive hosts
+        return MFpos / numHostsSampled; // convert to prevalence of mf positive hosts
     }else{
         return 0.0;
     }
@@ -680,7 +683,7 @@ double Population::HydroceleTestByAge(int ageStart, int ageEnd, int HydroceleTot
         
     }
     if(numHostsSampled > 0){
-        return HydroPos /= numHostsSampled; // convert to prevalence of hydrocele positive hosts
+        return HydroPos / numHostsSampled; // convert to prevalence of hydrocele positive hosts
     }else{
         return 0.0;
     }
@@ -708,7 +711,7 @@ double Population::LymphodemaTestByAge(int ageStart, int ageEnd, int LymphodemaT
         
     }
     if(numHostsSampled > 0){
-        return LymphodemaPos /= numHostsSampled; // convert to prevalence of hydrocele positive hosts
+        return LymphodemaPos / numHostsSampled; // convert to prevalence of hydrocele positive hosts
     }else{
         return 0.0;
     }
@@ -757,7 +760,7 @@ double Population::getICPrev(Scenario& sc,  int t, int outputEndgameDate, int re
         sc.writeTAS(t, numSurvey, maxAge, rep, folderName);
     }
     if(numHostsSampled > 0){
-        return ICpos /= numHostsSampled; // convert to prevalence rather than number of infected
+        return ICpos / numHostsSampled; // convert to prevalence rather than number of infected
     }else{
         return 0.0;
     }
@@ -791,7 +794,7 @@ double Population::getICPrevForOutput(bool sample){
         }
     }
     if(numHostsSampled > 0){
-        return ICpos /= numHostsSampled; // convert to prevalence rather than number of infected
+        return ICpos / numHostsSampled; // convert to prevalence rather than number of infected
     }else{
         return 0.0;
     }
