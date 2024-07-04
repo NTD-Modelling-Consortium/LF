@@ -51,14 +51,14 @@ int index, int outputEndgame, int reduceImpViaXml, std::string randParamsfile, s
     std::vector<double> v_to_h_vals;
     std::vector<double> aImp_vals;
     std::vector<double> wPropMDA;
-    std::vector<double> seeds;
+    std::vector<unsigned long int> seeds;
     // we read in the entries of the random seed file. a different value will be used for each set of parameters
-    getRandomSeeds(seeds, unsigned (replicates), RandomSeedFile);
+    readSeedsFromFile(seeds, unsigned (replicates), RandomSeedFile);
     
     for (int rep = 0; rep < replicates; rep++){
         // Read the seed from the seeds vector if it has been generated
         // othewise we set a random seed
-        double rseed;
+        unsigned long int rseed;
         if(seeds.size() >  0){
             rseed = seeds[rep];
             stats.set_seed(rseed);
@@ -90,7 +90,7 @@ int index, int outputEndgame, int reduceImpViaXml, std::string randParamsfile, s
         //save these values for printing later
         currentOutput.clearRandomValues();
         //MUST be cvalled i nsame order as saveRandomNames above
-        currentOutput.saveRandomValues(printSeedValue(rseed ));
+        currentOutput.saveRandomValues({static_cast<double>(rseed)} );
         currentOutput.saveRandomValues(popln.printRandomVariableValues());
         currentOutput.saveRandomValues(vectors.printRandomVariableValues());
         currentOutput.saveRandomValues(worms.printRandomVariableValues());
@@ -587,14 +587,14 @@ void Model::getRandomParametersMultiplePerLine(int index, std::vector<double>& k
 }
 
 
-void Model::getRandomSeeds( std::vector<double>& seeds, unsigned replicates, std::string fname){
+void Model::readSeedsFromFile( std::vector<unsigned long int>& seeds, unsigned replicates, std::string fname){
     // We retrieve the random seeds from the input seed file. The line on which the
     // seed is on will correspond to the set of parameters on the same line of the 
     // input parameters file.
     // If there is no seed file input we don't do anything and will later set the seed randomly.
     if (fname.length() > 0){
         std::ifstream infile(fname, std::ios_base::in);
-        int seed;
+        unsigned long int seed;
         if(!infile.is_open()){
             std::cout << "Error in getting seeds. Cannot read file " << fname << std::endl;
             exit(1);
@@ -608,8 +608,9 @@ void Model::getRandomSeeds( std::vector<double>& seeds, unsigned replicates, std
         // if we haven't input enough seeds based on how many runs we want to make
         // then we will abort the run as at some point we will run out of seeds and the simulations will crash.
         if(seeds.size() < replicates){
-            exit(1);
             std::cout << "Error in Model::runScenarios. " << fname << " is too short for " << replicates << " replicates" << std::endl;
+            exit(1);
+            
         }
         infile.close();   
     }
