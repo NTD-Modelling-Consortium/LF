@@ -187,7 +187,8 @@ std::vector<double>& k_vals, std::vector<double>& v_to_h_vals, int updateParams,
     int sampleSize = popln.getSampleSize();
     // set the outputEndgameDate to be relative to year 2000. 
     // This should be updated when we automatically get the baseYear of the simulations from the scenario file.
-    outputEndgameDate = (outputEndgameDate-2000)*12;
+    int BASEYEAR = 2000;
+    outputEndgameDate = (outputEndgameDate-BASEYEAR)*12;
     double mfprev_aimp_old = popln.getMFPrev(sc, 0, 0, outputEndgameDate, rep, popln.getPopSize(), folderName); 
     double mfprev_aimp_new = 0;
     bool preTAS_Pass = 0;
@@ -195,7 +196,7 @@ std::vector<double>& k_vals, std::vector<double>& v_to_h_vals, int updateParams,
     int changeNeverTreat = 0;
    // int maxAge = popln.getMaxAge();
     int TAS_Pass = 0;
-    int neededTASPass = 2;
+    int neededTASPass = 3; // number of times TAS must be passed to reached WHO target (https://www.who.int/publications/i/item/9789241501484)
     // int outputTime = floor(currentMonth/12);
     //int outputTime = 0;
     int LymphodemaTotalWorms = popln.getLymphodemaTotalWorms();
@@ -268,7 +269,7 @@ std::vector<double>& k_vals, std::vector<double>& v_to_h_vals, int updateParams,
             
             if(donePreTAS == 0){
                 
-                int year = (t+1)/12 + 1999;
+                int year = (t+1)/12 + BASEYEAR - 1;
                 sc.writeEmptySurvey(year, maxAge, rep, "PreTAS survey", folderName);
                 sc.writeNumberByAge(popln, t, rep, folderName, "PreTAS survey");
             }
@@ -276,7 +277,7 @@ std::vector<double>& k_vals, std::vector<double>& v_to_h_vals, int updateParams,
 
             if(doneTAS == 0){
                 
-                int year = (t+1)/12 + 1999;
+                int year = (t+1)/12 + BASEYEAR - 1;
                 sc.writeEmptySurvey(year, maxAge, rep, "TAS survey", folderName);
                 sc.writeNumberByAge(popln, t, rep, folderName, "TAS survey");
             }
@@ -399,8 +400,14 @@ std::vector<double>& k_vals, std::vector<double>& v_to_h_vals, int updateParams,
             popln.totMDAs += 1; 
           
             if (popln.totMDAs == numMDADoSurvey){
-                    preTASSurveyTime = t + 6;
-                    TASSurveyTime = t + 6;
+                // following the document at https://www.who.int/publications/i/item/9789241501484 the pre TAS survey must be at least 6 months after the 5th effective MDA.
+                // We also do not want the surveys to begin too early into the simulation, as the first survey was done around 2012,
+                // so we don't want surveys to begin as early as the above condition is passed in some cases.
+                // Hence we set the time for the pre TAS survey to be the maximum of a specified date given by popln.getSurveyStartDate()
+                // and t + minNumberMonthsBeforeSurvey, which is minNumberMonthsBeforeSurvey from now.
+                // We will set the time for the TAS survey if the pre TAS survey is passed.
+                int minNumberMonthsBeforeSurvey = 6;
+                preTASSurveyTime = std::max(popln.getSurveyStartDate(), t + minNumberMonthsBeforeSurvey);
             }
         }
 
