@@ -400,8 +400,8 @@ std::vector<double>& k_vals, std::vector<double>& v_to_h_vals, int updateParams,
             popln.totMDAs += 1; 
           
             if (popln.totMDAs == numMDADoSurvey){
-                preTASSurveyTime = t + 6;
-                TASSurveyTime = t + 6;
+                    preTASSurveyTime = t + 6;
+                    TASSurveyTime = t + 6;
             }
         }
 
