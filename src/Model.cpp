@@ -46,18 +46,17 @@ int index, int outputEndgame, int reduceImpViaXml, std::string randParamsfile, s
     scenarios.openFilesandPrintHeadings(index, currentOutput);
     
     
-    //Temporary fix. Read file containing random values for v_to_h, aImp and k
-    //bool updateParams = true;
-    //bool updateParams = false;
+    
     std::vector<double> k_vals;
     std::vector<double> v_to_h_vals;
     std::vector<double> aImp_vals;
     std::vector<double> wPropMDA;
     std::vector<double> seeds;
+    // we read in the entries of the random seed file. a different value will be used for each set of parameters
     getRandomSeeds(seeds, unsigned (replicates), RandomSeedFile);
     
     for (int rep = 0; rep < replicates; rep++){
-        // Read the seed from the seeds vector if has been generated
+        // Read the seed from the seeds vector if it has been generated
         // othewise we set a random seed
         double rseed;
         if(seeds.size() >  0){
@@ -321,7 +320,7 @@ std::vector<double>& k_vals, std::vector<double>& v_to_h_vals, int updateParams,
         // snippet to perform a TAS survey
         
         if(t == TASSurveyTime){
-            int TAS_Pass_ind = popln.TASSurvey(sc, outputEndgame , t,rep, folderName);
+            int TAS_Pass_ind = popln.TASSurvey(sc, outputEndgame , t, rep, folderName);
             if(outputEndgame == 1){
                 sc.writeNumberByAge(popln, t, rep, folderName, "TAS survey");
             }
@@ -620,7 +619,7 @@ void Model::getRandomSeeds( std::vector<double>& seeds, unsigned replicates, std
 
 std::vector<std::string> Model::printSeedName() const {
     
-    //outputs a list of name/value pairs of any length. These are passed to output object to be printed to file
+    //outputs "seed" as a column title for fitting output file
     
     std::vector<std::string> names = {"seed"};
     return names;
@@ -630,7 +629,7 @@ std::vector<std::string> Model::printSeedName() const {
 
 std::vector<double> Model::printSeedValue(double rseed ) const {
     
-    //outputs a list of name/value pairs of any length. These are passed to output object to be printed to file
+    //prints the value of the seed that was used for each run to the fitting output file
     
     std::vector<double> values = {rseed};
     return values;
