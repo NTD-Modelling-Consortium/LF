@@ -36,7 +36,7 @@ function run_ID () {
 	( time do_file_combinations "${id}" "${output_folder_name}" "${RESULTS}" ) 2>&1
 
 	echo "== clearing out model 'result' files"
-#	rm -rf "${RESULTS}"
+	rm -rf "${RESULTS}"
 }
 
 function do_file_combinations () {
