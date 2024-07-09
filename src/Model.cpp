@@ -63,7 +63,7 @@ int index, int outputEndgame, int reduceImpViaXml, std::string randParamsfile, s
             rseed = seeds[rep];
             stats.set_seed(rseed);
         }else{
-            rseed = (unsigned)std::chrono::system_clock::now().time_since_epoch().count();
+            rseed = std::chrono::system_clock::now().time_since_epoch().count();
             stats.set_seed(rseed);
         }
         getRandomParametersMultiplePerLine(rep+1, k_vals, v_to_h_vals, aImp_vals, wPropMDA, unsigned (replicates), randParamsfile) ;
@@ -89,12 +89,13 @@ int index, int outputEndgame, int reduceImpViaXml, std::string randParamsfile, s
         
         //save these values for printing later
         currentOutput.clearRandomValues();
+        currentOutput.clearSeedValues();
         //MUST be cvalled i nsame order as saveRandomNames above
-        currentOutput.saveRandomValues({static_cast<double>(rseed)} );
+        currentOutput.saveSeedValues(rseed);
         currentOutput.saveRandomValues(popln.printRandomVariableValues());
         currentOutput.saveRandomValues(vectors.printRandomVariableValues());
         currentOutput.saveRandomValues(worms.printRandomVariableValues());
-        
+
         //baseline prevalence
         PrevalenceEvent pe = PrevalenceEvent(popln.getMinAgePrev(), scenarios.getExtraMinAge(), scenarios.getExtraMaxAge(), scenarios.getOutputtMethod());  //default age range and method to output at end of burn in
         burnIn(popln, vectors, worms, currentOutput, &pe);                    //should be at least 100 years
@@ -626,3 +627,4 @@ std::vector<std::string> Model::printSeedName() const {
     return names;
     
 }
+

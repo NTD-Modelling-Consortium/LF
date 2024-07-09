@@ -400,7 +400,7 @@ void Scenario::printResults(int repnum, Output& results, Population& popln){
 
 void Scenario::printColumnTitles(std::ofstream& of, Output& results, bool extra) const {
     
-    std::string indent(results.getNumRandomVars()+1, '\t');
+    std::string indent(results.getNumRandomVars()+2, '\t');
     
     //print headers for every month with either prevalenc or mda
     
@@ -482,11 +482,16 @@ void Scenario::printReplicate(std::ofstream& of, Output& results, int repnum, Po
     
     
     of << (repnum+1);
-    for (int i =0; i < results.getNumRandomVars(); i++)
-        if (results.getRandomVarValues(i) >= 0.0)
+    of << "\t" << results.getSeedValues(0) ;
+    for (int i =0; i < results.getNumRandomVars(); i++){
+        
+        if (results.getRandomVarValues(i) >= 0.0){
             of << "\t" << results.getRandomVarValues(i);
+        }
+    
         else
             of << "\t" << "na"; //this value wasn't used
+    }
             
     of << "\t";
     
