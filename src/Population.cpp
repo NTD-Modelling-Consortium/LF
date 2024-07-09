@@ -198,6 +198,11 @@ void Population::loadPopulationSize(const std::string popfile){
     while(getline(infile, line))
         numLines++;
     
+    if(numLines > 2){
+        std::cerr << "We currently only support a file with one population size entry from file: " << popfile << std::endl;
+        exit(1);
+    }
+    
     //read file
     infile.clear();
     infile.seekg(0,std::ios::beg);
