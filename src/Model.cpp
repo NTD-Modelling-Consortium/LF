@@ -89,9 +89,8 @@ int index, int outputEndgame, int reduceImpViaXml, std::string randParamsfile, s
         
         //save these values for printing later
         currentOutput.clearRandomValues();
-        currentOutput.clearSeedValues();
         //MUST be cvalled i nsame order as saveRandomNames above
-        currentOutput.saveSeedValues(rseed);
+        currentOutput.saveSeedValue(rseed);
         currentOutput.saveRandomValues(popln.printRandomVariableValues());
         currentOutput.saveRandomValues(vectors.printRandomVariableValues());
         currentOutput.saveRandomValues(worms.printRandomVariableValues());

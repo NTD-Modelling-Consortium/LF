@@ -482,7 +482,7 @@ void Scenario::printReplicate(std::ofstream& of, Output& results, int repnum, Po
     
     
     of << (repnum+1);
-    of << "\t" << results.getSeedValues(0) ;
+    of << "\t" << results.getSeedValue() ;
     for (int i =0; i < results.getNumRandomVars(); i++){
         
         if (results.getRandomVarValues(i) >= 0.0){

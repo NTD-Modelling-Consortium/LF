@@ -87,14 +87,14 @@ class Output {
     int getSize() const {return int(months.size());};
     
     void clearRandomValues();
-    void clearSeedValues();
+
     void saveRandomNames(std::vector<std::string> names);
     void saveRandomValues(std::vector<double> vals);
-    void saveSeedValues(unsigned long int vals);
+    void saveSeedValue(unsigned long int vals);
     int getNumRandomVars();
     std::string&  getRandomVarNames(int idx);
     double  getRandomVarValues(int idx);
-    unsigned long int  getSeedValues(int idx);
+    unsigned long int  getSeedValue();
     
     
     std::string getMinAgeForTreatment(int n) const;
@@ -107,7 +107,7 @@ private:
     
     std::vector<std::string> randomVarNames;
     std::vector<double> randomVarValues;
-    std::vector<unsigned long int> seedValues;
+    unsigned long int seedValue;
     
     std::vector<monthToOuput> months;
     std::string monthNames[12] = {"Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"};

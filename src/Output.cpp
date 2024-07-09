@@ -267,11 +267,11 @@ void Output::saveRandomValues(std::vector<double> vals){
 }
 
 
-void Output::saveSeedValues(unsigned long int vals){
+void Output::saveSeedValue(unsigned long int vals){
     
     //Values corresponding to names passed to above
     
-    seedValues.push_back(vals);
+    seedValue = vals;
     
 }
 
@@ -295,20 +295,15 @@ void Output::clearRandomValues(){
     randomVarValues.clear();
 }
 
-void Output::clearSeedValues(){
-    
-    seedValues.clear();
-}
-
 double  Output::getRandomVarValues(int idx){
     
     return randomVarValues[idx];
     
 }
 
-unsigned long int  Output::getSeedValues(int idx){
+unsigned long int  Output::getSeedValue(){
     
-    return seedValues[idx];
+    return seedValue;
     
 }
 
