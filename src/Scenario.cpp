@@ -848,7 +848,12 @@ void Scenario::InitNTDMCData(int rep, std::string folder){
     } 
     std::ofstream outfile;
     outfile.open(fname);
-    outfile << "espen_loc" << ","  << "year_id" << "," << "age_start" <<"," << "age_end" << "," << "measure" << "," << "draw_0" << "\n";
+
+    if(rep == 0){
+        outfile << "espen_loc" << ","  << "year_id" << "," << "age_start" <<"," << "age_end" << "," << "measure" << "," << "draw_0" << "\n";
+    }else{
+         outfile << "draw_0" << "\n";
+    }
     outfile.close();
 
 }

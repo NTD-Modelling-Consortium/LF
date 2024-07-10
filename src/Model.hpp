@@ -31,12 +31,13 @@ class Model {
 public:
 
     void runScenarios( ScenariosList& scenarios, Population& popln, Vector& vectors, Worm& worms, int replicates, 
-        double timestep, int index, int outputEndgame, int reduceImpViaXml, std::string randParamsfile, std::string RandomSeedFile, std::string opDir);
+        double timestep, int index, int outputEndgame, int outputEndgameDate, int reduceImpViaXml, int rseed, std::string randParamsfile, std::string RandomSeedFile, std::string opDir);
+
 protected:
     
     void burnIn(Population& popln, Vector& vectors, const Worm& worms, Output& currentOutput, PrevalenceEvent* pe);
     void evolveAndSave(int y, Population& popln, Vector& vectors, Worm& worms, Scenario& sc, Output& currentOutput, int rep,
-     std::vector<double>& k_vals, std::vector<double>& v_to_h_vals, int updateParams, int outputEndgame, int reduceImpViaXml, std::string opDir);
+     std::vector<double>& k_vals, std::vector<double>& v_to_h_vals, int updateParams, int outputEndgame, int outputEndgameDate, int reduceImpViaXml, std::string opDir);
     void getRandomParameters(int index, std::vector<double>& k_vals, std::vector<double>& v_to_h_vals, std::vector<double>& aImp_vals, std::vector<double>& wPropMDA, unsigned replicates, std::string fname);
     void getRandomParametersMultiplePerLine(int index, std::vector<double>& k_vals, std::vector<double>& v_to_h_vals, std::vector<double>& aImp_vals, std::vector<double>& wProp_vals, unsigned replicates, std::string fname);
     void readSeedsFromFile( std::vector<unsigned long int>& seeds, unsigned replicates, std::string fname);

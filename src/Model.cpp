@@ -28,7 +28,8 @@ extern Statistics stats;
 
 
 void Model::runScenarios(ScenariosList& scenarios, Population& popln, Vector& vectors, Worm& worms, int replicates, double timestep, 
-int index, int outputEndgame, int reduceImpViaXml, std::string randParamsfile, std::string RandomSeedFile, std::string opDir){
+int index, int outputEndgame, int outputEndgameDate, int reduceImpViaXml, std::string randParamsfile, std::string RandomSeedFile, std::string opDir){
+
 
     std::cout << std::endl << "Index " << index << " running " << scenarios.getName() << " with " << scenarios.getNumScenarios() << " scenarios" << std::endl;
     
@@ -119,7 +120,7 @@ int index, int outputEndgame, int reduceImpViaXml, std::string randParamsfile, s
           
             //evolve, saving any specified months along the way
             for (int y = 0; y < sc.getNumMonthsToSave(); y++)
-                evolveAndSave(y, popln, vectors, worms, sc, currentOutput, rep, k_vals, v_to_h_vals, popln.getUpdateParams(), outputEndgame, reduceImpViaXml, opDir);
+                evolveAndSave(y, popln, vectors, worms, sc, currentOutput, rep, k_vals, v_to_h_vals, popln.getUpdateParams(), outputEndgame, outputEndgameDate, reduceImpViaXml, opDir);
             
             //done for this scenario, save the prevalence values for this replicate
             if(!_DEBUG) sc.printResults(rep, currentOutput, popln);
@@ -168,9 +169,8 @@ void Model::burnIn(Population& popln, Vector& vectors, const Worm& worms, Output
 
 }
 
-
 void Model::evolveAndSave(int y, Population& popln, Vector& vectors, Worm& worms, Scenario& sc, Output& currentOutput, int rep,
-std::vector<double>& k_vals, std::vector<double>& v_to_h_vals, int updateParams, int outputEndgame, int reduceImpViaXml, std::string opDir){
+std::vector<double>& k_vals, std::vector<double>& v_to_h_vals, int updateParams, int outputEndgame, int outputEndgameDate, int reduceImpViaXml, std::string opDir){
 
     //advance to the next target month
     std::string folderName = opDir ;
@@ -189,7 +189,11 @@ std::vector<double>& k_vals, std::vector<double>& v_to_h_vals, int updateParams,
     popln.numTASSurveys = 0;
     popln.t_TAS_Pass = -1;
     int sampleSize = popln.getSampleSize();
-    double mfprev_aimp_old = popln.getMFPrev(sc, 0, 0, rep, popln.getPopSize(), folderName); 
+    // set the outputEndgameDate to be relative to year 2000. 
+    // This should be updated when we automatically get the baseYear of the simulations from the scenario file.
+    int BASEYEAR = 2000;
+    outputEndgameDate = (outputEndgameDate-BASEYEAR)*12;
+    double mfprev_aimp_old = popln.getMFPrev(sc, 0, 0, outputEndgameDate, rep, popln.getPopSize(), folderName); 
     double mfprev_aimp_new = 0;
     bool preTAS_Pass = 0;
     int changeSensSpec = 0;
@@ -241,7 +245,7 @@ std::vector<double>& k_vals, std::vector<double>& v_to_h_vals, int updateParams,
 
         paramIndex = t / 12;
         // if we are updating the k and v_to_h params, then do so if the time is right to do so
-        if ((updateParams) && (t%12 == 0) && (paramIndex <= (k_vals.size()-1))){
+        if ((updateParams) && (t%12 == 0) && (paramIndex <= (k_vals.size()-1)) && (t>= outputEndgameDate)){
             popln.updateKVal(k_vals[paramIndex]);
             vectors.updateVtoH(v_to_h_vals[paramIndex]);
         }
@@ -249,8 +253,9 @@ std::vector<double>& k_vals, std::vector<double>& v_to_h_vals, int updateParams,
         PrevalenceEvent* outputPrev = sc.prevalenceDue(t); //defines min age of host to include and method ic/mf
         MDAEvent* applyMDA = sc.treatmentDue(t);
         // at the beginning of every year we record the prevalence of the population, along with the number of people
-        // in each age group and the sequelae prevalence in each age group
-        if ((t % 12 == 0) && (outputEndgame == 1) ){
+        // in each age group and the sequelae prevalence in each age group. If it is earlier than the first year we want
+        // to do the endgame output for, then don't do this.
+        if ((t % 12 == 0) && (outputEndgame == 1) && (t >= outputEndgameDate)){
             sc.writePrevByAge(popln, t, rep, folderName);
             sc.writeRoadmapTarget(popln, t, rep, DoMDA, TAS_Pass, neededTASPass, folderName);
             sc.writeNumberByAge(popln, t, rep, folderName, "not survey");
@@ -259,11 +264,16 @@ std::vector<double>& k_vals, std::vector<double>& v_to_h_vals, int updateParams,
             sc.writeSurveyByAge(popln, t, preTAS_Pass, TAS_Pass, rep, folderName);
         }
 
-        if(((t+1)%12 == 0) && (outputEndgame == 1)){
+        // If we haven't done a survey this year we still want to output this fact for endgame. This is because
+        // the decision to do the survey is dynamic and may occur in some simulations but not in others.
+        // to make sure that outputs for different simulations will always have the same number of lines, we will output
+        // for each year, even if it is just a bunch of 0's.
+        // If it is earlier than the first year we want to do the endgame output for, then don't do this.
+        if(((t+1)%12 == 0) && (outputEndgame == 1) && (t >= outputEndgameDate)){
             
             if(donePreTAS == 0){
                 
-                int year = (t+1)/12 + 1999;
+                int year = (t+1)/12 + BASEYEAR - 1;
                 sc.writeEmptySurvey(year, maxAge, rep, "PreTAS survey", folderName);
                 sc.writeNumberByAge(popln, t, rep, folderName, "PreTAS survey");
             }
@@ -271,7 +281,7 @@ std::vector<double>& k_vals, std::vector<double>& v_to_h_vals, int updateParams,
 
             if(doneTAS == 0){
                 
-                int year = (t+1)/12 + 1999;
+                int year = (t+1)/12 + BASEYEAR - 1;
                 sc.writeEmptySurvey(year, maxAge, rep, "TAS survey", folderName);
                 sc.writeNumberByAge(popln, t, rep, folderName, "TAS survey");
             }
@@ -300,8 +310,8 @@ std::vector<double>& k_vals, std::vector<double>& v_to_h_vals, int updateParams,
         // snippet to perform a preTAS survey
         if(t == preTASSurveyTime){
 
-            preTAS_Pass = popln.PreTASSurvey(sc, outputEndgame , t, rep, folderName);
-            if(outputEndgame == 1){
+            preTAS_Pass = popln.PreTASSurvey(sc, outputEndgame , t, outputEndgameDate, rep, folderName);
+            if((outputEndgame == 1) && (t>= outputEndgameDate)){
                 sc.writeNumberByAge(popln, t, rep, folderName, "PreTAS survey");
             }
             
@@ -320,8 +330,8 @@ std::vector<double>& k_vals, std::vector<double>& v_to_h_vals, int updateParams,
         // snippet to perform a TAS survey
         
         if(t == TASSurveyTime){
-            int TAS_Pass_ind = popln.TASSurvey(sc, outputEndgame , t, rep, folderName);
-            if(outputEndgame == 1){
+            int TAS_Pass_ind = popln.TASSurvey(sc, t, outputEndgameDate, rep, folderName);
+            if((outputEndgame == 1) && (t >= outputEndgameDate)){
                 sc.writeNumberByAge(popln, t, rep, folderName, "TAS survey");
             }
             doneTAS = 1;
@@ -373,7 +383,7 @@ std::vector<double>& k_vals, std::vector<double>& v_to_h_vals, int updateParams,
 
             if(popln.totMDAs == 0){
                 if(popln.getNoMDALowMF() == 1){
-                    mfprev = popln.getMFPrev(sc, 0, t, rep, sampleSize, folderName);
+                    mfprev = popln.getMFPrev(sc, 0, t, outputEndgameDate, rep, sampleSize, folderName);
                     if(mfprev <= popln.MFThreshold){
                         DoMDA = 0;
                     }
@@ -384,11 +394,11 @@ std::vector<double>& k_vals, std::vector<double>& v_to_h_vals, int updateParams,
             // and reduce the importation inline with this decrease
 
             // this uses the whole population to get its value as it is used for an intrinsic property of the population
-            mfprev_aimp_old = popln.getMFPrev(sc, 0, t, rep, popln.getPopSize(), folderName); 
+            mfprev_aimp_old = popln.getMFPrev(sc, 0, t, outputEndgameDate, rep, popln.getPopSize(), folderName); 
 
             // apply the MDA. If DoMDA = 0, then we call this function, but don't do the MDA,
             // we just write to a file showing that no people were treated.
-            popln.ApplyTreatmentUpdated(applyMDA, worms, sc, t, rep, DoMDA, outputEndgame, folderName);
+            popln.ApplyTreatmentUpdated(applyMDA, worms, sc, t, outputEndgameDate, rep, DoMDA, outputEndgame, folderName);
             t_import_reduction = t + 6;
             
             popln.totMDAs += 1; 
@@ -409,11 +419,11 @@ std::vector<double>& k_vals, std::vector<double>& v_to_h_vals, int updateParams,
         if(reduceImpViaXml == 0){
             if(t == t_import_reduction){
 
-                mfprev_aimp_new = popln.getMFPrev(sc, 0, t, rep, popln.getPopSize(), folderName); 
+                mfprev_aimp_new = popln.getMFPrev(sc, 0, t, outputEndgameDate, rep, popln.getPopSize(), folderName); 
                 if (mfprev_aimp_old > mfprev_aimp_new){
                     popln.aImp = popln.aImp * mfprev_aimp_new / mfprev_aimp_old;
                 }
-                mfprev_aimp_old = popln.getMFPrev(sc, 0, t, rep, popln.getPopSize(), folderName);            
+                mfprev_aimp_old = popln.getMFPrev(sc, 0, t, outputEndgameDate, rep, popln.getPopSize(), folderName);            
 
             }
         }
@@ -585,6 +595,7 @@ void Model::getRandomParametersMultiplePerLine(int index, std::vector<double>& k
 
     ProcessLine(line, k_vals, v_to_h_vals, aImp_vals, wProp_vals);
 }
+
 
 
 void Model::readSeedsFromFile( std::vector<unsigned long int>& seeds, unsigned replicates, std::string fname){

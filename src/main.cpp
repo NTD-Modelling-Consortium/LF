@@ -23,15 +23,8 @@
  on nero
  
  
-<<<<<<< .mine
- 
- 
  g++ -I. -I./tinyxml -I/usr/include  -L/usr/lib64  -Wall -O3 -std=c++11  -lm -lgsl -lgslcblas main.cpp ScenariosList.cpp Scenario.cpp Population.cpp Host.cpp Model.cpp Output.cpp Vector.cpp Worm.cpp Statistics.cpp MDAEvent.cpp BedNetEvent.cpp PrevalenceEvent.cpp ImportationRateEvent.cpp RecordedPrevalence.cpp tinyxml/tinystr.cpp tinyxml/tinyxmlparser.cpp tinyxml/tinyxmlerror.cpp tinyxml/tinyxml.cpp -o transfil
-||||||| .r19
- g++ -I. -I./tinyxml -I/usr/include  -L/usr/lib64  -Wall -O3 -std=c++11  -lm -lgsl -lgslcblas main.cpp ScenariosList.cpp Scenario.cpp Population.cpp Host.cpp Model.cpp Output.cpp Vector.cpp Worm.cpp Statistics.cpp MDAEvent.cpp BedNetEvent.cpp PrevalenceEvent.cpp ImportationRateEvent.cpp tinyxml/tinystr.cpp tinyxml/tinyxmlparser.cpp tinyxml/tinyxmlerror.cpp tinyxml/tinyxml.cpp -o transfil
-=======
- g++ -I. -I./tinyxml -I/usr/include  -L/usr/lib64  -Wall -O3 -std=c++11  -lm -lgsl -lgslcblas main.cpp ScenariosList.cpp Scenario.cpp Population.cpp Host.cpp Model.cpp Output.cpp Vector.cpp Worm.cpp Statistics.cpp MDAEvent.cpp BedNetEvent.cpp PrevalenceEvent.cpp ImportationRateEvent.cpp RecordedPrevalence.cpp tinyxml/tinystr.cpp tinyxml/tinyxmlparser.cpp tinyxml/tinyxmlerror.cpp tinyxml/tinyxml.cpp -o transfil
->>>>>>> .r26
+
 
  */
 
@@ -43,7 +36,7 @@ int main(int argc, char **argv) {
     
     if (argc < 2){
 
-        std::cout << "transfil index -s <scenarios_file> -n <pop_file> -p <random_parameters_file> -r <replicates=1000> -t <timestep=1> -o <output_directory=\"./\"> -g <random_seed=1> -e <output_endgame=1> -x <reduce_imp_via-xml=0>"  << std::endl;
+        std::cout << "transfil index -s <scenarios_file> -n <pop_file> -p <random_parameters_file> -r <replicates=1000> -t <timestep=1> -o <output_directory=\"./\"> -g <random_seed=1> -e <output_endgame=1> -x <reduce_imp_via-xml=0> -D <outputEndgameDate=2000>"   << std::endl;
         return 1;
     }
    
@@ -63,6 +56,7 @@ int main(int argc, char **argv) {
     // and whether the reduction in importation rate should be done via the 
     // xml file rather than impact of MDA on the prevalence
     int outputEndgame = 1;
+    int outputEndgameDate = 2000;
     int reduceImpViaXml = 0;
     
     int index = 0;
@@ -97,6 +91,8 @@ int main(int argc, char **argv) {
             RandomSeedFile = argv[i+1];
         else if (!strcmp(argv[i],  "-e"))
             outputEndgame = atoi(argv[i+1]);
+        else if (!strcmp(argv[i],  "-D"))
+            outputEndgameDate = atoi(argv[i+1]);
         else if (!strcmp(argv[i],  "-x"))
             reduceImpViaXml = atoi(argv[i+1]);
         else{   
@@ -180,7 +176,7 @@ int main(int argc, char **argv) {
     
     //Run
     Model model;
-    model.runScenarios(Scenarios, hostPopulation, vectors, worms, replicates, dt, index, outputEndgame, reduceImpViaXml, randParamsfile, RandomSeedFile, opDir);
+    model.runScenarios(Scenarios, hostPopulation, vectors, worms, replicates, dt, index, outputEndgame,outputEndgameDate, reduceImpViaXml, randParamsfile, RandomSeedFile, opDir);
 
     
     gettimeofday(&tv2, NULL);
