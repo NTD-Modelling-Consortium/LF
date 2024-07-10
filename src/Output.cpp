@@ -267,6 +267,15 @@ void Output::saveRandomValues(std::vector<double> vals){
 }
 
 
+void Output::saveSeedValue(unsigned long int vals){
+    
+    //Values corresponding to names passed to above
+    
+    seedValue = vals;
+    
+}
+
+
 int Output::getNumRandomVars(){
     
     //used for indenting results spreadsheet by right number of cols
@@ -289,6 +298,12 @@ void Output::clearRandomValues(){
 double  Output::getRandomVarValues(int idx){
     
     return randomVarValues[idx];
+    
+}
+
+unsigned long int  Output::getSeedValue(){
+    
+    return seedValue;
     
 }
 

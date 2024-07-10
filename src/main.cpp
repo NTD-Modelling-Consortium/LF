@@ -23,15 +23,8 @@
  on nero
  
  
-<<<<<<< .mine
- 
- 
  g++ -I. -I./tinyxml -I/usr/include  -L/usr/lib64  -Wall -O3 -std=c++11  -lm -lgsl -lgslcblas main.cpp ScenariosList.cpp Scenario.cpp Population.cpp Host.cpp Model.cpp Output.cpp Vector.cpp Worm.cpp Statistics.cpp MDAEvent.cpp BedNetEvent.cpp PrevalenceEvent.cpp ImportationRateEvent.cpp RecordedPrevalence.cpp tinyxml/tinystr.cpp tinyxml/tinyxmlparser.cpp tinyxml/tinyxmlerror.cpp tinyxml/tinyxml.cpp -o transfil
-||||||| .r19
- g++ -I. -I./tinyxml -I/usr/include  -L/usr/lib64  -Wall -O3 -std=c++11  -lm -lgsl -lgslcblas main.cpp ScenariosList.cpp Scenario.cpp Population.cpp Host.cpp Model.cpp Output.cpp Vector.cpp Worm.cpp Statistics.cpp MDAEvent.cpp BedNetEvent.cpp PrevalenceEvent.cpp ImportationRateEvent.cpp tinyxml/tinystr.cpp tinyxml/tinyxmlparser.cpp tinyxml/tinyxmlerror.cpp tinyxml/tinyxml.cpp -o transfil
-=======
- g++ -I. -I./tinyxml -I/usr/include  -L/usr/lib64  -Wall -O3 -std=c++11  -lm -lgsl -lgslcblas main.cpp ScenariosList.cpp Scenario.cpp Population.cpp Host.cpp Model.cpp Output.cpp Vector.cpp Worm.cpp Statistics.cpp MDAEvent.cpp BedNetEvent.cpp PrevalenceEvent.cpp ImportationRateEvent.cpp RecordedPrevalence.cpp tinyxml/tinystr.cpp tinyxml/tinyxmlparser.cpp tinyxml/tinyxmlerror.cpp tinyxml/tinyxml.cpp -o transfil
->>>>>>> .r26
+
 
  */
 
@@ -57,11 +50,11 @@ int main(int argc, char **argv) {
     std::string randParamsfile("");
     std::string scenariosFile("");
     std::string opDir("");
+    std::string RandomSeedFile("");
 
     // initialize random seed value, whether the endgame output will be done
     // and whether the reduction in importation rate should be done via the 
     // xml file rather than impact of MDA on the prevalence
-    int rseed = -1;
     int outputEndgame = 1;
     int outputEndgameDate = 2000;
     int reduceImpViaXml = 0;
@@ -95,7 +88,7 @@ int main(int argc, char **argv) {
         else if (!strcmp(argv[i],  "-o"))
             opDir = argv[i+1];
         else if (!strcmp(argv[i],  "-g"))
-            rseed = atoi(argv[i+1]);
+            RandomSeedFile = argv[i+1];
         else if (!strcmp(argv[i],  "-e"))
             outputEndgame = atoi(argv[i+1]);
         else if (!strcmp(argv[i],  "-D"))
@@ -183,7 +176,7 @@ int main(int argc, char **argv) {
     
     //Run
     Model model;
-    model.runScenarios(Scenarios, hostPopulation, vectors, worms, replicates, dt, index, outputEndgame, outputEndgameDate, reduceImpViaXml, rseed, randParamsfile, opDir);
+    model.runScenarios(Scenarios, hostPopulation, vectors, worms, replicates, dt, index, outputEndgame,outputEndgameDate, reduceImpViaXml, randParamsfile, RandomSeedFile, opDir);
 
     
     gettimeofday(&tv2, NULL);

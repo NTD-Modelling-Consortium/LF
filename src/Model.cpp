@@ -28,13 +28,16 @@ extern Statistics stats;
 
 
 void Model::runScenarios(ScenariosList& scenarios, Population& popln, Vector& vectors, Worm& worms, int replicates, double timestep, 
-int index, int outputEndgame, int outputEndgameDate, int reduceImpViaXml, int rseed, std::string randParamsfile, std::string opDir){
+int index, int outputEndgame, int outputEndgameDate, int reduceImpViaXml, std::string randParamsfile, std::string RandomSeedFile, std::string opDir){
+
 
     std::cout << std::endl << "Index " << index << " running " << scenarios.getName() << " with " << scenarios.getNumScenarios() << " scenarios" << std::endl;
+    
     std::cout << std::unitbuf;
     std::cout << "Progress:  0%";
     
     Output currentOutput(scenarios.getBaseYear());
+    currentOutput.saveRandomNames(printSeedName());
     currentOutput.saveRandomNames(popln.printRandomVariableNames());
     currentOutput.saveRandomNames(vectors.printRandomVariableNames()); //names of random vars to be printed
     currentOutput.saveRandomNames(worms.printRandomVariableNames());
@@ -44,23 +47,25 @@ int index, int outputEndgame, int outputEndgameDate, int reduceImpViaXml, int rs
     scenarios.openFilesandPrintHeadings(index, currentOutput);
     
     
-    //Temporary fix. Read file containing random values for v_to_h, aImp and k
-    //bool updateParams = true;
-    //bool updateParams = false;
+    
     std::vector<double> k_vals;
     std::vector<double> v_to_h_vals;
     std::vector<double> aImp_vals;
     std::vector<double> wPropMDA;
-    
-    //getRandomParameters(index, k_vals, v_to_h_vals, aImp_vals, wPropMDA, unsigned(replicates), randParamsfile);
+    std::vector<unsigned long int> seeds;
+    // we read in the entries of the random seed file. a different value will be used for each set of parameters
+    readSeedsFromFile(seeds, unsigned (replicates), RandomSeedFile);
     
     for (int rep = 0; rep < replicates; rep++){
-        // Set the seed for the random number generator. If no seed is input, then rseed will still be -1 from
-    // initialization. In this case, we set a random seed. Else we set the seed to be what is input.
-        if(rseed == -1){
-            stats.set_seed((unsigned)std::chrono::system_clock::now().time_since_epoch().count());
+        // Read the seed from the seeds vector if it has been generated
+        // othewise we set a random seed
+        unsigned long int rseed;
+        if(seeds.size() >  0){
+            rseed = seeds[rep];
+            stats.set_seed(rseed);
         }else{
-            stats.set_seed(rseed + rep);
+            rseed = std::chrono::system_clock::now().time_since_epoch().count();
+            stats.set_seed(rseed);
         }
         getRandomParametersMultiplePerLine(rep+1, k_vals, v_to_h_vals, aImp_vals, wPropMDA, unsigned (replicates), randParamsfile) ;
         currentMonth = 0;
@@ -86,10 +91,11 @@ int index, int outputEndgame, int outputEndgameDate, int reduceImpViaXml, int rs
         //save these values for printing later
         currentOutput.clearRandomValues();
         //MUST be cvalled i nsame order as saveRandomNames above
+        currentOutput.saveSeedValue(rseed);
         currentOutput.saveRandomValues(popln.printRandomVariableValues());
         currentOutput.saveRandomValues(vectors.printRandomVariableValues());
         currentOutput.saveRandomValues(worms.printRandomVariableValues());
-        
+
         //baseline prevalence
         PrevalenceEvent pe = PrevalenceEvent(popln.getMinAgePrev(), scenarios.getExtraMinAge(), scenarios.getExtraMaxAge(), scenarios.getOutputtMethod());  //default age range and method to output at end of burn in
         burnIn(popln, vectors, worms, currentOutput, &pe);                    //should be at least 100 years
@@ -163,11 +169,8 @@ void Model::burnIn(Population& popln, Vector& vectors, const Worm& worms, Output
 
 }
 
-
-
 void Model::evolveAndSave(int y, Population& popln, Vector& vectors, Worm& worms, Scenario& sc, Output& currentOutput, int rep,
 std::vector<double>& k_vals, std::vector<double>& v_to_h_vals, int updateParams, int outputEndgame, int outputEndgameDate, int reduceImpViaXml, std::string opDir){
-
 
     //advance to the next target month
     std::string folderName = opDir ;
@@ -592,3 +595,46 @@ void Model::getRandomParametersMultiplePerLine(int index, std::vector<double>& k
 
     ProcessLine(line, k_vals, v_to_h_vals, aImp_vals, wProp_vals);
 }
+
+
+
+void Model::readSeedsFromFile( std::vector<unsigned long int>& seeds, unsigned replicates, std::string fname){
+    // We retrieve the random seeds from the input seed file. The line on which the
+    // seed is on will correspond to the set of parameters on the same line of the 
+    // input parameters file.
+    // If there is no seed file input we don't do anything and will later set the seed randomly.
+    if (fname.length() > 0){
+        std::ifstream infile(fname, std::ios_base::in);
+        unsigned long int seed;
+        if(!infile.is_open()){
+            std::cout << "Error in getting seeds. Cannot read file " << fname << std::endl;
+            exit(1);
+        }
+        std::string line;
+        while (getline(infile, line)){
+            std::istringstream linestream(line);
+            linestream >> seed;
+            seeds.push_back(seed);   
+        }
+        // if we haven't input enough seeds based on how many runs we want to make
+        // then we will abort the run as at some point we will run out of seeds and the simulations will crash.
+        if(seeds.size() < replicates){
+            std::cout << "Error in Model::runScenarios. " << fname << " is too short for " << replicates << " replicates" << std::endl;
+            exit(1);
+            
+        }
+        infile.close();   
+    }
+}
+
+
+
+std::vector<std::string> Model::printSeedName() const {
+    
+    //outputs "seed" as a column title for fitting output file
+    
+    std::vector<std::string> names = {"seed"};
+    return names;
+    
+}
+

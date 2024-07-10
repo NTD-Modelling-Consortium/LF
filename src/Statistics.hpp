@@ -12,6 +12,7 @@
 #include <cmath>
 #include <chrono>
 #include <algorithm>
+#include <vector>
 
 // Container class for gsl random number functions required by many other classes
 class Statistics {
