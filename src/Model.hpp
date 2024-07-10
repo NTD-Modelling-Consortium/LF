@@ -31,7 +31,7 @@ class Model {
 public:
 
     void runScenarios( ScenariosList& scenarios, Population& popln, Vector& vectors, Worm& worms, int replicates, 
-        double timestep, int index, int outputEndgame, int outputEndgameDate, int reduceImpViaXml, int rseed, std::string randParamsfile, std::string RandomSeedFile, std::string opDir);
+        double timestep, int index, int outputEndgame, int outputEndgameDate, int reduceImpViaXml, std::string randParamsfile, std::string RandomSeedFile, std::string opDir);
 
 protected:
     
