@@ -51,6 +51,10 @@ output/*
 lf-run-*.txt
 nohup.out
 
+# c++ output files
+*.o
+*.d
+
 # Cmake
 *.cmake
 **/CMakeCache.txt
