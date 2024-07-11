@@ -16,3 +16,19 @@ jobs:
             pipx install clang-format
       - name: Run clang-format h, cpp and hpp files
         run: find . -iname '*.h' -o -iname '*.cpp' -o -iname '*.hpp' | xargs clang-format --dry-run -Werror
+      - name: Build
+        run: |
+          cd src
+          g++ \
+          *.cpp tinyxml/*.cpp \
+          -o transfil_N \
+          -g -I. -I./tinyxml \
+          $(gsl-config --libs) \
+          $(gsl-config --cflags) \
+          -lstdc++fs \
+          -Wall -O3 -std=c++17
+      - name: Run test
+        run: |
+          cd src
+          mkdir ../sample_results
+          ./transfil\_N -s ../sample_inputs/scenario.xml -n ../sample_inputs/population_distribution.csv -p ../sample_inputs/random_parameters.txt -r 2 -t 1 -o ../sample_results
