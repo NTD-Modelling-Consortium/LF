@@ -1,4 +1,4 @@
-name: Run clang-format-18
+name: clang-format, build and run
 on: [push]
 jobs:
   Explore-GitHub-Actions:
