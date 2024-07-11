@@ -50,3 +50,10 @@ vignettes/*.pdf
 output/*
 lf-run-*.txt
 nohup.out
+
+# Cmake
+*.cmake
+**/CMakeCache.txt
+**/CMakeFiles/*
+Makefile
+*.a
