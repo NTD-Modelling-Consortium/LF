@@ -11,9 +11,8 @@ jobs:
       - name: Install clang-format-18
         run: |
             sudo apt update
-            wget https://apt.llvm.org/llvm.sh
-            chmod +x llvm.sh
-            sudo ./llvm.sh 18
-            sudo apt install clang-format-18
+            sudo apt install pipx
+            pipx ensurepath
+            pipx install clang-format
       - name: Run clang-format h, cpp and hpp files
-        run: find . -iname '*.h' -o -iname '*.cpp' -o -iname '*.hpp' | xargs clang-format-18 --dry-run -Werror
+        run: find . -iname '*.h' -o -iname '*.cpp' -o -iname '*.hpp' | xargs clang-format --dry-run -Werror

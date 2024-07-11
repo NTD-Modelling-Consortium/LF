@@ -64,26 +64,24 @@ The gsl calls will need to be changed to where gsl library is installed on your 
 
 ### File formatting
 
-This repository uses clang-format-18 to format files and this is checked on each pull request. Ideally, files should be formatted before each commit.
+This repository uses clang-format 18 to format files and this is checked on each pull request. Ideally, files should be formatted before each commit.
 
-#### Download clang-format 18
+#### Install clang-format 18
 
-MacOS: `brew install clang-format` At the time of writing, brew defaults to clang-format-18.
+Use `pipx` to install clang-format. [Install `pipx`](https://pipx.pypa.io/latest/installation/) if you need to.
 
-Linux: Run
 ```
-sudo apt update
-wget https://apt.llvm.org/llvm.sh
-chmod +x llvm.sh
-sudo ./llvm.sh 18
-sudo apt install clang-format-18
+pipx install clang-format
 ```
 
-Windows: `choco install llvm` At the time of writing, chocolatey defaults to clang-format-18.
+then follow any instructions about adding it to your path. Restart your shell, then check that is version is 18 by running 
+```
+clang-format --version
+```
+
+You can also use other package managers for your OS, such as `brew`, `choco` or by installing `LLVM` and using the `clang-format` packaged with it, but ensure that clang-format is version 18.
 
 #### Running clang-format
-
-Note that on Linux, as installed above, `clang-format` should be replaced with `clang-format-18`
 
 To run clang-format on a single file and update the file with changes:
 ```
