@@ -6,23 +6,14 @@
 //  Copyright © 2018 Paul Brown. All rights reserved.
 //
 
-
 #include "ImportationRateEvent.hpp"
 
+bool ImportationRateEvent::sort(const ImportationRateEvent &lhs,
+                                const ImportationRateEvent &rhs) {
 
-
-bool ImportationRateEvent::sort(const ImportationRateEvent& lhs, const ImportationRateEvent& rhs) {
-    
-    return (lhs.getMonth() < rhs.getMonth());
-    
+  return (lhs.getMonth() < rhs.getMonth());
 }
 
-int ImportationRateEvent::getMonth() const {
-    
-    return month;
-}
+int ImportationRateEvent::getMonth() const { return month; }
 
-double ImportationRateEvent::getFactor() const {
-    
-    return factor;
-}
+double ImportationRateEvent::getFactor() const { return factor; }

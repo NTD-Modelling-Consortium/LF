@@ -8,33 +8,15 @@
 
 #include "BedNetEvent.hpp"
 
+int BedNetEvent::getMonth() const { return startMonth; }
 
-int BedNetEvent::getMonth() const {
-    
-    return startMonth;
-    
-}
+double BedNetEvent::getCoverage() const { return coverage; }
 
-double BedNetEvent::getCoverage() const {
-    
-    return coverage;
-    
-}
+double BedNetEvent::getSysComp() const { return sysComp; }
 
-double BedNetEvent::getSysComp() const {
-    
-    return sysComp;
-    
-}
+double BedNetEvent::getSigma2() const { return sysComp / (1 - sysComp); }
 
-double BedNetEvent::getSigma2() const {
-    
-    return sysComp/(1-sysComp);
-    
-}
+bool BedNetEvent::sort(const BedNetEvent &lhs, const BedNetEvent &rhs) {
 
-bool BedNetEvent::sort(const BedNetEvent& lhs, const BedNetEvent& rhs) {
-    
-    return (lhs.getMonth() < rhs.getMonth());
-    
+  return (lhs.getMonth() < rhs.getMonth());
 }

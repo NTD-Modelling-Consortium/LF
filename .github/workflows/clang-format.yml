@@ -1,0 +1,18 @@
+name: Run clang-format-18
+on: [push]
+jobs:
+  Explore-GitHub-Actions:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository code
+        uses: actions/checkout@v4
+      - run: echo "💡 The ${{ github.repository }} repository has been cloned to the runner."
+      - run: echo "🖥️ The workflow is now ready to test your code on the runner."
+      - name: Install clang-format-18
+        run: |
+            sudo apt update
+            sudo apt install pipx
+            pipx ensurepath
+            pipx install clang-format
+      - name: Run clang-format h, cpp and hpp files
+        run: find . -iname '*.h' -o -iname '*.cpp' -o -iname '*.hpp' | xargs clang-format --dry-run -Werror
