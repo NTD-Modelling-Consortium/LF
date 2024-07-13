@@ -30,7 +30,7 @@ function run_ID () {
 		-o "${RESULTS}" \
 		-n ./Pop_Distribution.csv \
 		-r "${NUM_SIMULATIONS}" \
-        -D "${STARTING_YEAR}"
+		-D "${STARTING_YEAR}"
 
 	echo "== combining output files for IHME & NTDMC using output folder ${output_folder_name}"
 	( time do_file_combinations "${id}" "${output_folder_name}" "${RESULTS}" ) 2>&1
