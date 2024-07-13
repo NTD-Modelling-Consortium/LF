@@ -152,7 +152,7 @@ select CHOICE in yes no ; do
 					PARAMETER_ROOT="${PARAMETER_ROOT}" \
 					RESULTS_ROOT="${RESULTS_ROOT}" \
 					OUTPUT_ROOT="${OUTPUT_ROOT}" \
-                    STARTING_YEAR="${STARTING_YEAR}" \
+					STARTING_YEAR="${STARTING_YEAR}" \
 				bash run-in-parallel.bash "${OUTPUT_ROOT}/${OUTPUT_SUBDIRECTORY}" \
 					2>&1 \
 					> "${PROJECT_ROOT_DIR}/${LOG_FILE}" \
