@@ -17,7 +17,7 @@ function run_ID () {
 	PARAMS="${PARAMETER_ROOT}/RandomParamIU${id}.txt"
 	SCENARIO="${SCENARIO_ROOT}/scenariosNoImp${id}.xml"
 	RESULTS="${RESULTS_ROOT}/${id}"
-    STARTING_YEAR="${STARTING_YEAR:=2020}"
+	STARTING_YEAR="${STARTING_YEAR:=2020}"
 
 	echo "== making result directory ${RESULTS} for ID ${id}"
 
