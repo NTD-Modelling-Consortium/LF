@@ -9,30 +9,23 @@
 #ifndef ImportationRateEvent_hpp
 #define ImportationRateEvent_hpp
 
-
 class ImportationRateEvent {
-    
-    //A list of these represents all the months to outupt prevalance
-    
-public:
-    
-    
-    ImportationRateEvent(): month(0), factor(1.0) {};
-    ImportationRateEvent(int m, double f): month(m), factor(f) {};
-    
-    int getMonth() const;
-    double getFactor() const;
-    
-    static bool sort(const ImportationRateEvent& lhs, const ImportationRateEvent& rhs);
-    
-    
-private:
-    
-    int month;
-    double factor;
-    
-    
-};
 
+  // A list of these represents all the months to outupt prevalance
+
+public:
+  ImportationRateEvent() : month(0), factor(1.0) {};
+  ImportationRateEvent(int m, double f) : month(m), factor(f) {};
+
+  int getMonth() const;
+  double getFactor() const;
+
+  static bool sort(const ImportationRateEvent &lhs,
+                   const ImportationRateEvent &rhs);
+
+private:
+  int month;
+  double factor;
+};
 
 #endif /* ImportationRateEvent_hpp */
