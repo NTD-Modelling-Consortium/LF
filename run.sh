@@ -16,7 +16,7 @@ function error () {
 }
 
 function usage () {
-	error "usage: ${0} [-n <num-simulations>] [-f <running-id-list-file>] [-o <output-subdirectory>] [-j <num-parallel-jobs>] [-s <scenarios- dir>] [-p <parameters-dir>] [-r <results-dir>] [-O <output-dir>]"
+	error "usage: ${0} [-n <num-simulations>] [-f <running-id-list-file>] [-o <output-subdirectory>] [-j <num-parallel-jobs>] [-s <scenarios- dir>] [-p <parameters-dir>] [-r <results-dir>] [-O <output-dir>] [-Y <starting-year(default 2020)>]"
 	exit 1
 }
 
