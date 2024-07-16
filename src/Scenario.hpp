@@ -178,7 +178,7 @@ public:
   void writeSequelaeByAge(Population &popln, int t, int LymphodemaTotalWorms,
                           double LymphodemaShape, int HydroceleTotalWorms,
                           double HydroceleShape, int rep, std::string folder);
-  void writeMDADataAllTreated(int t, int *numTreat, int maxAge, int rep,
+  void writeMDADataAllTreated(int t, int *numTreat, int* numHosts, int maxAge, int rep,
                               std::string type, std::string folder);
   void writePreTAS(int t, int *numSurvey, int maxAge, int rep,
                    std::string folderName);
@@ -220,3 +220,4 @@ protected:
 };
 
 #endif /* Scenario_hpp */
+

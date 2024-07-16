@@ -812,7 +812,7 @@ void Scenario::InitNTDMCData(int rep, std::string folder) {
   outfile.close();
 }
 
-void Scenario::writeMDADataAllTreated(int t, int *numTreat, int maxAge, int rep,
+void Scenario::writeMDADataAllTreated(int t, int *numTreat, int *numHosts, int maxAge, int rep,
                                       std::string type, std::string folder) {
 
   std::ofstream outfile;
@@ -839,6 +839,18 @@ void Scenario::writeMDADataAllTreated(int t, int *numTreat, int maxAge, int rep,
   } else {
     for (int j = 0; j < maxAge; j++) {
       outfile << numTreat[j] << "\n";
+    }
+  }
+
+  if (rep == 0) {
+    for (int j = 0; j < maxAge; j++) {
+      outfile << name << "," << year << "," << j << "," << j + 1 << "," 
+              << "MDA (" << type << ") number," << numHosts[j] << "\n";
+              
+    }
+  } else {
+    for (int j = 0; j < maxAge; j++) {
+      outfile << numHosts[j] << "\n";
     }
   }
 
@@ -987,3 +999,4 @@ std::string Scenario::getName() {
   std::string fol_n = name.substr(0, first_);
   return fol_n;
 }
+
