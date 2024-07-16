@@ -812,7 +812,9 @@ void Scenario::InitNTDMCData(int rep, std::string folder) {
   outfile.close();
 }
 
-void Scenario::writeMDADataAllTreated(int t, int *numTreat, int *numHosts,
+void Scenario::writeMDADataAllTreated(int t,
+                                      const std::vector<int> &numTreatedByAge,
+                                      const std::vector<int> &numHostsByAge,
                                       int maxAge, int rep, std::string type,
                                       std::string folder) {
 
@@ -838,11 +840,11 @@ void Scenario::writeMDADataAllTreated(int t, int *numTreat, int *numHosts,
   if (rep == 0) {
     for (int j = 0; j < maxAge; j++) {
       outfile << name << "," << year << "," << j << "," << j + 1 << ","
-              << "MDA (" << type << ")," << numTreat[j] << "\n";
+              << "MDA (" << type << ")," << numTreatedByAge[j] << "\n";
     }
   } else {
     for (int j = 0; j < maxAge; j++) {
-      outfile << numTreat[j] << "\n";
+      outfile << numTreatedByAge[j] << "\n";
     }
   }
 
@@ -851,11 +853,11 @@ void Scenario::writeMDADataAllTreated(int t, int *numTreat, int *numHosts,
   if (rep == 0) {
     for (int j = 0; j < maxAge; j++) {
       outfile << name << "," << year << "," << j << "," << j + 1 << ","
-              << "MDA (" << type << ") number," << numHosts[j] << "\n";
+              << "MDA (" << type << ") number," << numHostsByAge[j] << "\n";
     }
   } else {
     for (int j = 0; j < maxAge; j++) {
-      outfile << numHosts[j] << "\n";
+      outfile << numHostsByAge[j] << "\n";
     }
   }
 

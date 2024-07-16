@@ -1219,33 +1219,29 @@ void Population::ApplyTreatmentUpdated(MDAEvent *mda, Worm &worms, Scenario &sc,
     return;
   }
 
-  int numTreat[maxAge];
-  int numHosts[maxAge];
-  for (int i = 0; i < maxAge; ++i) {
-    numTreat[i] = 0;
-    numHosts[i] = 0;
-  }
+  std::vector<int> numTreatedByAge(maxAge, 0);
+  std::vector<int> numHostsByAge(maxAge, 0);
 
   std::string MDAtype = mda->getType();
 
   for (int i = 0; i < size; i++) {
     float flooredAge = std::floor(host_pop[i].age / 12);
     int flooredAgeInt = std::min(static_cast<int>(flooredAge), maxAge - 1);
-    numHosts[flooredAgeInt] += 1;
+    numHostsByAge[flooredAgeInt] += 1;
     if (DoMDA == 1) {
       if (host_pop[i].age >= minAgeMDAinMonths) {
         if (stats.uniform_dist() < host_pop[i].pTreat) {
           if (host_pop[i].neverTreat == 0) {
             host_pop[i].getsTreated(worms, MDAtype);
-            numTreat[flooredAgeInt] += 1;
+            numTreatedByAge[flooredAgeInt] += 1;
           }
         }
       }
     }
   }
   if ((outputEndgame == 1) && (t >= outputEndgameDate))
-    sc.writeMDADataAllTreated(t, numTreat, numHosts, maxAge, rep, MDAtype,
-                              folderName);
+    sc.writeMDADataAllTreated(t, numTreatedByAge, numHostsByAge, maxAge, rep,
+                              MDAtype, folderName);
 }
 
 double Population::getBedNetCoverage() const {
