@@ -818,6 +818,8 @@ void Scenario::writeMDADataAllTreated(int t,
                                       int maxAge, int rep, std::string type,
                                       std::string folder) {
 
+  assert(numHostsByAge.size() == maxAge);
+  assert(numTreatedByAge.size() == maxAge);
   std::ofstream outfile;
   std::string fname;
   std::string rep1 = std::to_string(rep);
