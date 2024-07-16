@@ -6,13 +6,13 @@
 //  Copyright © 2017 Paul Brown. All rights reserved.
 //
 
-#include "Scenario.hpp"
 #include "Output.hpp"
+#include "Scenario.hpp"
+#include <cassert>
 #include <filesystem>
 #include <sstream>
 #include <string>
 #include <sys/stat.h>
-#include <cassert>
 #ifdef __APPLE__
 namespace fs = std::__fs::filesystem;
 #else
