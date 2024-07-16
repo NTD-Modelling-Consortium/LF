@@ -812,9 +812,14 @@ void Scenario::InitNTDMCData(int rep, std::string folder) {
   outfile.close();
 }
 
-void Scenario::writeMDADataAllTreated(int t, int *numTreat, int maxAge, int rep,
-                                      std::string type, std::string folder) {
+void Scenario::writeMDADataAllTreated(int t,
+                                      const std::vector<int> &numTreatedByAge,
+                                      const std::vector<int> &numHostsByAge,
+                                      int maxAge, int rep, std::string type,
+                                      std::string folder) {
 
+  assert(numHostsByAge.size() == maxAge);
+  assert(numTreatedByAge.size() == maxAge);
   std::ofstream outfile;
   std::string fname;
   std::string rep1 = std::to_string(rep);
@@ -831,14 +836,30 @@ void Scenario::writeMDADataAllTreated(int t, int *numTreat, int maxAge, int rep,
               << std::endl;
     return; // Or handle the error appropriately
   }
+
+  // we output the number of people who were given doses of drugs, so we can
+  // keep track of the distribution across age groups and costs
   if (rep == 0) {
     for (int j = 0; j < maxAge; j++) {
       outfile << name << "," << year << "," << j << "," << j + 1 << ","
-              << "MDA (" << type << ")," << numTreat[j] << "\n";
+              << "MDA (" << type << ")," << numTreatedByAge[j] << "\n";
     }
   } else {
     for (int j = 0; j < maxAge; j++) {
-      outfile << numTreat[j] << "\n";
+      outfile << numTreatedByAge[j] << "\n";
+    }
+  }
+
+  // we also want to output the number of people in each age group so that
+  // coverages can be calculated in post-processing
+  if (rep == 0) {
+    for (int j = 0; j < maxAge; j++) {
+      outfile << name << "," << year << "," << j << "," << j + 1 << ","
+              << "MDA (" << type << ") number," << numHostsByAge[j] << "\n";
+    }
+  } else {
+    for (int j = 0; j < maxAge; j++) {
+      outfile << numHostsByAge[j] << "\n";
     }
   }
 
