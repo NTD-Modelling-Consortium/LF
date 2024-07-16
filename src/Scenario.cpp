@@ -832,6 +832,9 @@ void Scenario::writeMDADataAllTreated(int t, int *numTreat, int *numHosts,
               << std::endl;
     return; // Or handle the error appropriately
   }
+
+  // we output the number of people who were given doses of drugs, so we can
+  // keep track of the distribution across age groups and costs
   if (rep == 0) {
     for (int j = 0; j < maxAge; j++) {
       outfile << name << "," << year << "," << j << "," << j + 1 << ","
@@ -843,6 +846,8 @@ void Scenario::writeMDADataAllTreated(int t, int *numTreat, int *numHosts,
     }
   }
 
+  // we also want to output the number of people in each age group so that
+  // coverages can be calculated in post-processing
   if (rep == 0) {
     for (int j = 0; j < maxAge; j++) {
       outfile << name << "," << year << "," << j << "," << j + 1 << ","
