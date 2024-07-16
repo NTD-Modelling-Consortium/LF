@@ -12,6 +12,7 @@
 #include <sstream>
 #include <string>
 #include <sys/stat.h>
+#include <cassert>
 #ifdef __APPLE__
 namespace fs = std::__fs::filesystem;
 #else
