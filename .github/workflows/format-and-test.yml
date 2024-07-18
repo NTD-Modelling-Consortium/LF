@@ -31,4 +31,4 @@ jobs:
         run: |
           cd src
           mkdir ../sample_results
-          ./transfil\_N -s ../sample_inputs/scenario.xml -n ../sample_inputs/population_distribution.csv -p ../sample_inputs/random_parameters.txt -r 2 -t 1 -o ../sample_results
+          ./transfil\_N -s ../sample_inputs/scenario.xml -n ../sample_inputs/population_distribution.csv -p ../sample_inputs/random_parameters.txt -g ../sample_inputs/random_seeds.txt -r 2 -t 1 -o ../sample_results
