@@ -6,18 +6,14 @@
 //  Copyright © 2017 Paul Brown. All rights reserved.
 //
 
-#include "Output.hpp"
 #include "Scenario.hpp"
+#include "Output.hpp"
 #include <cassert>
-#include <filesystem>
+#include <experimental/filesystem>
 #include <sstream>
 #include <string>
 #include <sys/stat.h>
-#ifdef __APPLE__
-namespace fs = std::__fs::filesystem;
-#else
-namespace fs = std::filesystem;
-#endif
+namespace fs = std::experimental::filesystem;
 
 bool IsPathExist(const std::string &s) {
   struct stat buffer;
