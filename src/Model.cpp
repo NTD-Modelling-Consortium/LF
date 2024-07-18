@@ -215,8 +215,8 @@ void Model::evolveAndSave(int y, Population &popln, Vector &vectors,
   int BASEYEAR = 2000;
   outputEndgameDate = (outputEndgameDate - BASEYEAR) * 12;
   int popSize = popln.getSizeOfPop();
-  double mfprev_aimp_old = popln.getMFPrev(sc, 0, 0, outputEndgameDate, rep,
-                                           popSize, folderName);
+  double mfprev_aimp_old =
+      popln.getMFPrev(sc, 0, 0, outputEndgameDate, rep, popSize, folderName);
   double mfprev_aimp_new = 0;
   bool preTAS_Pass = 0;
   int changeSensSpec = 0;
