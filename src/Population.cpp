@@ -248,6 +248,11 @@ double Population::getPopSize() {
   return popSize[choice];
 }
 
+int Population::getSizeOfPop() const{
+  // return the randomly chosen size of the population
+  return size;
+}
+
 void Population::initPTreat(double cov, double rho) {
   if (rho > 0) {
     double alpha = cov * (1 - rho) / rho;

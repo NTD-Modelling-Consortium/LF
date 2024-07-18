@@ -214,8 +214,9 @@ void Model::evolveAndSave(int y, Population &popln, Vector &vectors,
   // simulations from the scenario file.
   int BASEYEAR = 2000;
   outputEndgameDate = (outputEndgameDate - BASEYEAR) * 12;
+  int popSize = popln.getSizeOfPop();
   double mfprev_aimp_old = popln.getMFPrev(sc, 0, 0, outputEndgameDate, rep,
-                                           popln.getPopSize(), folderName);
+                                           popSize, folderName);
   double mfprev_aimp_new = 0;
   bool preTAS_Pass = 0;
   int changeSensSpec = 0;
@@ -443,7 +444,7 @@ void Model::evolveAndSave(int y, Population &popln, Vector &vectors,
       // this uses the whole population to get its value as it is used for an
       // intrinsic property of the population
       mfprev_aimp_old = popln.getMFPrev(sc, 0, t, outputEndgameDate, rep,
-                                        popln.getPopSize(), folderName);
+                                        popSize, folderName);
 
       // apply the MDA. If DoMDA = 0, then we call this function, but don't do
       // the MDA, we just write to a file showing that no people were treated.
@@ -477,12 +478,12 @@ void Model::evolveAndSave(int y, Population &popln, Vector &vectors,
       if (t == t_import_reduction) {
 
         mfprev_aimp_new = popln.getMFPrev(sc, 0, t, outputEndgameDate, rep,
-                                          popln.getPopSize(), folderName);
+                                          popSize, folderName);
         if (mfprev_aimp_old > mfprev_aimp_new) {
           popln.aImp = popln.aImp * mfprev_aimp_new / mfprev_aimp_old;
         }
         mfprev_aimp_old = popln.getMFPrev(sc, 0, t, outputEndgameDate, rep,
-                                          popln.getPopSize(), folderName);
+                                          popSize, folderName);
       }
     }
 

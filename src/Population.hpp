@@ -66,6 +66,7 @@ public:
   double getBedNetCoverage() const;
   double getBedNetSysComp() const;
   double getImportationRateFactor() const;
+  int getSizeOfPop() const;
 
   double getMFPrev(Scenario &sc, int forPreTass, int t, int outputEndgameDate,
                    int rep, int sampleSize, std::string folderName);
