@@ -1,0 +1,45 @@
+name: Check project compiles on various OSs
+on: [push]
+jobs:
+  Ubuntu-latest:
+    strategy:
+      matrix:
+        os: [ubuntu-latest, ubuntu-20.04, windows-latest, windows-2019]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - name: Check out repository code
+        uses: actions/checkout@v4
+      - run: echo "💡 The ${{ github.repository }} repository has been cloned to the runner."
+      - run: echo "🖥️ The workflow is now ready to test your code on the runner."
+      - name: Build
+        run: |
+          cd src
+          g++ \
+          *.cpp tinyxml/*.cpp \
+          -o transfil_N \
+          -g -I. -I./tinyxml \
+          $(gsl-config --libs) \
+          $(gsl-config --cflags) \
+          -lstdc++fs \
+          -Wall -O3 -std=c++11
+
+  Macos-latest:
+    strategy:
+      matrix:
+        os: [macos-latest, macos-12, macos-13]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - name: Check out repository code
+        uses: actions/checkout@v4
+      - run: echo "💡 The ${{ github.repository }} repository has been cloned to the runner."
+      - run: echo "🖥️ The workflow is now ready to test your code on the runner."
+      - name: Build
+        run: |
+          cd src
+          g++ \
+          *.cpp tinyxml/*.cpp \
+          -o transfil_N \
+          -g -I. -I./tinyxml \
+          $( $(brew --prefix)/bin/gsl-config --libs ) \
+          $( $(brew --prefix)/bin/gsl-config --cflags ) \
+          -Wall -O3 -std=c++11
