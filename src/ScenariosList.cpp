@@ -11,8 +11,7 @@
 #include "ImportationRateEvent.hpp"
 #include "Population.hpp"
 #include "PrevalenceEvent.hpp"
-#include "tinyxml/tinystr.h"
-#include "tinyxml/tinyxml.h"
+#include "tinyxml.h"
 #include <algorithm>
 #include <fstream>
 #include <iostream>

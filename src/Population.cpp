@@ -12,8 +12,7 @@
 #include "PrevalenceEvent.hpp"
 #include "Scenario.hpp"
 #include "Worm.hpp"
-#include "tinyxml/tinystr.h"
-#include "tinyxml/tinyxml.h"
+#include "tinyxml.h"
 #include <algorithm>
 #include <cmath>
 #include <fstream>

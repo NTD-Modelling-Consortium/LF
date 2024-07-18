@@ -14,8 +14,7 @@
 #include "Statistics.hpp"
 #include "Vector.hpp"
 #include "Worm.hpp"
-#include "tinyxml/tinystr.h"
-#include "tinyxml/tinyxml.h"
+#include "tinyxml.h"
 
 extern Statistics stats;
 
