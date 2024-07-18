@@ -12,7 +12,7 @@
 #include <sstream>
 #include <string>
 #include <sys/stat.h>
-namespace fs = std::__fs::filesystem;
+namespace fs = std::filesystem;
 
 bool IsPathExist(const std::string &s) {
   struct stat buffer;
