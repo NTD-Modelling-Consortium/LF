@@ -66,7 +66,7 @@ To run simulations:
 
 	* -n population_distribution.csv: file describing the population distribution.
 
-	* -p Randomrandom_parameters.txt: file with the fitted 200 parameter sets for IU 4629. Change to whichever parameter sets we want to run.
+	* -p random_parameters.txt: file with the fitted 200 parameter sets for IU 4629. Change to whichever parameter sets we want to run.
 
 	* -r 200: number of simualtions to run. Has to be smaller than or equal to the number of parameter sets given in the parameter file.
 
