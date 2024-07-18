@@ -22,7 +22,7 @@ g++ \
 	-g -I. -I./tinyxml \
 	$( $(brew --prefix)/bin/gsl-config --libs ) \
 	$( $(brew --prefix)/bin/gsl-config --cflags ) \
-	-Wall -O3 -std=c++11
+	-Wall -O3 -std=c++17
 ```
 
 On Debian Linux 11+ using `g++` from `build-essential` you need to specify `-lstdc++fs` in the build command:
@@ -35,7 +35,7 @@ g++ \
 	$(gsl-config --libs) \
 	$(gsl-config --cflags) \
 	-lstdc++fs \
-	-Wall -O3 -std=c++11
+	-Wall -O3 -std=c++17
 ```
 
 The gsl calls will need to be changed to where gsl library is installed on your computer.

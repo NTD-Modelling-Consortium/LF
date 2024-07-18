@@ -15,6 +15,7 @@
 #include "Population.hpp"
 #include "PrevalenceEvent.hpp"
 #include <algorithm>
+#include <cassert>
 #include <fstream>
 #include <iostream>
 #include <string>

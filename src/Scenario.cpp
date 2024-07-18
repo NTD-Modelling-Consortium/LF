@@ -13,11 +13,7 @@
 #include <sstream>
 #include <string>
 #include <sys/stat.h>
-#ifdef __APPLE__
-namespace fs = std::__fs::filesystem;
-#else
 namespace fs = std::filesystem;
-#endif
 
 bool IsPathExist(const std::string &s) {
   struct stat buffer;
