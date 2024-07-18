@@ -12,6 +12,7 @@
 #include <gsl/gsl_linalg.h>
 #include <gsl/gsl_matrix.h>
 #include <gsl/gsl_vector.h>
+#include <string>
 #include <vector>
 
 // Container class for gsl random number functions required by many other
