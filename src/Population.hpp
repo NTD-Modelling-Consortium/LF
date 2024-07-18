@@ -122,11 +122,23 @@ public:
   double MFThreshold;
   int interSurveyPeriod;
   int firstTASNumMDA;
-  int numPreTASSurveys = 0;
-  int numTASSurveys = 0;
-  int totMDAs = 0;
-  int post2020MDAs = 0;
-  int t_TAS_Pass = -1;
+  // declare the information regarding surveys
+  int numPreTASSurveys;
+  int numTASSurveys;
+  int totMDAs;
+  int post2020MDAs;
+  int t_TAS_Pass;
+  int preTASSurveyTime;
+  int TASSurveyTime;
+  int preTAS_Pass;
+  int TAS_Pass;
+  // indicator if we should do the MDA when the MDA is called.
+  // This will be switched to 0 if preTAS is passed, then the MDA function will
+  // be called, but will not be done We will still get the output of the MDA
+  // showing that no people were treated this year. This is to keep the output
+  // of MDA's constant so that we can combine different runs even if they have
+  // different numbers of MDA's performed.
+  int DoMDA;
   double aImp;
   int sensSpecChangeCount = 0;
   int neverTreatChangeCount = 0;
@@ -229,6 +241,14 @@ private:
     double u0MDA;
     double bednetCov;
     double mdaCov;
+    int DoMDA;
+    int totMDAs;
+    int numPreTASSurveys;
+    int numTASSurveys;
+    int preTASSurveyTime;
+    int TASSurveyTime;
+    int preTAS_Pass;
+    int TAS_Pass;
     std::string
         scenario; // for debugging only. The scenario that saved this month
 

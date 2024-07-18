@@ -395,6 +395,17 @@ void Population::initHosts(std::string distType, double k_val,
   bedNetCov = 0.0;
   aImp_factor = 1.0;
   mdaCoverage = 0.0;
+  numPreTASSurveys = 0;
+  numTASSurveys = 0;
+  // when initializing the hosts, also reset everything to do with surveys
+  totMDAs = 0;
+  post2020MDAs = 0;
+  t_TAS_Pass = -1;
+  preTASSurveyTime = -1000;
+  TASSurveyTime = -1000;
+  DoMDA = 1;
+  preTAS_Pass = 0;
+  TAS_Pass = 0;
 }
 
 void Population::updateKVal(double k_val) {
@@ -925,9 +936,10 @@ void Population::saveCurrentState(int month, std::string sname) {
   savedMonth currentState;
 
   currentState.scenario = sname; // debugging only
-  currentState.data.resize(size, {0, 0, 0, 0.0, 0.0, 0.0, 0,
-                                  0}); // WM, WF,totalWorms, totalWormYears,
-                                       // M,biteRisk,age,monthSinceTreated
+  currentState.data.resize(size,
+                           {0, 0, 0, 0.0, 0.0, 0.0, 0, 0,
+                            0.0}); // WM, WF,totalWorms, totalWormYears,
+                                   // M,biteRisk,age,monthSinceTreated, pTreat
 
   for (int i = 0; i < size; i++)
     currentState.data[i] =
@@ -942,7 +954,15 @@ void Population::saveCurrentState(int month, std::string sname) {
   currentState.u0bednets = u0CompBednets;
   currentState.mdaCov = mdaCoverage;
   currentState.bednetCov = bedNetCov;
-
+  // when saving data, also save everything to do with surveys
+  currentState.DoMDA = DoMDA;
+  currentState.totMDAs = totMDAs;
+  currentState.numPreTASSurveys = numPreTASSurveys;
+  currentState.numTASSurveys = numTASSurveys;
+  currentState.preTASSurveyTime = preTASSurveyTime;
+  currentState.TASSurveyTime = TASSurveyTime;
+  currentState.preTAS_Pass = preTAS_Pass;
+  currentState.TAS_Pass = TAS_Pass;
   savedMonths.push_back(currentState);
 }
 
@@ -967,7 +987,15 @@ void Population::resetToMonth(int month) {
       u0CompBednets = lastMonth.u0bednets;
       mdaCoverage = lastMonth.mdaCov;
       bedNetCov = lastMonth.bednetCov;
-
+      // when resetting time, also reset everything to do with surveys
+      DoMDA = lastMonth.DoMDA;
+      totMDAs = lastMonth.totMDAs;
+      numPreTASSurveys = lastMonth.numPreTASSurveys;
+      numTASSurveys = lastMonth.numTASSurveys;
+      preTASSurveyTime = lastMonth.preTASSurveyTime;
+      TASSurveyTime = lastMonth.TASSurveyTime;
+      preTAS_Pass = lastMonth.preTAS_Pass;
+      TAS_Pass = lastMonth.TAS_Pass;
       if (_DEBUG)
         std::cout << "Reset to month " << month << ", that was saved by "
                   << lastMonth.scenario << std::endl;
