@@ -16,7 +16,7 @@ function error () {
 }
 
 function usage () {
-	error "usage: ${0} [-n <num-simulations>] [-f <running-id-list-file>] [-o <output-subdirectory>] [-j <num-parallel-jobs>] [-s <scenarios- dir>] [-p <parameters-dir>] [-r <results-dir>] [-O <output-dir>]"
+	error "usage: ${0} [-n <num-simulations>] [-f <running-id-list-file>] [-o <output-subdirectory>] [-j <num-parallel-jobs>] [-s <scenarios- dir>] [-p <parameters-dir>] [-r <results-dir>] [-O <output-dir>] [-Y <starting-year(default 2020)>]"
 	exit 1
 }
 
@@ -37,9 +37,10 @@ PARAMETER_ROOT="${PARAMETER_ROOT:=$( realpath ./run/parameters )}"
 SCENARIO_ROOT="${SCENARIO_ROOT:=$( realpath ./run/scenarios )}"
 RESULTS_ROOT="${RESULTS_ROOT:=$( realpath ./run/results )}"
 OUTPUT_ROOT="${OUTPUT_ROOT:=$( realpath ./run/output/ntd )}"
+STARTING_YEAR="${STARTING_YEAR:=2020}"
 
 # read CLI options
-while getopts "n:f:o:j:s:p:r:O:" opts ; do
+while getopts "n:f:o:j:s:p:r:O:Y:" opts ; do
 
 	case "${opts}" in
 
@@ -79,6 +80,10 @@ while getopts "n:f:o:j:s:p:r:O:" opts ; do
 			OUTPUT_ROOT=$( realpath "${OPTARG}" )
 			;;
 
+		Y)
+			STARTING_YEAR=${OPTARG}
+			;;
+
 		*)
 			usage
 			;;
@@ -109,12 +114,14 @@ if [[ ! -d "${OUTPUT_ROOT}" ]] ; then
 fi
 
 # display info splash
+NUM_IUS=$( wc -l ${RUNNING_ID_LIST_FILE} | awk '{print $1}' )
 info "about to run model with these settings:"
 echo "- run ${NUM_SIMULATIONS} simulations for each IU"
 echo "- across ${NUM_PARALLEL_JOBS} parallel jobs"
-echo "- use ID list file ${RUNNING_ID_LIST_FILE}"
+echo "- use ID list file ${RUNNING_ID_LIST_FILE} (${NUM_IUS} IUs)"
 echo "- use scenarios in directory ${SCENARIO_ROOT}"
 echo "- use parameters in directory ${PARAMETER_ROOT}"
+echo "- start from year ${STARTING_YEAR}"
 echo "- write intermediate results in directory ${RESULTS_ROOT}"
 echo "- write combined model output files to directory ${OUTPUT_ROOT}/${OUTPUT_SUBDIRECTORY}"
 
@@ -145,6 +152,7 @@ select CHOICE in yes no ; do
 					PARAMETER_ROOT="${PARAMETER_ROOT}" \
 					RESULTS_ROOT="${RESULTS_ROOT}" \
 					OUTPUT_ROOT="${OUTPUT_ROOT}" \
+					STARTING_YEAR="${STARTING_YEAR}" \
 				bash run-in-parallel.bash "${OUTPUT_ROOT}/${OUTPUT_SUBDIRECTORY}" \
 					2>&1 \
 					> "${PROJECT_ROOT_DIR}/${LOG_FILE}" \
@@ -156,7 +164,7 @@ select CHOICE in yes no ; do
 			REAL_LOG_PATH=$( realpath ${PROJECT_ROOT_DIR}/${LOG_FILE} )
 			info "LF model is running in a detached shell."
 			echo "Log output is being saved to file: ${REAL_LOG_PATH}"
-			echo "When the model runs have finished, the file $( realpath ${PROJECT_ROOT_DIR} )/${FINISH_FILE} ) will be created."
+			echo "When the model runs have finished, the file $( realpath ${PROJECT_ROOT_DIR} )/${FINISH_FILE} will be created."
 
 			exit 0
 			;;
