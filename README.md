@@ -40,22 +40,39 @@ g++ \
 
 The gsl calls will need to be changed to where gsl library is installed on your computer.
 
+This compiles the source code and included libraries into the executable file `transfil_N`. This will be used to run the simulations.
+
 ### Running simulations
 
-`./transfil\_N -s testscenario.xml -n Pop_Distribution.csv -p RandomParamIU4629.txt -r 200 -t 1 -o results`
+To run simulations:
 
-**Inputs**:
+1) create a folder to output the results. For example, `sample_results` in the root of the project.
 
--s testscenario.xml: the file giving the scenario we want to run.
+2) then locate the three required input files: scenario, population distribution and random parameters. For testing, there are three files in the `sample_inputs` folder in the root of the project.
 
--n Pop_Distribution.csv: file describing the population distribution.
+* scenario.xml: the file giving the scenario we want to run.
 
--p RandomParamIU4629.txt: file with the fitted 200 parameter sets for IU 4629. Change to whichever parameter sets we want to run.
+* population_distribution.csv: file describing the population distribution.
 
--r 200: number of simualtions to run. Has to be smaller than or equal to the number of parameter sets given in the parameter file.
+* random_parameters.txt: file with the fitted 200 parameter sets for IU 4629. Change to whichever parameter sets we want to run.
 
--o results: folder in which to save the outputs of the simulation. This folder must be created inside the `src` folder.
+3) run the executable with the file input and other required parameters
 
+	`./transfil\_N -s ../sample_inputs/scenario.xml -n ../sample_inputs/population_distribution.csv -p ../sample_inputs/random_parameters.txt -r 200 -t 1 -o ../sample_results`
+
+	where the inputs are
+
+	* -s scenario.xml: the file giving the scenario we want to run.
+
+	* -n population_distribution.csv: file describing the population distribution.
+
+	* -p random_parameters.txt: file with the fitted 200 parameter sets for IU 4629. Change to whichever parameter sets we want to run.
+
+	* -r 200: number of simualtions to run. Has to be smaller than or equal to the number of parameter sets given in the parameter file.
+
+	* -o sample_results: folder in which to save the outputs of the simulation. This folder must be created inside the `src` folder.
+
+	* -t 1: the simulation time step, in months
 
 
 **Note**: Additional files runIU.csv, dummy_visualizations.R and vis_functions.R were previously used for post-processing of results and can be safely ignored
