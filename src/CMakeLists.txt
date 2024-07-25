@@ -1,5 +1,23 @@
-file(GLOB sources *.cpp)
-add_executable(transfil_N ${sources})
+
+# set source files
+set(SOURCES
+    BedNetEvent.cpp
+    Host.cpp
+    ImportationRateEvent.cpp
+    MDAEvent.cpp
+    Model.cpp
+    Output.cpp
+    Population.cpp
+    PrevalenceEvent.cpp
+    RecordedPrevalence.cpp
+    Scenario.cpp
+    ScenariosList.cpp
+    Statistics.cpp
+    Vector.cpp
+    Worm.cpp
+    main.cpp
+)
+add_executable(transfil_N ${SOURCES})
 
 find_package(GSL REQUIRED)
 # Include the library directories for linking

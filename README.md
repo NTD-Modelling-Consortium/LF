@@ -69,6 +69,10 @@ Random seeds are set per simulation through a .txt file. Each line of the text f
 
 ## Contributing
 
+### Add new cpp files
+
+The project is build using CMake. Any new C++ files will need to be added to the sources list in `src/CMakeLists.txt`.
+
 ### File formatting
 
 This repository uses clang-format 18 to format files and this is checked on each pull request. Ideally, files should be formatted before each commit.
