@@ -67,6 +67,18 @@ Random seeds are set per simulation through a .txt file. Each line of the text f
 
 **Note**: Additional files runIU.csv, dummy_visualizations.R and vis_functions.R were previously used for post-processing of results and can be safely ignored
 
+## Running project tests
+
+The project has tests in the directory `tests` and they are driven using `ctest` and written using the `Catch2` framework.
+
+You need to have Catch2 installed on your system, and the instructions for doing this are found on the [Catch2 Github page](https://github.com/catchorg/Catch2/blob/devel/docs/cmake-integration.md#installing-catch2-from-git-repository).
+
+To run the tests, ensure the project is built as specified above, then go to `build/tests` and run `ctest`. This will execute the tests and give a brief report.
+
+Note that if you've built the project into a different directory, then folder to navigate to will change. For example for the debug build as specified above it is `build_debug/tests`.
+
+To add new tests, add the test files to `TESTS_TO_RUN` in `tests/CMakeLists.txt`.
+
 ## Contributing
 
 ### Add new cpp files
