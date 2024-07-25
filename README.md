@@ -7,20 +7,25 @@ Along with files included in the `src` folder, the gsl library is used so will n
 
 ### Compiling
 
-The project is compiled using CMake. From the root directory run
+The project is compiled using CMake, and binaries are compiled into a separate folder `build`
 ```
-cmake .
-```
-then to build the project
-```
+mkdir build && cd build/
+cmake ..
 cmake --build .
 ```
-or if you need to clean the CMake files (perhas after modifying CMake or directory structure), then run
-```
-cmake --build . --clean-first
-```
+The executable is `build/src/transfil_N`. This will be used to run the simulations.
+On subsequent builds usually only `cmake --build .` needs to be run from the `build folder` (not `cmake ..`).
 
-This compiles the source code and included libraries into the executable file `src/transfil_N`. This will be used to run the simulations.
+If you need to clean the CMake files (perhas after modifying CMake or directory structure), then run `cmake --build .. --clean-first`
+
+#### Debug build
+If you need a build for debugging, build this into a separate folder `build_debug` and instead of the above run from the root directory
+```
+mkdir build_debug && cd build_debug/
+cmake -DCMAKE_BUILD_TYPE=Debug ..
+cmake --build .
+```
+The executable for debugging is `build_debug/src/transfil_N`.
 
 ### Running simulations
 

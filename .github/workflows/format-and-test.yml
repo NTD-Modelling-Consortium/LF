@@ -18,10 +18,10 @@ jobs:
         run: find . -iname '*.h' -o -iname '*.cpp' -o -iname '*.hpp' | xargs clang-format --dry-run -Werror
       - name: Build
         run: |
-          cmake .
+          mkdir build && cd build/
+          cmake ..
           cmake --build .
       - name: Run test
         run: |
-          cd src
-          mkdir ../sample_results
-          ./transfil\_N -s ../sample_inputs/scenario.xml -n ../sample_inputs/population_distribution.csv -p ../sample_inputs/random_parameters.txt -g ../sample_inputs/random_seeds.txt -r 2 -t 1 -o ../sample_results
+          mkdir sample_results
+          build/src/transfil\_N -s sample_inputs/scenario.xml -n sample_inputs/population_distribution.csv -p sample_inputs/random_parameters.txt -g sample_inputs/random_seeds.txt -r 2 -t 1 -o sample_results

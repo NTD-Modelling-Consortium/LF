@@ -13,7 +13,8 @@ jobs:
       - run: echo "🖥️ The workflow is now ready to test your code on the runner."
       - name: Build
         run: |
-          cmake .
+          mkdir build && cd build/
+          cmake ..
           cmake --build .
 
   Macos-latest:
@@ -29,5 +30,6 @@ jobs:
       - name: Build
         run: |
           brew install gsl
-          cmake .
+          mkdir build && cd build/
+          cmake ..
           cmake --build .
