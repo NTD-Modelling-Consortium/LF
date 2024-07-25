@@ -5,7 +5,7 @@ Along with files included in the `src` folder, the gsl library is used so will n
 - Alternatively on macOS you can install gsl using homebrew: `brew install gsl`
 - Or on Debian/Ubuntu Linux you can install packages `gsl-bin libgsl-dev` using apt/aptitude
 
-### Compiling
+## Compiling
 
 The project is compiled using CMake, and binaries are compiled into a separate folder `build`
 ```
@@ -18,7 +18,7 @@ On subsequent builds usually only `cmake --build .` needs to be run from the `bu
 
 If you need to clean the CMake files (perhas after modifying CMake or directory structure), then run `cmake --build .. --clean-first`
 
-#### Debug build
+### Debug build
 If you need a build for debugging, build this into a separate folder `build_debug` and instead of the above run from the root directory
 ```
 mkdir build_debug && cd build_debug/
@@ -27,7 +27,7 @@ cmake --build .
 ```
 The executable for debugging is `build_debug/src/transfil_N`.
 
-### Running simulations
+## Running simulations
 
 To run simulations from the root directory:
 
@@ -59,7 +59,7 @@ To run simulations from the root directory:
 
 	* -t 1: the simulation time step, in months
 
-#### Setting the seed for simulations
+### Setting the seed for simulations
 
 Random seeds are set per simulation through a .txt file. Each line of the text file should contain the random seed for the corresponding simulation. For example, if line 30 of the file is "123456", then for simulation number 30, the random seed is set to "123456". The number of lines must equal the input `-r` above. e.g. 200 for the command above. This file is passed in with the argument `-g`, e.g.
 
