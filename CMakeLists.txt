@@ -12,3 +12,6 @@ add_subdirectory(lib/tinyxml)
 
 # add source code
 add_subdirectory(src)
+
+# add tests
+add_subdirectory(tests)
