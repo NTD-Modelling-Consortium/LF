@@ -16,6 +16,13 @@ jobs:
         run: find . -iname '*.h' -o -iname '*.cpp' -o -iname '*.hpp' | xargs clang-format --dry-run -Werror
       - name: Build
         run: |
+          # install catch2
+          git clone https://github.com/catchorg/Catch2.git
+          cd Catch2
+          cmake -B build -S . -DBUILD_TESTING=OFF
+          sudo cmake --build build/ --target install
+          cd ..
+
           mkdir build && cd build/
           cmake ..
           cmake --build .
