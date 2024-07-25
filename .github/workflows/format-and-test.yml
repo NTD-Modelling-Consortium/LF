@@ -6,8 +6,6 @@ jobs:
     steps:
       - name: Check out repository code
         uses: actions/checkout@v4
-      - run: echo "💡 The ${{ github.repository }} repository has been cloned to the runner."
-      - run: echo "🖥️ The workflow is now ready to test your code on the runner."
       - name: Install clang-format-18
         run: |
             sudo apt update
@@ -18,17 +16,10 @@ jobs:
         run: find . -iname '*.h' -o -iname '*.cpp' -o -iname '*.hpp' | xargs clang-format --dry-run -Werror
       - name: Build
         run: |
-          cd src
-          g++ \
-          *.cpp tinyxml/*.cpp \
-          -o transfil_N \
-          -g -I. -I./tinyxml \
-          $(gsl-config --libs) \
-          $(gsl-config --cflags) \
-          -lstdc++fs \
-          -Wall -O3 -std=c++17
+          mkdir build && cd build/
+          cmake ..
+          cmake --build .
       - name: Run test
         run: |
-          cd src
-          mkdir ../sample_results
-          ./transfil\_N -s ../sample_inputs/scenario.xml -n ../sample_inputs/population_distribution.csv -p ../sample_inputs/random_parameters.txt -g ../sample_inputs/random_seeds.txt -r 2 -t 1 -o ../sample_results
+          mkdir sample_results
+          build/src/transfil\_N -s sample_inputs/scenario.xml -n sample_inputs/population_distribution.csv -p sample_inputs/random_parameters.txt -g sample_inputs/random_seeds.txt -r 2 -t 1 -o sample_results

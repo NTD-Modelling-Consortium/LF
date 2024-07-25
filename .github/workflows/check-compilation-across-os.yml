@@ -9,19 +9,11 @@ jobs:
     steps:
       - name: Check out repository code
         uses: actions/checkout@v4
-      - run: echo "💡 The ${{ github.repository }} repository has been cloned to the runner."
-      - run: echo "🖥️ The workflow is now ready to test your code on the runner."
       - name: Build
         run: |
-          cd src
-          g++ \
-          *.cpp tinyxml/*.cpp \
-          -o transfil_N \
-          -g -I. -I./tinyxml \
-          $(gsl-config --libs) \
-          $(gsl-config --cflags) \
-          -lstdc++fs \
-          -Wall -O3 -std=c++17
+          mkdir build && cd build/
+          cmake ..
+          cmake --build .
 
   Macos-latest:
     strategy:
@@ -31,16 +23,9 @@ jobs:
     steps:
       - name: Check out repository code
         uses: actions/checkout@v4
-      - run: echo "💡 The ${{ github.repository }} repository has been cloned to the runner."
-      - run: echo "🖥️ The workflow is now ready to test your code on the runner."
       - name: Build
         run: |
           brew install gsl
-          cd src
-          g++ \
-          *.cpp tinyxml/*.cpp \
-          -o transfil_N \
-          -g -I. -I./tinyxml \
-          $( $(brew --prefix)/bin/gsl-config --libs ) \
-          $( $(brew --prefix)/bin/gsl-config --cflags ) \
-          -Wall -O3 -std=c++17
+          mkdir build && cd build/
+          cmake ..
+          cmake --build .
