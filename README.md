@@ -74,6 +74,11 @@ To run simulations:
 
 	* -t 1: the simulation time step, in months
 
+#### Setting the seed for simulations
+
+Random seeds are set per simulation through a .txt file. Each line of the text file should contain the random seed for the corresponding simulation. For example, if line 30 of the file is "123456", then for simulation number 30, the random seed is set to "123456". The number of lines must equal the input `-r` above. e.g. 200 for the command above. This file is passed in with the argument `-g`, e.g.
+
+`./transfil\_N -s ../sample_inputs/scenario.xml -n ../sample_inputs/population_distribution.csv -p ../sample_inputs/random_parameters.txt -g ../sample_inputs/random_seeds.txt -r 200 -t 1 -o ../sample_results`
 
 **Note**: Additional files runIU.csv, dummy_visualizations.R and vis_functions.R were previously used for post-processing of results and can be safely ignored
 
