@@ -1,7 +1,7 @@
 file(GLOB sources *.cpp)
 add_executable(transfil_N ${sources})
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++17 -g")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g")
 
 find_package(GSL REQUIRED)
 # Include the library directories for linking
