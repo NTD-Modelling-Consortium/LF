@@ -73,9 +73,15 @@ The project has tests in the directory `tests` and they are driven using `ctest`
 
 You need to have Catch2 installed on your system, and the instructions for doing this are found on the [Catch2 Github page](https://github.com/catchorg/Catch2/blob/devel/docs/cmake-integration.md#installing-catch2-from-git-repository).
 
-To run the tests, ensure the project is built as specified above, then go to `build/tests` and run `ctest`. This will execute the tests and give a brief report.
+To run the tests, ensure the project is built as specified above, then run:
 
-Note that if you've built the project into a different directory, then folder to navigate to will change. For example for the debug build as specified above it is `build_debug/tests`.
+```bash
+$ ctest --test-dir build/tests
+```
+
+This will execute the tests and give a brief report.
+
+Note that if you've built the project into a different directory, then the folder specified in `--test-dir` will need to change. For example for the debug build as specified above it is `build_debug/tests`.
 
 To add new tests, add the test files to `TESTS_TO_RUN` in `tests/CMakeLists.txt`.
 
@@ -127,4 +133,3 @@ $files=(git ls-files --exclude-standard); foreach ($file in $files) { if ((get-i
 ```
 
 If you have made very large changes, it is possible that clang-format may need to be run more than once.
-
