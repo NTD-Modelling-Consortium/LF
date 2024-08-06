@@ -5,7 +5,7 @@ Along with files included in the `src` folder, the gsl library is used so will n
 - Alternatively on macOS you can install gsl using homebrew: `brew install gsl`
 - Or on Debian/Ubuntu Linux you can install packages `gsl-bin libgsl-dev` using apt/aptitude
 
-### Compiling
+## Compiling
 
 The project is compiled using CMake, and binaries are compiled into a separate folder `build`
 ```
@@ -16,9 +16,9 @@ cmake --build .
 The executable is `build/src/transfil_N`. This will be used to run the simulations.
 On subsequent builds usually only `cmake --build .` needs to be run from the `build folder` (not `cmake ..`).
 
-If you need to clean the CMake files (perhas after modifying CMake or directory structure), then run `cmake --build .. --clean-first`
+If you need to clean the CMake files (perhaps after modifying CMake or directory structure), then run `cmake --build .. --clean-first`
 
-#### Debug build
+### Debug build
 If you need a build for debugging, build this into a separate folder `build_debug` and instead of the above run from the root directory
 ```
 mkdir build_debug && cd build_debug/
@@ -27,7 +27,7 @@ cmake --build .
 ```
 The executable for debugging is `build_debug/src/transfil_N`.
 
-### Running simulations
+## Running simulations
 
 To run simulations from the root directory:
 
@@ -59,13 +59,31 @@ To run simulations from the root directory:
 
 	* -t 1: the simulation time step, in months
 
-#### Setting the seed for simulations
+### Setting the seed for simulations
 
 Random seeds are set per simulation through a .txt file. Each line of the text file should contain the random seed for the corresponding simulation. For example, if line 30 of the file is "123456", then for simulation number 30, the random seed is set to "123456". The number of lines must equal the input `-r` above. e.g. 200 for the command above. This file is passed in with the argument `-g`, e.g.
 
 `src/transfil\_N -s sample_inputs/scenario.xml -n sample_inputs/population_distribution.csv -p sample_inputs/random_parameters.txt -g sample_inputs/random_seeds.txt -r 200 -t 1 -o sample_results`
 
 **Note**: Additional files runIU.csv, dummy_visualizations.R and vis_functions.R were previously used for post-processing of results and can be safely ignored
+
+## Running project tests
+
+The project has tests in the directory `tests` and they are driven using `ctest` and written using the `Catch2` framework.
+
+You need to have Catch2 installed on your system, and the instructions for doing this are found on the [Catch2 Github page](https://github.com/catchorg/Catch2/blob/devel/docs/cmake-integration.md#installing-catch2-from-git-repository).
+
+To run the tests, ensure the project is built as specified above, then run:
+
+```bash
+$ ctest --test-dir build/tests
+```
+
+This will execute the tests and give a brief report.
+
+Note that if you've built the project into a different directory, then the folder specified in `--test-dir` will need to change. For example for the debug build as specified above it is `build_debug/tests`.
+
+To add new tests, add the test files to `TESTS_TO_RUN` in `tests/CMakeLists.txt`.
 
 ## Contributing
 
@@ -115,4 +133,3 @@ $files=(git ls-files --exclude-standard); foreach ($file in $files) { if ((get-i
 ```
 
 If you have made very large changes, it is possible that clang-format may need to be run more than once.
-
