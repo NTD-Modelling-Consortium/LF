@@ -32,5 +32,4 @@ jobs:
           build/src/transfil\_N -s sample_inputs/scenario.xml -n sample_inputs/population_distribution.csv -p sample_inputs/random_parameters.txt -g sample_inputs/random_seeds.txt -r 2 -t 1 -o sample_results
       - name: Run tests
         run: |
-          cd build/tests
-          ctest --output-on-failure
+          ctest --test-dir build/tests --output-on-failure
