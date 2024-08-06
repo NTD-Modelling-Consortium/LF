@@ -16,7 +16,7 @@ cmake --build .
 The executable is `build/src/transfil_N`. This will be used to run the simulations.
 On subsequent builds usually only `cmake --build .` needs to be run from the `build folder` (not `cmake ..`).
 
-If you need to clean the CMake files (perhas after modifying CMake or directory structure), then run `cmake --build .. --clean-first`
+If you need to clean the CMake files (perhaps after modifying CMake or directory structure), then run `cmake --build .. --clean-first`
 
 ### Debug build
 If you need a build for debugging, build this into a separate folder `build_debug` and instead of the above run from the root directory
