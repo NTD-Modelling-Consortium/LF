@@ -238,13 +238,18 @@ void Population::loadPopulationSize(const std::string popfile) {
       (unsigned)std::chrono::system_clock::now().time_since_epoch().count());
 }
 
-double Population::getPopSize() {
+double Population::selectPopSizeFromDistribution() {
 
   // use distribution defined above to get a population size
 
   unsigned choice = (*populationDistribution)(randgen);
   // this a number in range 0 to numLines-1
   return popSize[choice];
+}
+
+int Population::getSizeOfPop() const {
+  // return the randomly chosen size of the population
+  return size;
 }
 
 void Population::initPTreat(double cov, double rho) {
@@ -355,7 +360,7 @@ void Population::initHosts(std::string distType, double k_val,
 
   // generate a new population size and reset all members at the start of a new
   // replicate
-  size = getPopSize();
+  size = selectPopSizeFromDistribution();
   TotalBiteRisk = 0.0;
 
   // new random value for k, shape of gamma distrib
