@@ -187,8 +187,18 @@ if [[ ! -d "${SCENARIO_ROOT}" ]] ; then
 	usage
 fi
 
+if [[ -z "$( ls -1 ${SCENARIO_ROOT}/${SCENARIO_FILE_STEM}* 2>/dev/null )" ]] ; then
+	error "there aren't any scenario files in ${SCENARIO_ROOT} with filename stem ${SCENARIO_FILE_STEM}"
+	usage
+fi
+
 if [[ ! -d "${PARAMETER_ROOT}" ]] ; then
 	error "parameter-dir must be a real path to a directory"
+	usage
+fi
+
+if [[ -z "$( ls -1 ${PARAMETER_ROOT}/${PARAMETER_FILE_STEM}* 2>/dev/null )" ]] ; then
+	error "there aren't any parameter files in ${PARAMETER_ROOT} with filename stem ${PARAMETER_FILE_STEM}"
 	usage
 fi
 
@@ -202,6 +212,11 @@ if [[ "${USE_SEED_FILE}" = "true" ]] && [[ -z "${SEED_ROOT}" ]] ; then
 	usage
 fi
 
+if [[ -z "$( ls -1 ${SEED_ROOT}/${SEED_FILE_STEM}* 2>/dev/null )" ]] ; then
+	error "there aren't any seed files in ${SEED_ROOT} with filename stem ${SEED_FILE_STEM}"
+	usage
+fi
+
 if [[ ! -d "${RESULTS_ROOT}" ]] ; then
 	error "result-dir must be a real path to a directory"
 	usage
@@ -209,11 +224,6 @@ fi
 
 if [[ ! -d "${OUTPUT_ROOT}" ]] ; then
 	error "output-dir must be a real path to a directory"
-	usage
-fi
-
-if [[ -z "$( ls -1 ${SEED_ROOT}/${SEED_FILE_STEM}* 2>/dev/null )" ]] ; then
-	error "there aren't any seed files in ${SEED_ROOT} with filename stem ${SEED_FILE_STEM}"
 	usage
 fi
 
@@ -235,6 +245,7 @@ echo "- use parameters in directory ${PARAMETER_ROOT}"
 echo "- use parameter filename stem '${PARAMETER_FILE_STEM}'"
 if [[ "${USE_SEED_FILE}" = "true" ]] && [[ -n "${SEED_ROOT}" ]] ; then
 	echo "- use seed files in directory ${SEED_ROOT}"
+	echo "- use seed filename stem '${SEED_FILE_STEM}'"
 else
 	echo "- use standard seed (1)"
 fi

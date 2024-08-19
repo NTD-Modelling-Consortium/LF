@@ -44,6 +44,18 @@ function run_ID () {
 		-r "${NUM_SIMULATIONS}" \
 		-D "${STARTING_YEAR}"
 
+	time ./transfil_N \
+		-s "${SCENARIO}" \
+		-p "${PARAMS}" \
+		-t "${TIMESTEP}" \
+		-e "${OUTPUT_ENDGAME}" \
+		-x "${REDUCE_IMP_VIA_XML}" \
+		-g "${SEED_ARG}" \
+		-o "${RESULTS}" \
+		-n "${POP_DISTRIBUTION_FILE}" \
+		-r "${NUM_SIMULATIONS}" \
+		-D "${STARTING_YEAR}"
+
 	exit
 
 	echo "== combining output files for IHME & NTDMC using output folder ${output_folder_name}"
