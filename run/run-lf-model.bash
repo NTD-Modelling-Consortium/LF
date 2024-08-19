@@ -14,23 +14,37 @@ function run_ID () {
 	output_folder_name=${1}
 	id=${2}
 
-	PARAMS="${PARAMETER_ROOT}/RandomParamIU${id}.txt"
-	SCENARIO="${SCENARIO_ROOT}/scenariosNoImp${id}.xml"
+	PARAMS="${PARAMETER_ROOT}/${PARAMETER_FILE_STEM}${id}.txt"
+	SCENARIO="${SCENARIO_ROOT}/${SCENARIO_FILE_STEM}${id}.xml"
+	SEED="${SEED_ROOT}/${SEED_FILE_STEM}${id}.txt"
 	RESULTS="${RESULTS_ROOT}/${id}"
 	STARTING_YEAR="${STARTING_YEAR:=2020}"
+
+	if [[ "${USE_SEED_FILE}" = "true" ]] && [[ -n $( realpath "${SEED}" 2>/dev/null ) ]] ; then
+		SEED_ARG="${SEED}"
+		echo "--> WARNING not using seed file ${SEED} as it doesn't exist"
+	else
+		SEED_ARG=1
+	fi
 
 	echo "== making result directory ${RESULTS} for ID ${id}"
 
 	mkdir -p "${RESULTS}"
 
 	echo "== running ${NUM_SIMULATIONS} simulations of LF model starting in ${STARTING_YEAR} with ${PARAMS} ${SCENARIO}"
-	time ./transfil_N \
-		-p  "${PARAMS}" \
-		-s  "${SCENARIO}" \
+	echo time ./transfil_N \
+		-s "${SCENARIO}" \
+		-p "${PARAMS}" \
+		-t "${TIMESTEP}" \
+		-e "${OUTPUT_ENDGAME}" \
+		-x "${REDUCE_IMP_VIA_XML}" \
+		-g "${SEED_ARG}" \
 		-o "${RESULTS}" \
-		-n ./Pop_Distribution.csv \
+		-n "${POP_DISTRIBUTION_FILE}" \
 		-r "${NUM_SIMULATIONS}" \
 		-D "${STARTING_YEAR}"
+
+	exit
 
 	echo "== combining output files for IHME & NTDMC using output folder ${output_folder_name}"
 	( time do_file_combinations "${id}" "${output_folder_name}" "${RESULTS}" ) 2>&1

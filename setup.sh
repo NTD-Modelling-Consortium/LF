@@ -39,7 +39,7 @@ info "-> clearing 'build' directory"
 
 info "-> building C++ LF model ..."
 mkdir -p "${BUILD_DIR}" && cd "${BUILD_DIR}"
-cmake .. && cmake --build .  && ( [[ -f "src/${EXENAME}" ]] && cp "src/${EXENAME}" "${RUN_DIR}/${EXENAME}" ) && echo
+cmake .. && cmake --build . --clean-first && ( [[ -f "src/${EXENAME}" ]] && cp "src/${EXENAME}" "${RUN_DIR}/${EXENAME}" ) && echo
 
 info "-> checking for executable in ${RUN_DIR} ..."
 

@@ -57,9 +57,11 @@ STARTING_YEAR=${STARTING_YEAR:=2020} \
 	parallel ${JOBS_ARG} -a "${RUNNING_ID_LIST_FILE}" \
 	pipenv run bash run-lf-model.bash "${output_folder_name}"
 
-# clean up
-echo "== LF model run ${RUN_STAMP} removing intermediate model output files in $( get_abs_filename . )/{res_endgame,results}"
-rm -rf res_endgame results/*
+# clean up intermediate files?
+if [[ "${KEEP_INTERMEDIATE_RESULTS}" = "false" ]] ; then
+	echo "== LF model run ${RUN_STAMP} removing intermediate model output files in $( get_abs_filename . )/{res_endgame,results}"
+	rm -rf res_endgame results/*
+fi
 
 # indicate completion
 FINISH_STAMP=$( date +%Y%m%d%H%M%S )
