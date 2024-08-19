@@ -32,17 +32,6 @@ function run_ID () {
 	mkdir -p "${RESULTS}"
 
 	echo "== running ${NUM_SIMULATIONS} simulations of LF model starting in ${STARTING_YEAR} with ${PARAMS} ${SCENARIO}"
-	echo time ./transfil_N \
-		-s "${SCENARIO}" \
-		-p "${PARAMS}" \
-		-t "${TIMESTEP}" \
-		-e "${OUTPUT_ENDGAME}" \
-		-x "${REDUCE_IMP_VIA_XML}" \
-		-g "${SEED_ARG}" \
-		-o "${RESULTS}" \
-		-n "${POP_DISTRIBUTION_FILE}" \
-		-r "${NUM_SIMULATIONS}" \
-		-D "${STARTING_YEAR}"
 
 	time ./transfil_N \
 		-s "${SCENARIO}" \
