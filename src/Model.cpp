@@ -231,17 +231,17 @@ void Model::evolveAndSave(int y, Population &popln, Vector &vectors,
   }
 
   int vec_control = 0;
-  
+
   int minAge;
   int maxAge = popln.returnMaxAge();
   int donePreTAS = 0;
   int doneTAS = 0;
   // indicator if we should do the MDA when the MDA is called.
-  // This will be switched to false if preTAS is passed, then the MDA function will
-  // be called, but will not be done. We will still get the output of the MDA
-  // showing that no people were treated this year. This is to keep the output
-  // of MDA's constant so that we can combine different runs even if they have
-  // different numbers of MDA's performed.
+  // This will be switched to false if preTAS is passed, then the MDA function
+  // will be called, but will not be done. We will still get the output of the
+  // MDA showing that no people were treated this year. This is to keep the
+  // output of MDA's constant so that we can combine different runs even if they
+  // have different numbers of MDA's performed.
   popln.DoMDA = true;
 
   for (int q = 0; q < popln.sensSpecChangeCount; q++) {
