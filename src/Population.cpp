@@ -403,7 +403,7 @@ void Population::initHosts(std::string distType, double k_val,
   t_TAS_Pass = -1;
   preTASSurveyTime = -1000;
   TASSurveyTime = -1000;
-  DoMDA = 1;
+  DoMDA = true;
   preTAS_Pass = 0;
   TAS_Pass = 0;
 }
@@ -963,6 +963,8 @@ void Population::saveCurrentState(int month, std::string sname) {
   currentState.TASSurveyTime = TASSurveyTime;
   currentState.preTAS_Pass = preTAS_Pass;
   currentState.TAS_Pass = TAS_Pass;
+  currentState.prevCov = prevCov;
+  currentState.prevRho = prevRho;
   savedMonths.push_back(currentState);
 }
 
@@ -996,6 +998,8 @@ void Population::resetToMonth(int month) {
       TASSurveyTime = lastMonth.TASSurveyTime;
       preTAS_Pass = lastMonth.preTAS_Pass;
       TAS_Pass = lastMonth.TAS_Pass;
+      prevCov = lastMonth.prevCov;
+      prevRho = lastMonth.prevRho;
       if (_DEBUG)
         std::cout << "Reset to month " << month << ", that was saved by "
                   << lastMonth.scenario << std::endl;
@@ -1237,7 +1241,7 @@ int Population::returnMaxAge() { return maxAge; }
 
 void Population::ApplyTreatmentUpdated(MDAEvent *mda, Worm &worms, Scenario &sc,
                                        int t, int outputEndgameDate, int rep,
-                                       int DoMDA, int outputEndgame,
+                                       bool DoMDA, int outputEndgame,
                                        std::string folderName) {
   int minAge = (mda->getMinAge() >= 0) ? mda->getMinAge() : minAgeMDA;
   int minAgeMDAinMonths = minAge * 12;
@@ -1256,7 +1260,7 @@ void Population::ApplyTreatmentUpdated(MDAEvent *mda, Worm &worms, Scenario &sc,
     float flooredAge = std::floor(host_pop[i].age / 12);
     int flooredAgeInt = std::min(static_cast<int>(flooredAge), maxAge - 1);
     numHostsByAge[flooredAgeInt] += 1;
-    if (DoMDA == 1) {
+    if (DoMDA) {
       if (host_pop[i].age >= minAgeMDAinMonths) {
         if (stats.uniform_dist() < host_pop[i].pTreat) {
           if (host_pop[i].neverTreat == 0) {

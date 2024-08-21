@@ -231,12 +231,18 @@ void Model::evolveAndSave(int y, Population &popln, Vector &vectors,
   }
 
   int vec_control = 0;
-  double prevCov = -1;
-  double prevRho = -1;
+  
   int minAge;
   int maxAge = popln.returnMaxAge();
   int donePreTAS = 0;
   int doneTAS = 0;
+  // indicator if we should do the MDA when the MDA is called.
+  // This will be switched to false if preTAS is passed, then the MDA function will
+  // be called, but will not be done. We will still get the output of the MDA
+  // showing that no people were treated this year. This is to keep the output
+  // of MDA's constant so that we can combine different runs even if they have
+  // different numbers of MDA's performed.
+  popln.DoMDA = true;
 
   for (int q = 0; q < popln.sensSpecChangeCount; q++) {
     if (popln.sensSpecChangeName[q] == sc.getName()) {
@@ -342,10 +348,10 @@ void Model::evolveAndSave(int y, Population &popln, Vector &vectors,
         // if we pass the preTAS survey then we set a time for the TASsurvey
         // we also stop doing MDA
         popln.TASSurveyTime = t;
-        popln.DoMDA = 0;
+        popln.DoMDA = false;
       } else {
         popln.preTASSurveyTime = t + popln.interSurveyPeriod;
-        popln.DoMDA = 1;
+        popln.DoMDA = true;
       }
     }
     // snippet to perform a TAS survey
@@ -364,7 +370,7 @@ void Model::evolveAndSave(int y, Population &popln, Vector &vectors,
         popln.TAS_Pass = 0;
         popln.preTASSurveyTime = t + popln.interSurveyPeriod;
         popln.TASSurveyTime = t + popln.interSurveyPeriod;
-        popln.DoMDA = 1;
+        popln.DoMDA = true;
       } else if (popln.TAS_Pass == neededTASPass) {
         // if we have passed a sufficient number of times, then make it so we
         // won't do any more TAS surveys
@@ -387,19 +393,19 @@ void Model::evolveAndSave(int y, Population &popln, Vector &vectors,
       double rho = applyMDA->getCompliance();
       // if we this is the first MDA, then we need to initialise the Probability
       // of treatment for each person
-      if (prevCov == -1) {
+      if (popln.prevCov == -1) {
         popln.initPTreat(cov, rho);
-        prevCov = cov;
-        prevRho = rho;
+        popln.prevCov = cov;
+        popln.prevRho = rho;
       }
       // if the MDA parameters have changed then we need to update the
       // probability of treatment for each person
-      if ((prevCov != applyMDA->getCoverage()) ||
-          (prevRho != applyMDA->getCompliance())) {
-        popln.checkForZeroPTreat(prevCov, prevRho);
+      if ((popln.prevCov != applyMDA->getCoverage()) ||
+          (popln.prevRho != applyMDA->getCompliance())) {
+        popln.checkForZeroPTreat(popln.prevCov, popln.prevRho);
         popln.editPTreat(cov, rho);
-        prevCov = cov;
-        prevRho = rho;
+        popln.prevCov = cov;
+        popln.prevRho = rho;
       }
       // check for anyone with 0 probability of treatment, as these will be
       // people who have not had this value initialised
@@ -410,13 +416,12 @@ void Model::evolveAndSave(int y, Population &popln, Vector &vectors,
       // then we will not begin MDA. If the indicator is not 1 then we will do
       // MDA even with low MF prevalence this uses the sampleSize input as this
       // would be assessed via a survey
-
       if (popln.totMDAs == 0) {
         if (popln.getNoMDALowMF() == 1) {
           mfprev = popln.getMFPrev(sc, 0, t, outputEndgameDate, rep, sampleSize,
                                    folderName);
           if (mfprev <= popln.MFThreshold) {
-            popln.DoMDA = 0;
+            popln.DoMDA = false;
           }
         }
       }
@@ -430,7 +435,7 @@ void Model::evolveAndSave(int y, Population &popln, Vector &vectors,
       mfprev_aimp_old = popln.getMFPrev(sc, 0, t, outputEndgameDate, rep,
                                         popln.getPopSize(), folderName);
 
-      // apply the MDA. If popln.DoMDA = 0, then we call this function, but
+      // apply the MDA. If popln.DoMDA = false, then we call this function, but
       // don't do the MDA, we just write to a file showing that no people were
       // treated.
       popln.ApplyTreatmentUpdated(applyMDA, worms, sc, t, outputEndgameDate,
