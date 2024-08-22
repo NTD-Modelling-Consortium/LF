@@ -1,7 +1,0 @@
-# built binary
-transfil_N*
-
-# object files
-*.o
-*.d
-

@@ -8,11 +8,12 @@
 
 #include "Scenario.hpp"
 #include "Output.hpp"
+#include <cassert>
 #include <filesystem>
 #include <sstream>
 #include <string>
 #include <sys/stat.h>
-namespace fs = std::__fs::filesystem;
+namespace fs = std::filesystem;
 
 bool IsPathExist(const std::string &s) {
   struct stat buffer;
@@ -277,21 +278,24 @@ void Scenario::printResults(int repnum, Output &results, Population &popln) {
       if (prevalence)
         myFileIC << "\t" << prevalence->IC;
       else
-        myFileIC << "\t" << " "; // placeholder, just mda needed for this month
+        myFileIC << "\t"
+                 << " "; // placeholder, just mda needed for this month
     }
 
     if (MFNeeded) {
       if (prevalence)
         myFileMF << "\t" << prevalence->MF;
       else
-        myFileMF << "\t" << " ";
+        myFileMF << "\t"
+                 << " ";
     }
 
     if (WCNeeded) {
       if (prevalence)
         myFileWC << "\t" << prevalence->WC;
       else
-        myFileWC << "\t" << " ";
+        myFileWC << "\t"
+                 << " ";
     }
 
     if (requiresExtra) {
@@ -310,7 +314,8 @@ void Scenario::printResults(int repnum, Output &results, Population &popln) {
         if (prevalence)
           myFileExtraMF << "\t" << prevalence->MFRestrictedAge;
         else
-          myFileExtraMF << "\t" << " ";
+          myFileExtraMF << "\t"
+                        << " ";
       }
 
       if (WCNeeded) {
@@ -318,7 +323,8 @@ void Scenario::printResults(int repnum, Output &results, Population &popln) {
         if (prevalence)
           myFileExtraWC << "\t" << prevalence->WCRestrictedAge;
         else
-          myFileExtraWC << "\t" << " ";
+          myFileExtraWC << "\t"
+                        << " ";
       }
     }
   }
@@ -451,7 +457,8 @@ void Scenario::printReplicate(std::ofstream &of, Output &results, int repnum,
     }
 
     else
-      of << "\t" << "na"; // this value wasn't used
+      of << "\t"
+         << "na"; // this value wasn't used
   }
 
   of << "\t";
@@ -507,10 +514,21 @@ void Scenario::InitIHMEData(int rep, std::string folder) {
   std::ofstream outfile;
   outfile.open(fname);
   if (rep == 0) {
-    outfile << "espen_loc" << "," << "year_id" << "," << "age_start" << ","
-            << "age_end" << "," << "measure" << "," << "draw_0" << "\n";
+    outfile << "espen_loc"
+            << ","
+            << "year_id"
+            << ","
+            << "age_start"
+            << ","
+            << "age_end"
+            << ","
+            << "measure"
+            << ","
+            << "draw_0"
+            << "\n";
   } else {
-    outfile << "draw_0" << "\n";
+    outfile << "draw_0"
+            << "\n";
   }
 
   outfile.close();
@@ -535,10 +553,21 @@ void Scenario::InitPreTASData(int rep, std::string folder) {
   std::ofstream outfile;
   outfile.open(fname);
   if (rep == 0) {
-    outfile << "espen_loc" << "," << "year_id" << "," << "age_start" << ","
-            << "age_end" << "," << "measure" << "," << "draw_0" << "\n";
+    outfile << "espen_loc"
+            << ","
+            << "year_id"
+            << ","
+            << "age_start"
+            << ","
+            << "age_end"
+            << ","
+            << "measure"
+            << ","
+            << "draw_0"
+            << "\n";
   } else {
-    outfile << "draw_0" << "\n";
+    outfile << "draw_0"
+            << "\n";
   }
 
   outfile.close();
@@ -563,10 +592,21 @@ void Scenario::InitTASData(int rep, std::string folder) {
   std::ofstream outfile;
   outfile.open(fname);
   if (rep == 0) {
-    outfile << "espen_loc" << "," << "year_id" << "," << "age_start" << ","
-            << "age_end" << "," << "measure" << "," << "draw_0" << "\n";
+    outfile << "espen_loc"
+            << ","
+            << "year_id"
+            << ","
+            << "age_start"
+            << ","
+            << "age_end"
+            << ","
+            << "measure"
+            << ","
+            << "draw_0"
+            << "\n";
   } else {
-    outfile << "draw_0" << "\n";
+    outfile << "draw_0"
+            << "\n";
   }
 
   outfile.close();
@@ -590,8 +630,8 @@ void Scenario::writePrevByAge(Population &popln, int t, int rep,
   if (rep == 0) {
     for (int j = 0; j < maxAge; j++) {
       outfile << name << "," << year << "," << j << "," << j + 1 << ","
-              << "prevalence" << "," << popln.getMFPrevByAge(j, j + 1, sample)
-              << "\n";
+              << "prevalence"
+              << "," << popln.getMFPrevByAge(j, j + 1, sample) << "\n";
     }
   } else {
     for (int j = 0; j < maxAge; j++) {
@@ -635,19 +675,34 @@ void Scenario::writeRoadmapTarget(Population &popln, int t, int rep, int DoMDA,
 
   if (rep == 0) {
     outfile << name << "," << year << "," << 5 << "," << maxAge << ","
-            << "sampled mf prevalence (all pop)" << "," << mfprevSample << "\n";
+            << "sampled mf prevalence (all pop)"
+            << "," << mfprevSample << "\n";
     outfile << name << "," << year << "," << 5 << "," << maxAge << ","
-            << "true mf prevalence (all pop)" << "," << mfprevTrue << "\n";
+            << "true mf prevalence (all pop)"
+            << "," << mfprevTrue << "\n";
     outfile << name << "," << year << "," << 6 << "," << 7 << ","
-            << "sampled IC prevalence (all pop)" << "," << ICprevSample << "\n";
+            << "sampled IC prevalence (all pop)"
+            << "," << ICprevSample << "\n";
     outfile << name << "," << year << "," << 6 << "," << 7 << ","
-            << "true IC prevalence (all pop)" << "," << ICprevTrue << "\n";
+            << "true IC prevalence (all pop)"
+            << "," << ICprevTrue << "\n";
     outfile << name << "," << year << "," << 5 << "," << maxAge << ","
-            << "metRoadmapTarget" << "," << roadmapTargetMet << "\n";
-    outfile << name << "," << year << "," << "None" << "," << "None" << ","
-            << "MDA ceased" << "," << 1 - DoMDA << "\n";
-    outfile << name << "," << year << "," << "None" << "," << "None" << ","
-            << "achieve EPHP" << "," << achieveEPHP << "\n";
+            << "metRoadmapTarget"
+            << "," << roadmapTargetMet << "\n";
+    outfile << name << "," << year << ","
+            << "None"
+            << ","
+            << "None"
+            << ","
+            << "MDA ceased"
+            << "," << 1 - DoMDA << "\n";
+    outfile << name << "," << year << ","
+            << "None"
+            << ","
+            << "None"
+            << ","
+            << "achieve EPHP"
+            << "," << achieveEPHP << "\n";
   } else {
     outfile << mfprevSample << "\n";
     outfile << mfprevTrue << "\n";
@@ -757,14 +812,16 @@ void Scenario::writeSequelaeByAge(Population &popln, int t,
   if (rep == 0) {
     for (int j = 0; j < maxAge; j++) {
       outfile << name << "," << year << "," << j << "," << j + 1 << ","
-              << "Hydrocele" << ","
+              << "Hydrocele"
+              << ","
               << popln.HydroceleTestByAge(j, j + 1, HydroceleTotalWorms,
                                           HydroceleShape)
               << "\n";
     }
     for (int j = 0; j < maxAge; j++) {
       outfile << name << "," << year << "," << j << "," << j + 1 << ","
-              << "Lymphodema" << ","
+              << "Lymphodema"
+              << ","
               << popln.LymphodemaTestByAge(j, j + 1, LymphodemaTotalWorms,
                                            LymphodemaShape)
               << "\n";
@@ -804,10 +861,21 @@ void Scenario::InitNTDMCData(int rep, std::string folder) {
   outfile.open(fname);
 
   if (rep == 0) {
-    outfile << "espen_loc" << "," << "year_id" << "," << "age_start" << ","
-            << "age_end" << "," << "measure" << "," << "draw_0" << "\n";
+    outfile << "espen_loc"
+            << ","
+            << "year_id"
+            << ","
+            << "age_start"
+            << ","
+            << "age_end"
+            << ","
+            << "measure"
+            << ","
+            << "draw_0"
+            << "\n";
   } else {
-    outfile << "draw_0" << "\n";
+    outfile << "draw_0"
+            << "\n";
   }
   outfile.close();
 }
@@ -985,14 +1053,34 @@ void Scenario::writeSurveyByAge(Population &popln, int t, int preTAS_Pass,
   outfile.open(fname, std::ios::app);
 
   if (rep == 0) {
-    outfile << name << "," << year << "," << "None" << "," << "None" << ","
-            << "numPreTASSurveys" << "," << popln.numPreTASSurveys << "\n";
-    outfile << name << "," << year << "," << "None" << "," << "None" << ","
-            << "TASSurveys" << "," << popln.numTASSurveys << "\n";
-    outfile << name << "," << year << "," << "None" << "," << "None" << ","
-            << "PreTASPass" << "," << preTAS_Pass << "\n";
-    outfile << name << "," << year << "," << "None" << "," << "None" << ","
-            << "TASPass" << "," << TAS_Pass << "\n";
+    outfile << name << "," << year << ","
+            << "None"
+            << ","
+            << "None"
+            << ","
+            << "numPreTASSurveys"
+            << "," << popln.numPreTASSurveys << "\n";
+    outfile << name << "," << year << ","
+            << "None"
+            << ","
+            << "None"
+            << ","
+            << "TASSurveys"
+            << "," << popln.numTASSurveys << "\n";
+    outfile << name << "," << year << ","
+            << "None"
+            << ","
+            << "None"
+            << ","
+            << "PreTASPass"
+            << "," << preTAS_Pass << "\n";
+    outfile << name << "," << year << ","
+            << "None"
+            << ","
+            << "None"
+            << ","
+            << "TASPass"
+            << "," << TAS_Pass << "\n";
   } else {
     outfile << popln.numPreTASSurveys << "\n";
     outfile << popln.numTASSurveys << "\n";

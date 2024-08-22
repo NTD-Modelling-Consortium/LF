@@ -8,8 +8,7 @@
 
 #include "Worm.hpp"
 #include "Statistics.hpp"
-#include "tinyxml/tinystr.h"
-#include "tinyxml/tinyxml.h"
+#include "tinyxml.h"
 #include <fstream>
 #include <iostream>
 

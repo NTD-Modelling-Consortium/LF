@@ -28,13 +28,18 @@ if [[ -z $( which pgrep ) ]] ; then
 fi
 
 # do the C++ build
-info "-> building C++ LF model ..."
 
 EXENAME="transfil_N"
 PROJECT_ROOT="${PWD}"
 RUN_DIR="${PROJECT_ROOT}/run"
-cd src
-make && ( [[ -f "${EXENAME}" ]] && cp "${EXENAME}" "${RUN_DIR}/${EXENAME}" ) && echo
+BUILD_DIR="${PROJECT_ROOT}/build"
+
+info "-> clearing 'build' directory"
+[[ -d "${BUILD_DIR}" ]] && rm -rf "${BUILD_DIR}"
+
+info "-> building C++ LF model ..."
+mkdir -p "${BUILD_DIR}" && cd "${BUILD_DIR}"
+cmake .. && cmake --build .  && ( [[ -f "src/${EXENAME}" ]] && cp "src/${EXENAME}" "${RUN_DIR}/${EXENAME}" ) && echo
 
 info "-> checking for executable in ${RUN_DIR} ..."
 
@@ -71,7 +76,6 @@ tar jxf scenarios.tbz
 ls -ld parameters scenarios
 
 cd "${PROJECT_ROOT}"
-cp src/Pop_Distribution.csv run
 echo
 
 info "-> LF model and runner are built and ready to run."

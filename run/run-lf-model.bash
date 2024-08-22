@@ -17,24 +17,26 @@ function run_ID () {
 	PARAMS="${PARAMETER_ROOT}/RandomParamIU${id}.txt"
 	SCENARIO="${SCENARIO_ROOT}/scenariosNoImp${id}.xml"
 	RESULTS="${RESULTS_ROOT}/${id}"
+	STARTING_YEAR="${STARTING_YEAR:=2020}"
 
 	echo "== making result directory ${RESULTS} for ID ${id}"
 
 	mkdir -p "${RESULTS}"
 
-	echo "== running ${NUM_SIMULATIONS} simulations of LF model with ${PARAMS} ${SCENARIO}"
+	echo "== running ${NUM_SIMULATIONS} simulations of LF model starting in ${STARTING_YEAR} with ${PARAMS} ${SCENARIO}"
 	time ./transfil_N \
 		-p  "${PARAMS}" \
 		-s  "${SCENARIO}" \
 		-o "${RESULTS}" \
 		-n ./Pop_Distribution.csv \
-		-r "${NUM_SIMULATIONS}"
+		-r "${NUM_SIMULATIONS}" \
+		-D "${STARTING_YEAR}"
 
-	echo "== combining output files for IHME & IPM using output folder ${output_folder_name}"
+	echo "== combining output files for IHME & NTDMC using output folder ${output_folder_name}"
 	( time do_file_combinations "${id}" "${output_folder_name}" "${RESULTS}" ) 2>&1
 
 	echo "== clearing out model 'result' files"
-#	rm -rf "${RESULTS}"
+	rm -rf "${RESULTS}"
 }
 
 function do_file_combinations () {
@@ -48,8 +50,10 @@ function do_file_combinations () {
 		scen=$( echo $scen_iu | cut -f 1 -d _ )
 		iu=$( echo $scen_iu | cut -f 2 -d _ )
 
+        echo "  -- running file combinations for scenario ${scen} in IU ${iu}"
+
 		combine_output_files "${scen}" "${iu}" IHME "${output_folder_name}" "${result_folder_path}"
-		combine_output_files "${scen}" "${iu}" IPM "${output_folder_name}" "${result_folder_path}"
+		combine_output_files "${scen}" "${iu}" NTDMC "${output_folder_name}" "${result_folder_path}"
 
 	done
 

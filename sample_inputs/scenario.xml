@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="utf-8">
+<Model>
+    <ParamList>
+        <host>
+            <param name="tau" value="0.00167" description="death rate" />
+            <param name="rhoBU" value="0.0" description="correlation between non-compliance and bite risk" />
+            <param name="rhoCN" value="0.0" description="correlation of non-compliance between bed-nets and MDA" />
+            <param name="minAgePrev" value="5" description="minimum age for inclusion in prevalence calculation" />
+            <param name="minAgeMDA" value="5" description="minimum age to receive" />
+            <param name="minAgeMF" value="5" description="min age to be tested for MF" />
+            <param name="maxAgeMF" value="100" description="max age to be tested for MF" />
+            <param name="minAgeIC" value="6" description="minimum age to be tested for antigen" />
+            <param name="maxAgeIC" value="7" description="maximum age to be tested for antigen" />
+            <param name="ICsensitivity" value="0.97" description="sensitivity of IC test" />
+            <param name="ICspecificity" value="0.995" description="sensitivity of IC test" />
+            <param name="ICsensitivityChange" value="0.99" description="sensitivity of IC test 2" />
+            <param name="ICspecificityChange" value="0.998" description="sensitivity of IC test 3" />
+            <param name="ICTestChangeTime" value="312" description="sensitivity of IC test 4" />
+            <param name="surveyStartDate" value=" 282 " description="first MDA survey" />
+            <param name="ICThreshold" value=" 0.02 " description="IC threshold for MDA" />
+            <param name="MFThreshold" value=" 0.01 " description="MF threshold for MDA" />
+            <param name="interSurveyPeriod" value="24" description="time between successive MDA surveys" />
+            <param name="firstTASNumMDA" value="6" description="how many MDAs before first TAS survey" />
+            <param name="HydroceleTotalWorms" value="11" description="if have had more than this cumulative number of worms, could have hydrocele" />
+            <param name="HydroceleShape" value="0.71" description="shape parameter to govern personal likelihood of getting hydrocele" />
+            <param name="LymphodemaTotalWorms" value="11" description="if have had more than this cumulative number of worms, could have lymphodema" />
+            <param name="LymphodemaShape" value="0.02" description="shape parameter to govern personal likelihood of getting Lymphodema" />
+            <param name="neverTreated" value="0" description="proportion of individuals who will never be treated" />
+            <param name="neverTreatedChange" value="0" description="proportion of individuals who will never be treated 2" />
+            <param name="neverTreatedChangeTime" value="5000" description="proportion of individuals who will never be treated 3" />
+            <param name="sensSpecChangeScen" value="3" description="change sensitivity and specificity in this scenario" />
+            <param name="updateParams" value="1" description="set to 1 if we should k and v_to_h values be updated every year, else set to 0" />
+            <param name="NoMDALowMF" value="0" description="set to 1 if we should not begin MDA treatments if the MF prevalence is already below threshold, else 0" />
+        </host>
+        <vector>
+            <param name="species" value="0" description="species of mosquito 0 - Anopheles, 1 - Culex" />
+            <param name="L3" value="5" description="init larvae density" />
+            <param name="lambda" value="10" description="bite rate per mosquito per month" />
+            <param name="g" value="0.37" description="Proportion of mosquitoes which pick up infection when biting an infected host" />
+            <param name="kappas1" value="4.395" description="L3 uptake and development" />
+            <param name="r1" value="0.055" description="L3 uptake and development" />
+            <param name="sigma" value="5.0" description="baseline death rate of mosquitos" />
+        </vector>
+        <worm>
+            <param name="nu" value="0.0" description="poly-monogamy parameter" />
+            <param name="alpha" value="1.0" description="mf birth rate per FW" />
+            <param name="psi1" value="0.414" description="Proportion of L3 leaving mosquito per bite" />
+            <param name="psi2" value="0.32" description="Proportion of L3 leaving mosquito that enter host" />
+            <param name="s2" value="0.00275" description="Prop of L3 that enter human host developing into adult" />
+            <param name="mu" value="0.0104" description="death rate of worms" />
+            <param name="gamma" value="0.1" description="death rate of mf" />
+        </worm>
+    </ParamList>
+    <ScenarioList name="Endgame" start="2000" end="2040">
+        <scenario name="minus1_TCD10760">
+            <output t="0" />
+            <output t="12" />
+            <output t="24" />
+            <output t="36" />
+            <output t="48" />
+            <output t="60" />
+            <output t="72" />
+            <output t="84" />
+            <output t="96" />
+            <output t="108" />
+            <output t="120" />
+            <output t="132" />
+            <output t="144" />
+            <output t="156" />
+            <output t="168" />
+            <output t="180" />
+            <output t="192" />
+            <output t="204" />
+            <output t="216" />
+            <output t="228" />
+            <output t="240" />
+            <output t="252" />
+            <output t="264" />
+            <output t="276" />
+            <output t="288" />
+            <output t="300" />
+            <output t="312" />
+            <output t="324" />
+            <output t="336" />
+            <output t="348" />
+            <output t="360" />
+            <output t="372" />
+            <output t="384" />
+            <output t="396" />
+            <output t="408" />
+            <output t="420" />
+            <output t="432" />
+            <output t="444" />
+            <output t="456" />
+            <output t="468" />
+            <output t="480" />
+        </scenario>
+        <scenario name="0_TCD10760" start="264">
+            <output t="264" />
+            <output t="276" />
+            <output t="288" />
+            <output t="300" />
+            <output t="312" />
+            <output t="324" />
+            <output t="336" />
+            <output t="348" />
+            <output t="360" />
+            <output t="372" />
+            <output t="384" />
+            <output t="396" />
+            <output t="408" />
+            <output t="420" />
+            <output t="432" />
+            <output t="444" />
+            <output t="456" />
+            <output t="468" />
+            <output t="480" />
+            <bednet t="264" coverage="0" syscomp="0.99" />
+            <bednet t="276" coverage="0" syscomp="0.99" />
+            <bednet t="288" coverage="0" syscomp="0.99" />
+            <bednet t="300" coverage="0" syscomp="0.99" />
+            <bednet t="312" coverage="0" syscomp="0.99" />
+        </scenario>
+    </ScenarioList>
+</Model>

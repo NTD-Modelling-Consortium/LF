@@ -7,7 +7,6 @@
 //
 
 #include "Statistics.hpp"
-#include <string>
 #include <vector>
 
 double Statistics::gamma_dist(double k) {

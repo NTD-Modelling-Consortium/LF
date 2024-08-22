@@ -12,8 +12,7 @@
 #include "Statistics.hpp"
 #include "Vector.hpp"
 #include "Worm.hpp"
-#include "tinyxml/tinystr.h"
-#include "tinyxml/tinyxml.h"
+#include "tinyxml.h"
 
 /*
  to compile on mac
@@ -41,6 +40,9 @@
 bool _DEBUG = false;
 Statistics stats;
 
+// Exclude the test when building the `model` library
+// used for testing (as CTest provides the main method)
+#ifndef DISABLE_MAIN_METHOD
 int main(int argc, char **argv) {
 
   if (argc < 2) {
@@ -200,3 +202,4 @@ int main(int argc, char **argv) {
 
   return 0;
 }
+#endif // DISABLE_MAIN_METHOD

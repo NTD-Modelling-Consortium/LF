@@ -5,62 +5,91 @@ Along with files included in the `src` folder, the gsl library is used so will n
 - Alternatively on macOS you can install gsl using homebrew: `brew install gsl`
 - Or on Debian/Ubuntu Linux you can install packages `gsl-bin libgsl-dev` using apt/aptitude
 
-### Compiling
+## Compiling
 
-From within `src` folder the following command should be run in the terminal in order to compile and run simulations:
-
+The project is compiled using CMake, and binaries are compiled into a separate folder `build`
 ```
-g++ -g -I. -I./tinyxml -I/usr/include -I/Users/matthewgraham/gsl/include -L/Users/matthewgraham/gsl/lib -Wall -O3 -std=c++11 -lm -lgsl -lgslcblas \*.cpp tinyxml/\*.cpp -o transfil_N
+mkdir build && cd build/
+cmake ..
+cmake --build .
 ```
+The executable is `build/src/transfil_N`. This will be used to run the simulations.
+On subsequent builds usually only `cmake --build .` needs to be run from the `build folder` (not `cmake ..`).
 
-On MacOS, using homebrewed `gsl`:
+If you need to clean the CMake files (perhaps after modifying CMake or directory structure), then run `cmake --build .. --clean-first`
 
+### Debug build
+If you need a build for debugging, build this into a separate folder `build_debug` and instead of the above run from the root directory
 ```
-g++ \
-	*.cpp tinyxml/*.cpp \
-	-o transfil_N \
-	-g -I. -I./tinyxml \
-	$( $(brew --prefix)/bin/gsl-config --libs ) \
-	$( $(brew --prefix)/bin/gsl-config --cflags ) \
-	-Wall -O3 -std=c++11
+mkdir build_debug && cd build_debug/
+cmake -DCMAKE_BUILD_TYPE=Debug ..
+cmake --build .
 ```
+The executable for debugging is `build_debug/src/transfil_N`.
 
-On Debian Linux 11+ using `g++` from `build-essential` you need to specify `-lstdc++fs` in the build command:
+## Running simulations
 
-```
-g++ \
-	*.cpp tinyxml/*.cpp \
-	-o transfil_N \
-	-g -I. -I./tinyxml \
-	$(gsl-config --libs) \
-	$(gsl-config --cflags) \
-	-lstdc++fs \
-	-Wall -O3 -std=c++11
-```
+To run simulations from the root directory:
 
-The gsl calls will need to be changed to where gsl library is installed on your computer.
+1) create a folder to output the results. For example, `sample_results` in the root of the project.
 
-### Running simulations
+2) then locate the three required input files: scenario, population distribution and random parameters. For testing, there are three files in the `sample_inputs` folder in the root of the project.
 
-`./transfil\_N -s testscenario.xml -n Pop_Distribution.csv -p RandomParamIU4629.txt -r 200 -t 1 -o results`
+* scenario.xml: the file giving the scenario we want to run.
 
-**Inputs**:
+* population_distribution.csv: file describing the population distribution.
 
--s testscenario.xml: the file giving the scenario we want to run.
+* random_parameters.txt: file with the fitted 200 parameter sets for IU 4629. Change to whichever parameter sets we want to run.
 
--n Pop_Distribution.csv: file describing the population distribution.
+3) run the executable with the file input and other required parameters
 
--p RandomParamIU4629.txt: file with the fitted 200 parameter sets for IU 4629. Change to whichever parameter sets we want to run.
+	`src/transfil\_N -s sample_inputs/scenario.xml -n sample_inputs/population_distribution.csv -p sample_inputs/random_parameters.txt -r 200 -t 1 -o sample_results`
 
--r 200: number of simualtions to run. Has to be smaller than or equal to the number of parameter sets given in the parameter file.
+	where the inputs are
 
--o results: folder in which to save the outputs of the simulation. This folder must be created inside the `src` folder.
+	* -s scenario.xml: the file giving the scenario we want to run.
 
+	* -n population_distribution.csv: file describing the population distribution.
 
+	* -p random_parameters.txt: file with the fitted 200 parameter sets for IU 4629. Change to whichever parameter sets we want to run.
+
+	* -r 200: number of simualtions to run. Has to be smaller than or equal to the number of parameter sets given in the parameter file.
+
+	* -o sample_results: folder in which to save the outputs of the simulation. This folder must be created inside the `src` folder.
+
+	* -t 1: the simulation time step, in months
+
+### Setting the seed for simulations
+
+Random seeds are set per simulation through a .txt file. Each line of the text file should contain the random seed for the corresponding simulation. For example, if line 30 of the file is "123456", then for simulation number 30, the random seed is set to "123456". The number of lines must equal the input `-r` above. e.g. 200 for the command above. This file is passed in with the argument `-g`, e.g.
+
+`src/transfil\_N -s sample_inputs/scenario.xml -n sample_inputs/population_distribution.csv -p sample_inputs/random_parameters.txt -g sample_inputs/random_seeds.txt -r 200 -t 1 -o sample_results`
 
 **Note**: Additional files runIU.csv, dummy_visualizations.R and vis_functions.R were previously used for post-processing of results and can be safely ignored
 
+## Running project tests
+
+The project has tests in the directory `tests` and they are driven using `ctest` and written using the `Catch2` framework.
+
+You need to have Catch2 installed on your system, and the instructions for doing this are found on the [Catch2 Github page](https://github.com/catchorg/Catch2/blob/devel/docs/cmake-integration.md#installing-catch2-from-git-repository).
+
+To run the tests, ensure the project is built as specified above, then run:
+
+```bash
+$ ctest --test-dir build/tests
+```
+
+This will execute the tests and give a brief report.
+
+Note that if you've built the project into a different directory, then the folder specified in `--test-dir` will need to change. For example for the debug build as specified above it is `build_debug/tests`.
+
+To add new tests, add the test files to `TESTS_TO_RUN` in `tests/CMakeLists.txt`.
+
 ## Contributing
+
+### Add new cpp files
+
+The project is build using CMake. Any new C++ files will need to be added to the sources list in `src/CMakeLists.txt`.
 
 ### File formatting
 
@@ -104,4 +133,3 @@ $files=(git ls-files --exclude-standard); foreach ($file in $files) { if ((get-i
 ```
 
 If you have made very large changes, it is possible that clang-format may need to be run more than once.
-

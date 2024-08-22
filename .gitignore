@@ -38,7 +38,6 @@ vignettes/*.pdf
 # R Environment Variables
 .Renviron
 .DS_Store
-*.txt
 
 # built binary
 */transfil_N*
@@ -51,3 +50,14 @@ vignettes/*.pdf
 output/*
 lf-run-*.txt
 nohup.out
+
+# c++ output files
+*.o
+*.d
+
+# Cmake
+*.cmake
+**/CMakeCache.txt
+**/CMakeFiles/*
+Makefile
+*.a

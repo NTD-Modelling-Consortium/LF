@@ -1,0 +1,35 @@
+name: clang-format, build and run
+on: [push]
+jobs:
+  format-and-build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository code
+        uses: actions/checkout@v4
+      - name: Install clang-format-18
+        run: |
+            sudo apt update
+            sudo apt install pipx
+            pipx ensurepath
+            pipx install clang-format
+      - name: Run clang-format h, cpp and hpp files
+        run: find . -iname '*.h' -o -iname '*.cpp' -o -iname '*.hpp' | xargs clang-format --dry-run -Werror
+      - name: Build
+        run: |
+          # install catch2
+          git clone https://github.com/catchorg/Catch2.git
+          cd Catch2
+          cmake -B build -S . -DBUILD_TESTING=OFF
+          sudo cmake --build build/ --target install
+          cd ..
+
+          mkdir build && cd build/
+          cmake ..
+          cmake --build .
+      - name: Run model
+        run: |
+          mkdir sample_results
+          build/src/transfil\_N -s sample_inputs/scenario.xml -n sample_inputs/population_distribution.csv -p sample_inputs/random_parameters.txt -g sample_inputs/random_seeds.txt -r 2 -t 1 -o sample_results
+      - name: Run tests
+        run: |
+          ctest --test-dir build/tests --output-on-failure
