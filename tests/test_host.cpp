@@ -16,15 +16,16 @@ TEST_CASE("Host", "[classic]") {
 
     // Save the state of each host
     hostState currentState[size];
+    
     for (int i = 0; i < size; ++i) {
-      currentState[i] = hostState(host_pop[i]);
+      currentState[i] = host_pop[i];
     }
 
     // change pTreat, so that we know that the test is doing something
     for (int i = 0; i < size; ++i) {
       host_pop[i].pTreat = 1;
     }
-
+    
     // Restore the hosts from the saved state
     for (int i = 0; i < size; ++i) {
       host_pop[i].restore(currentState[i]);
