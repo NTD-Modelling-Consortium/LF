@@ -18,6 +18,20 @@ On subsequent builds usually only `cmake --build .` needs to be run from the `bu
 
 If you need to clean the CMake files (perhaps after modifying CMake or directory structure), then run `cmake --build .. --clean-first`
 
+### Compile Options
+
+| Option | Effect | Default |
+| ------ | ------ | ------- |
+| BUILD_TESTS | Compiles the unit tests | ON
+
+To set an option, you change the initial cmake command:
+
+```
+cmake .. -DBUILD_TESTS=OFF
+```
+
+For example, to not compile the tests. 
+
 ### Debug build
 If you need a build for debugging, build this into a separate folder `build_debug` and instead of the above run from the root directory
 ```
