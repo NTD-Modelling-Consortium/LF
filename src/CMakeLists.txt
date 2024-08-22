@@ -29,7 +29,8 @@ target_link_libraries(transfil_N GSL::gsl GSL::gslcblas tinyxml)
 
 # add as a library for testing, we call the library "model"
 add_library(model ${SOURCES})
-target_include_directories(model PRIVATE
+target_compile_definitions(model PRIVATE DISABLE_MAIN_METHOD)  
+target_include_directories(model PUBLIC
 ${CMAKE_CURRENT_SOURCE_DIR}
 )
 target_link_libraries(model GSL::gsl GSL::gslcblas tinyxml)
