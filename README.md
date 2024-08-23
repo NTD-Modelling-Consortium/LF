@@ -1,9 +1,15 @@
 # LF
 
-Along with files included in the `src` folder, the gsl library is used so will need to be installed. The installation process for gsl is described [here](https://coral.ise.lehigh.edu/jild13/2016/07/11/hello/).
+## Dependencies
 
-- Alternatively on macOS you can install gsl using homebrew: `brew install gsl`
-- Or on Debian/Ubuntu Linux you can install packages `gsl-bin libgsl-dev` using apt/aptitude
+ - [GSL](https://coral.ise.lehigh.edu/jild13/2016/07/11/hello/)
+   - `brew install gsl`
+   - `apt install gsl-bin libgsl-dev`
+ - [CMake](https://cmake.org/download/)
+   - `brew install cmake`
+   - `apt install cmake`
+ - [Catch](https://github.com/catchorg/Catch2) (optional - use `-DBUILD_TESTS=OFF` to disable building tests)
+   - [Installation instructions](https://github.com/catchorg/Catch2/blob/devel/docs/cmake-integration.md#installing-catch2-from-git-repository)
 
 ## Compiling
 
@@ -17,6 +23,20 @@ The executable is `build/src/transfil_N`. This will be used to run the simulatio
 On subsequent builds usually only `cmake --build .` needs to be run from the `build folder` (not `cmake ..`).
 
 If you need to clean the CMake files (perhaps after modifying CMake or directory structure), then run `cmake --build .. --clean-first`
+
+### Compile Options
+
+| Option | Effect | Default |
+| ------ | ------ | ------- |
+| BUILD_TESTS | Compiles the unit tests | ON
+
+To set an option, you change the initial cmake command:
+
+```
+cmake .. -DBUILD_TESTS=OFF
+```
+
+For example, to not compile the tests. 
 
 ### Debug build
 If you need a build for debugging, build this into a separate folder `build_debug` and instead of the above run from the root directory
