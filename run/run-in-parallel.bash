@@ -54,7 +54,7 @@ echo "-> saving output into ${output_folder_name}" >&2
 # run the job in parallel
 NUM_SIMULATIONS=${NUM_SIMULATIONS:=5} \
 STARTING_YEAR=${STARTING_YEAR:=2020} \
-	parallel ${JOBS_ARG} -a "${RUNNING_ID_LIST_FILE}" \
+	parallel "${JOBS_ARG}" -a "${RUNNING_ID_LIST_FILE}" \
 	pipenv run bash run-lf-model.bash "${output_folder_name}"
 
 # clean up intermediate files?

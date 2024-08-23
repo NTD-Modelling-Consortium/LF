@@ -45,8 +45,6 @@ function run_ID () {
 		-r "${NUM_SIMULATIONS}" \
 		-D "${STARTING_YEAR}"
 
-	exit
-
 	echo "== combining output files for IHME & NTDMC using output folder ${output_folder_name}"
 	( time do_file_combinations "${id}" "${output_folder_name}" "${RESULTS}" ) 2>&1
 

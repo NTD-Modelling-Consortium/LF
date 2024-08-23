@@ -64,6 +64,7 @@ PROJECT_ROOT_DIR=$( get_abs_filename . )
 # default options, potentially overridden in env
 PARAMETER_ROOT="${PARAMETER_ROOT:=$( realpath ./run/parameters )}"
 PARAMETER_FILE_STEM="${PARAMETER_FILE_STEM:=RandomParamIU}"
+# shellcheck disable=SC2005,SC2046
 SEED_ROOT="${SEED_ROOT:=$( [[ -d ./run/seeds ]] && echo $( realpath ./run/seeds ) || echo '' )}"
 SEED_FILE_STEM="${SEED_FILE_STEM:=RandomSeeds_}"
 SCENARIO_ROOT="${SCENARIO_ROOT:=$( realpath ./run/scenarios )}"
@@ -187,6 +188,7 @@ if [[ ! -d "${SCENARIO_ROOT}" ]] ; then
 	usage
 fi
 
+# shellcheck disable=SC2086
 if [[ -z "$( ls -1 ${SCENARIO_ROOT}/${SCENARIO_FILE_STEM}* 2>/dev/null )" ]] ; then
 	error "there aren't any scenario files in ${SCENARIO_ROOT} with filename stem ${SCENARIO_FILE_STEM}"
 	usage
@@ -197,6 +199,7 @@ if [[ ! -d "${PARAMETER_ROOT}" ]] ; then
 	usage
 fi
 
+# shellcheck disable=SC2086
 if [[ -z "$( ls -1 ${PARAMETER_ROOT}/${PARAMETER_FILE_STEM}* 2>/dev/null )" ]] ; then
 	error "there aren't any parameter files in ${PARAMETER_ROOT} with filename stem ${PARAMETER_FILE_STEM}"
 	usage
@@ -212,6 +215,7 @@ if [[ "${USE_SEED_FILE}" = "true" ]] && [[ -z "${SEED_ROOT}" ]] ; then
 	usage
 fi
 
+# shellcheck disable=SC2086
 if [[ -z "$( ls -1 ${SEED_ROOT}/${SEED_FILE_STEM}* 2>/dev/null )" ]] ; then
 	error "there aren't any seed files in ${SEED_ROOT} with filename stem ${SEED_FILE_STEM}"
 	usage
@@ -233,7 +237,7 @@ if [[ ! "${TIMESTEP}" =~ ^-?[0-9]+$ ]] ; then
 fi
 
 # display info splash
-NUM_IUS=$( wc -l ${RUNNING_ID_LIST_FILE} | awk '{print $1}' )
+NUM_IUS=$( wc -l "${RUNNING_ID_LIST_FILE}" | awk '{print $1}' )
 info "about to run model with these settings:"
 echo "- run ${NUM_SIMULATIONS} simulations for each IU"
 echo "- across ${NUM_PARALLEL_JOBS} parallel jobs"
@@ -308,6 +312,7 @@ select CHOICE in yes no ; do
 			REAL_LOG_PATH=$( realpath ${PROJECT_ROOT_DIR}/${LOG_FILE} )
 			info "LF model is running in a detached shell."
 			echo "Log output is being saved to file: ${REAL_LOG_PATH}"
+			# shellcheck disable=SC2086
 			echo "When the model runs have finished, the file $( realpath ${PROJECT_ROOT_DIR} )/${FINISH_FILE} will be created."
 
 			exit 0
