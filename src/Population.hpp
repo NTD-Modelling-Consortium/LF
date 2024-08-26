@@ -133,7 +133,7 @@ public:
   int TASSurveyTime;
   int preTAS_Pass;
   int TAS_Pass;
-  double prevCov = -1;
+  double prevCov;
   double prevRho;
   // indicator if we should do the MDA when the MDA is called.
   // This will be switched to 0 if preTAS is passed, then the MDA function will

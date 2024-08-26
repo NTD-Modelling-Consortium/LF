@@ -410,6 +410,7 @@ void Population::initHosts(std::string distType, double k_val,
   DoMDA = true;
   preTAS_Pass = 0;
   TAS_Pass = 0;
+  prevCov = -1;
 }
 
 void Population::updateKVal(double k_val) {
@@ -562,7 +563,7 @@ int Population::TASSurvey(Scenario &sc, int t, int outputEndgameDate, int rep,
   if ((icprev <= ICThreshold)) { // if the ic prevalence is below the threshold
                                  // and mf prev also below threshold
     TAS_Pass = 1;                // set TAS pass indicator to 1
-    time_TAS_Passes = t;              // store the time of passing TAS
+    time_TAS_Passes = t;         // store the time of passing TAS
   }
   return TAS_Pass;
 }
