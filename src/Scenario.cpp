@@ -334,7 +334,7 @@ void Scenario::printResults(int repnum, Output &results, Population &popln) {
     myFileIC << "\t" << popln.post2020MDAs;
     myFileIC << "\t" << popln.numPreTASSurveys;
     myFileIC << "\t" << popln.numTASSurveys;
-    myFileIC << "\t" << popln.t_TAS_Pass;
+    myFileIC << "\t" << popln.time_TAS_Passes;
     myFileIC << std::endl;
   }
 
@@ -343,7 +343,7 @@ void Scenario::printResults(int repnum, Output &results, Population &popln) {
     myFileMF << "\t" << popln.post2020MDAs;
     myFileMF << "\t" << popln.numPreTASSurveys;
     myFileMF << "\t" << popln.numTASSurveys;
-    myFileMF << "\t" << popln.t_TAS_Pass;
+    myFileMF << "\t" << popln.time_TAS_Passes;
     myFileMF << std::endl;
   }
 
@@ -352,7 +352,7 @@ void Scenario::printResults(int repnum, Output &results, Population &popln) {
     myFileWC << "\t" << popln.post2020MDAs;
     myFileWC << "\t" << popln.numPreTASSurveys;
     myFileWC << "\t" << popln.numTASSurveys;
-    myFileWC << "\t" << popln.t_TAS_Pass;
+    myFileWC << "\t" << popln.time_TAS_Passes;
     myFileWC << std::endl;
   }
 

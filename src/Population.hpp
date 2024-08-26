@@ -128,7 +128,7 @@ public:
   int numTASSurveys;
   int totMDAs;
   int post2020MDAs;
-  int t_TAS_Pass;
+  int time_TAS_Passes;
   int preTASSurveyTime;
   int TASSurveyTime;
   int preTAS_Pass;

@@ -404,7 +404,7 @@ void Population::initHosts(std::string distType, double k_val,
   // when initializing the hosts, also reset everything to do with surveys
   totMDAs = 0;
   post2020MDAs = 0;
-  t_TAS_Pass = -1;
+  time_TAS_Passes = -1;
   preTASSurveyTime = -1000;
   TASSurveyTime = -1000;
   DoMDA = true;
@@ -562,7 +562,7 @@ int Population::TASSurvey(Scenario &sc, int t, int outputEndgameDate, int rep,
   if ((icprev <= ICThreshold)) { // if the ic prevalence is below the threshold
                                  // and mf prev also below threshold
     TAS_Pass = 1;                // set TAS pass indicator to 1
-    t_TAS_Pass = t;              // store the time of passing TAS
+    time_TAS_Passes = t;              // store the time of passing TAS
   }
   return TAS_Pass;
 }
