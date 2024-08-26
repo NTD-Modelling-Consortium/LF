@@ -15,8 +15,12 @@ TEST_CASE("Host", "[classic]") {
     }
 
     // Save the state of each host
-    hostState currentState[size];
-
+    //hostState currentState[size];
+    std::vector<hostState> currentState;
+    currentState.resize(size,
+                           {0, 0, 0, 0.0, 0.0, 0.0, 0, 0,
+                            0.0}); // WM, WF,totalWorms, totalWormYears,
+                                   // M,biteRisk,age,monthSinceTreated, pTreat
     for (int i = 0; i < size; ++i) {
       currentState[i] = host_pop[i];
     }
@@ -25,8 +29,8 @@ TEST_CASE("Host", "[classic]") {
     // doing something
     for (int i = 0; i < size; ++i) {
       host_pop[i].WM = 10;
-      host_pop[i].biteRisk = i;
-      host_pop[i].pTreat = 1;
+      host_pop[i].biteRisk = 1.0;
+      host_pop[i].pTreat = 1.0;
     }
 
     // Restore the hosts from the saved state
