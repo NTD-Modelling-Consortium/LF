@@ -940,11 +940,9 @@ void Population::saveCurrentState(int month, std::string sname) {
 
   savedMonth currentState;
 
-  currentState.scenario = sname; // debugging only
-  currentState.data.resize(size,
-                           {0, 0, 0, 0.0, 0.0, 0.0, 0, 0,
-                            0.0}); // WM, WF,totalWorms, totalWormYears,
-                                   // M,biteRisk,age,monthSinceTreated, pTreat
+  currentState.scenario = sname;  // debugging only
+  currentState.data.resize(size); // WM, WF,totalWorms, totalWormYears,
+                                  // M,biteRisk,age,monthSinceTreated, pTreat
 
   for (int i = 0; i < size; i++)
     currentState.data[i] =
