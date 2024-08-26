@@ -131,6 +131,7 @@ public:
   double aImp;
   int sensSpecChangeCount = 0;
   int neverTreatChangeCount = 0;
+  int switchImportationReducingMethodTime = 99999;
   std::vector<std::string> sensSpecChangeName;
   std::vector<std::string> neverTreatChangeName;
 

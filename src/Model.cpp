@@ -323,8 +323,13 @@ void Model::evolveAndSave(int y, Population &popln, Vector &vectors,
       doneTAS = 0;
     }
     // if we give values externally to reduce the importation rate, then do so
-    // here
-    if (reduceImpViaXml == 1) {
+    // here. This will apply up until the time at which we want to switch the
+    // method for reducing the importation rate to use the within simulation
+    // calculation based on prevalence post an MDA. If not included in the XML
+    // file for the scenario the time for this will be long after the end of the
+    // simulation, so we will never switch to the other method.
+    if ((reduceImpViaXml == 1) &&
+        (t < popln.switchImportationReducingMethodTime)) {
       sc.updateImportationRate(popln, t);
     }
     sc.updateBedNetCoverage(popln, t);
@@ -474,17 +479,21 @@ void Model::evolveAndSave(int y, Population &popln, Vector &vectors,
 
     // if it is the time to potentially reduce importation using the simulation
     // rather than externally input values, then do so
-    if (reduceImpViaXml == 0) {
-      if (t == t_import_reduction) {
-
-        mfprev_aimp_new = popln.getMFPrev(sc, 0, t, outputEndgameDate, rep,
-                                          popSize, folderName);
-        if (mfprev_aimp_old > mfprev_aimp_new) {
-          popln.aImp = popln.aImp * mfprev_aimp_new / mfprev_aimp_old;
-        }
-        mfprev_aimp_old = popln.getMFPrev(sc, 0, t, outputEndgameDate, rep,
-                                          popSize, folderName);
+    // the popln.switchImportationReducingMethodTime value gives the time for
+    // which we will switch to this method rather than using the XML file. This
+    // is needed for when we are looking at the future, since the specification
+    // within the xml file is based on map data of the progression of LF over
+    // time and hence for the future, we will not have any data to use here.
+    if ((reduceImpViaXml == 0 ||
+         popln.switchImportationReducingMethodTime <= t) &&
+        t == t_import_reduction) {
+      mfprev_aimp_new = popln.getMFPrev(sc, 0, t, outputEndgameDate, rep,
+                                        popSize, folderName);
+      if (mfprev_aimp_old > mfprev_aimp_new) {
+        popln.aImp = popln.aImp * mfprev_aimp_new / mfprev_aimp_old;
       }
+      mfprev_aimp_old = popln.getMFPrev(sc, 0, t, outputEndgameDate, rep,
+                                        popSize, folderName);
     }
 
     if (t < popln.getNeverTreatChangeTime()) {
@@ -530,8 +539,9 @@ void Model::evolveAndSave(int y, Population &popln, Vector &vectors,
 
   if (y < (sc.getNumMonthsToSave() - 1)) { // not finished this scenario
     popln.saveCurrentState(
-        currentMonth, sc.getName()); // worms and importation rate. Scenario
-                                     // name just needed for debugging
+        currentMonth,
+        sc.getName()); // worms and importation rate. Scenario
+                       // name just needed for debugging
     vectors.saveCurrentState(currentMonth); // larval density
 
     if (_DEBUG)
