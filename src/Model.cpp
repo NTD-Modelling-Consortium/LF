@@ -207,7 +207,10 @@ void Model::evolveAndSave(int y, Population &popln, Vector &vectors,
   // advance to the next target month
   std::string folderName = opDir;
   std::string MDAType;
-  int t_import_reduction = -1;
+  int time_to_reduce_importation_rate =
+      -1; // this is for when we want to reduce the importation rate via
+          // checking the prevalence post and MDA. This will be set to 6 months
+          // after the MDA occurs when the MDA is applied.
   int preTASSurveyTime = -1000;
   int TASSurveyTime = -1000;
   int paramIndex = 0;
@@ -467,7 +470,7 @@ void Model::evolveAndSave(int y, Population &popln, Vector &vectors,
       // the MDA, we just write to a file showing that no people were treated.
       popln.ApplyTreatmentUpdated(applyMDA, worms, sc, t, outputEndgameDate,
                                   rep, DoMDA, outputEndgame, folderName);
-      t_import_reduction = t + 6;
+      time_to_reduce_importation_rate = t + 6;
 
       popln.totMDAs += 1;
 
@@ -498,7 +501,7 @@ void Model::evolveAndSave(int y, Population &popln, Vector &vectors,
     // time and hence for the future, we will not have any data to use here.
     if (reduceImportationViaPrevalenceCheck(
             reduceImpViaXml, t, popln.switchImportationReducingMethodTime) &&
-        t == t_import_reduction) {
+        t == time_to_reduce_importation_rate) {
       mfprev_aimp_new = popln.getMFPrev(sc, 0, t, outputEndgameDate, rep,
                                         popSize, folderName);
       if (mfprev_aimp_old > mfprev_aimp_new) {
