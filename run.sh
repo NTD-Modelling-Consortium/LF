@@ -115,7 +115,7 @@ while getopts "n:f:D:o:j:s:S:p:P:u:U:V:r:O:Y:e:t:x:k:" opts ; do
 			;;
 
 		s)
-			SCENARIO_ROOT=$( realpath "${OPTARG}" )
+			SCENARIO_ROOT="${OPTARG}"
 			;;
 
 		S)
@@ -123,7 +123,7 @@ while getopts "n:f:D:o:j:s:S:p:P:u:U:V:r:O:Y:e:t:x:k:" opts ; do
 			;;
 
 		p)
-			PARAMETER_ROOT=$( realpath "${OPTARG}" )
+			PARAMETER_ROOT="${OPTARG}"
 			;;
 
 		P)
@@ -136,7 +136,7 @@ while getopts "n:f:D:o:j:s:S:p:P:u:U:V:r:O:Y:e:t:x:k:" opts ; do
 			;;
 
 		U)
-			SEED_ROOT=$( realpath "${OPTARG}" )
+			SEED_ROOT="${OPTARG}"
 			;;
 
 		V)
@@ -144,11 +144,11 @@ while getopts "n:f:D:o:j:s:S:p:P:u:U:V:r:O:Y:e:t:x:k:" opts ; do
 			;;
 
 		r)
-			RESULTS_ROOT=$( realpath "${OPTARG}" )
+			RESULTS_ROOT="${OPTARG}"
 			;;
 
 		O)
-			OUTPUT_ROOT=$( realpath "${OPTARG}" )
+			OUTPUT_ROOT="${OPTARG}"
 			;;
 
 		Y)
@@ -182,10 +182,11 @@ while getopts "n:f:D:o:j:s:S:p:P:u:U:V:r:O:Y:e:t:x:k:" opts ; do
 
 done
 
-# check input/output directories
 if [[ ! -d "${SCENARIO_ROOT}" ]] ; then
 	error "scenario-dir must be a real path to a directory"
 	usage
+else
+	SCENARIO_ROOT=$( realpath "${SCENARIO_ROOT}" )
 fi
 
 # shellcheck disable=SC2086
@@ -197,6 +198,8 @@ fi
 if [[ ! -d "${PARAMETER_ROOT}" ]] ; then
 	error "parameter-dir must be a real path to a directory"
 	usage
+else
+	PARAMETER_ROOT=$( realpath "${PARAMETER_ROOT}" )
 fi
 
 # shellcheck disable=SC2086
@@ -210,9 +213,13 @@ if [[ -n "${SEED_ROOT}" ]] && [[ ! -d "${SEED_ROOT}" ]] ; then
 	usage
 fi
 
-if [[ "${USE_SEED_FILE}" = "true" ]] && [[ -z "${SEED_ROOT}" ]] ; then
-	error "seed-dir must be specified if using seed files"
-	usage
+if [[ "${USE_SEED_FILE}" = "true" ]] ; then
+	if [[ -z "${SEED_ROOT}" ]] ; then
+		error "seed-dir must be specified if using seed files"
+		usage
+	else
+		SEED_ROOT=$( realpath "${SEED_ROOT}" )
+	fi
 fi
 
 # shellcheck disable=SC2086
@@ -224,11 +231,15 @@ fi
 if [[ ! -d "${RESULTS_ROOT}" ]] ; then
 	error "result-dir must be a real path to a directory"
 	usage
+else
+	RESULTS_ROOT=$( realpath "${RESULTS_ROOT}" )
 fi
 
 if [[ ! -d "${OUTPUT_ROOT}" ]] ; then
 	error "output-dir must be a real path to a directory"
 	usage
+else
+	OUTPUT_ROOT=$( realpath "${OUTPUT_ROOT}" )
 fi
 
 if [[ ! "${TIMESTEP}" =~ ^-?[0-9]+$ ]] ; then
@@ -308,10 +319,12 @@ select CHOICE in yes no ; do
 					&
 
 			# inform user
+			# disable check because re-quoting inside command substitution is ungainly
 			# shellcheck disable=SC2086
 			REAL_LOG_PATH=$( realpath ${PROJECT_ROOT_DIR}/${LOG_FILE} )
 			info "LF model is running in a detached shell."
 			echo "Log output is being saved to file: ${REAL_LOG_PATH}"
+			# disable check because re-quoting inside command substitution is ungainly
 			# shellcheck disable=SC2086
 			echo "When the model runs have finished, the file $( realpath ${PROJECT_ROOT_DIR} )/${FINISH_FILE} will be created."
 
