@@ -4,54 +4,64 @@
 TEST_CASE("Host", "[classic]") {
   SECTION("Host::restore") {
     // Initialize a population of hosts
-    int size = 10;
+    int size = 1;
     double TotalBiteRisk = 0.0;
-    Host host_pop[size];
+    Host host_pop;
 
     // initialise population and set pTreat value
-    for (int i = 0; i < size; ++i) {
-      host_pop[i].initialise(1.0, 100, 0.2, &TotalBiteRisk, 0.1, 0.1, 0.0);
-      host_pop[i].pTreat = (1.0 / i);
-    }
+
+    host_pop.initialise(1.0, 100, 0.2, &TotalBiteRisk, 0.1, 0.1, 0.0);
+    host_pop.WM = 1;
+    host_pop.WF = 2;
+    host_pop.totalWorms = 3;
+    host_pop.totalWormYears = 4.1;
+    host_pop.M = 5.0;
+    host_pop.biteRisk = 6.0;
+    host_pop.age = 7.0;
+    host_pop.monthsSinceTreated = 8;
+    host_pop.hydroMult = 9.0;
+    host_pop.lymphoMult = 10.0;
+    host_pop.sex = 0;
+    host_pop.pTreat = 3.1415926535;
 
     // Save the state of each host
     // hostState currentState[size];
-    std::vector<hostState> currentState;
-    currentState.resize(size); // WM, WF,totalWorms, totalWormYears,
-                               // M,biteRisk,age,monthSinceTreated, pTreat
-    for (int i = 0; i < size; ++i) {
-      currentState[i] = host_pop[i];
-    }
+    hostState currentState;
+    currentState = host_pop;
 
     // change the values in some fields, so that we know that the tested code is
     // doing something
-    for (int i = 0; i < size; ++i) {
-      host_pop[i].WM = 10;
-      host_pop[i].biteRisk = 1.0;
-      host_pop[i].pTreat = 1.0;
-    }
+
+    host_pop.WM = 0;
+    host_pop.WF = 0;
+    host_pop.totalWorms = 0;
+    host_pop.totalWormYears = 0.0;
+    host_pop.M = 0.0;
+    host_pop.biteRisk = 0.0;
+    host_pop.age = 0.0;
+    host_pop.monthsSinceTreated = 0;
+    host_pop.hydroMult = 0.0;
+    host_pop.lymphoMult = 0.0;
+    host_pop.sex = 1;
+    host_pop.pTreat = 0.0;
 
     // Restore the hosts from the saved state
-    for (int i = 0; i < size; ++i) {
-      host_pop[i].restore(currentState[i]);
-    }
+
+    host_pop.restore(currentState);
 
     // check that each host's state matches the saved state
-    for (int i = 0; i < size; ++i) {
-      REQUIRE(host_pop[i].WM == currentState[i].WM);
-      REQUIRE(host_pop[i].WF == currentState[i].WF);
-      REQUIRE(host_pop[i].totalWorms == currentState[i].totalWorms);
-      REQUIRE(host_pop[i].totalWormYears == currentState[i].totalWormYears);
-      REQUIRE(host_pop[i].M == currentState[i].M);
-      REQUIRE(host_pop[i].biteRisk == currentState[i].biteRisk);
-      REQUIRE(host_pop[i].age == currentState[i].age);
-      REQUIRE(host_pop[i].monthsSinceTreated ==
-              currentState[i].monthsSinceTreated);
-      REQUIRE(host_pop[i].hydroMult == currentState[i].hydroMult);
-      REQUIRE(host_pop[i].lymphoMult == currentState[i].lymphoMult);
-      REQUIRE(host_pop[i].sex == currentState[i].sex);
-      REQUIRE(host_pop[i].pTreat == 1.0 / i);
-      REQUIRE(host_pop[i].pTreat == currentState[i].pTreat);
-    }
+
+    REQUIRE(host_pop.WM == 1);
+    REQUIRE(host_pop.WF == 2);
+    REQUIRE(host_pop.totalWorms == 3);
+    REQUIRE(host_pop.totalWormYears == 4.1);
+    REQUIRE(host_pop.M == 5.0);
+    REQUIRE(host_pop.biteRisk == 6.0);
+    REQUIRE(host_pop.age == 7.0);
+    REQUIRE(host_pop.monthsSinceTreated == 8);
+    REQUIRE(host_pop.hydroMult == 9.0);
+    REQUIRE(host_pop.lymphoMult == 10.0);
+    REQUIRE(host_pop.sex == 0);
+    REQUIRE(host_pop.pTreat == 3.1415926535);
   }
 }
