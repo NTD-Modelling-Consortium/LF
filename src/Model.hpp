@@ -32,8 +32,8 @@ public:
                     std::string randParamsfile, std::string RandomSeedFile,
                     std::string opDir);
   bool
-  reduceImportationViaPrevalenceCheck(int t, int reduceImpViaXml,
-                                      int switchImportationReducingMethodTime);
+  shouldReduceImportationViaPrevalance(int t, int reduceImpViaXml,
+                                       int switchImportationReducingMethodTime);
 
 protected:
   void burnIn(Population &popln, Vector &vectors, const Worm &worms,

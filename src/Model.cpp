@@ -155,7 +155,7 @@ void Model::runScenarios(ScenariosList &scenarios, Population &popln,
   // finished
 }
 
-bool Model::reduceImportationViaPrevalenceCheck(
+bool Model::shouldReduceImportationViaPrevalance(
     int reduceImpViaXml, int t, int switchImportationReducingMethodTime) {
   // function to check if we should reduce the importation rate via checking how
   // the prevalence has changed over time. the alternative to this is via
@@ -343,7 +343,7 @@ void Model::evolveAndSave(int y, Population &popln, Vector &vectors,
     // calculation based on prevalence post an MDA. If not included in the XML
     // file for the scenario the time for this will be long after the end of the
     // simulation, so we will never switch to the other method.
-    if (!reduceImportationViaPrevalenceCheck(
+    if (!shouldReduceImportationViaPrevalance(
             reduceImpViaXml, t, popln.switchImportationReducingMethodTime)) {
       sc.updateImportationRate(popln, t);
     }
@@ -499,7 +499,7 @@ void Model::evolveAndSave(int y, Population &popln, Vector &vectors,
     // is needed for when we are looking at the future, since the specification
     // within the xml file is based on map data of the progression of LF over
     // time and hence for the future, we will not have any data to use here.
-    if (reduceImportationViaPrevalenceCheck(
+    if (shouldReduceImportationViaPrevalance(
             reduceImpViaXml, t, popln.switchImportationReducingMethodTime) &&
         t == time_to_reduce_importation_rate) {
       mfprev_aimp_new = popln.getMFPrev(sc, 0, t, outputEndgameDate, rep,
