@@ -99,7 +99,7 @@ public:
   void ApplyTreatment(MDAEvent *mda, Worm &worms, Scenario &sc, int t, int rep,
                       std::string folderName);
   void ApplyTreatmentUpdated(MDAEvent *mda, Worm &worms, Scenario &sc, int t,
-                             int outputEndgameDate, int rep, int DoMDA,
+                             int outputEndgameDate, int rep, bool DoMDA,
                              int outputEndgame, std::string folderName);
   void saveCurrentState(int month, std::string sname);
   void resetToMonth(int month);
@@ -123,11 +123,25 @@ public:
   double MFThreshold;
   int interSurveyPeriod;
   int firstTASNumMDA;
-  int numPreTASSurveys = 0;
-  int numTASSurveys = 0;
-  int totMDAs = 0;
-  int post2020MDAs = 0;
-  int t_TAS_Pass = -1;
+  // declare the information regarding surveys
+  int numPreTASSurveys;
+  int numTASSurveys;
+  int totMDAs;
+  int post2020MDAs;
+  int time_TAS_Passes;
+  int preTASSurveyTime;
+  int TASSurveyTime;
+  int preTAS_Pass;
+  int TAS_Pass;
+  double prevCov;
+  double prevRho;
+  // indicator if we should do the MDA when the MDA is called.
+  // This will be switched to 0 if preTAS is passed, then the MDA function will
+  // be called, but will not be done We will still get the output of the MDA
+  // showing that no people were treated this year. This is to keep the output
+  // of MDA's constant so that we can combine different runs even if they have
+  // different numbers of MDA's performed.
+  bool DoMDA;
   double aImp;
   int sensSpecChangeCount = 0;
   int neverTreatChangeCount = 0;
@@ -230,6 +244,16 @@ private:
     double u0MDA;
     double bednetCov;
     double mdaCov;
+    bool DoMDA;
+    int totMDAs;
+    int numPreTASSurveys;
+    int numTASSurveys;
+    int preTASSurveyTime;
+    int TASSurveyTime;
+    int preTAS_Pass;
+    int TAS_Pass;
+    double prevCov;
+    double prevRho;
     std::string
         scenario; // for debugging only. The scenario that saved this month
 

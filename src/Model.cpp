@@ -196,18 +196,11 @@ void Model::evolveAndSave(int y, Population &popln, Vector &vectors,
   std::string folderName = opDir;
   std::string MDAType;
   int t_import_reduction = -1;
-  int preTASSurveyTime = -1000;
-  int TASSurveyTime = -1000;
   int paramIndex = 0;
   int targetMonth = sc.getMonthToSave(y); // simulate to start of this month
   double mfprev = 1; // variable to check prevalence of mf for survey
   // double icprev = 1; //variable to check prevalence of ic for survey
   int numMDADoSurvey = popln.firstTASNumMDA;
-  popln.totMDAs = 0;
-  popln.post2020MDAs = 0;
-  popln.numPreTASSurveys = 0;
-  popln.numTASSurveys = 0;
-  popln.t_TAS_Pass = -1;
   int sampleSize = popln.getSampleSize();
   // set the outputEndgameDate to be relative to year 2000.
   // This should be updated when we automatically get the baseYear of the
@@ -218,11 +211,9 @@ void Model::evolveAndSave(int y, Population &popln, Vector &vectors,
   double mfprev_aimp_old =
       popln.getMFPrev(sc, 0, 0, outputEndgameDate, rep, popSize, folderName);
   double mfprev_aimp_new = 0;
-  bool preTAS_Pass = 0;
   int changeSensSpec = 0;
   int changeNeverTreat = 0;
   // int maxAge = popln.getMaxAge();
-  int TAS_Pass = 0;
   int neededTASPass =
       3; // number of times TAS must be passed to reached WHO target
          // (https://www.who.int/publications/i/item/9789241501484)
@@ -241,19 +232,18 @@ void Model::evolveAndSave(int y, Population &popln, Vector &vectors,
   }
 
   int vec_control = 0;
-  double prevCov = -1;
-  double prevRho = -1;
+
   int minAge;
   int maxAge = popln.returnMaxAge();
   int donePreTAS = 0;
   int doneTAS = 0;
   // indicator if we should do the MDA when the MDA is called.
-  // This will be switched to 0 if preTAS is passed, then the MDA function will
-  // be called, but will not be done We will still get the output of the MDA
-  // showing that no people were treated this year. This is to keep the output
-  // of MDA's constant so that we can combine different runs even if they have
-  // different numbers of MDA's performed.
-  int DoMDA = 1;
+  // This will be switched to false if preTAS is passed, then the MDA function
+  // will be called, but will not be done. We will still get the output of the
+  // MDA showing that no people were treated this year. This is to keep the
+  // output of MDA's constant so that we can combine different runs even if they
+  // have different numbers of MDA's performed.
+  popln.DoMDA = true;
 
   for (int q = 0; q < popln.sensSpecChangeCount; q++) {
     if (popln.sensSpecChangeName[q] == sc.getName()) {
@@ -286,14 +276,15 @@ void Model::evolveAndSave(int y, Population &popln, Vector &vectors,
     // year we want to do the endgame output for, then don't do this.
     if ((t % 12 == 0) && (outputEndgame == 1) && (t >= outputEndgameDate)) {
       sc.writePrevByAge(popln, t, rep, folderName);
-      sc.writeRoadmapTarget(popln, t, rep, DoMDA, TAS_Pass, neededTASPass,
-                            folderName);
+      sc.writeRoadmapTarget(popln, t, rep, popln.DoMDA, popln.TAS_Pass,
+                            neededTASPass, folderName);
       sc.writeNumberByAge(popln, t, rep, folderName, "not survey");
       sc.writeSequelaeByAge(popln, t, LymphodemaTotalWorms, LymphodemaShape,
                             HydroceleTotalWorms, HydroceleShape, rep,
                             folderName);
       popln.getIncidence(sc, t, rep, folderName);
-      sc.writeSurveyByAge(popln, t, preTAS_Pass, TAS_Pass, rep, folderName);
+      sc.writeSurveyByAge(popln, t, popln.preTAS_Pass, popln.TAS_Pass, rep,
+                          folderName);
     }
 
     // If we haven't done a survey this year we still want to output this fact
@@ -345,50 +336,50 @@ void Model::evolveAndSave(int y, Population &popln, Vector &vectors,
           outputPrev); // prev measured before mda done to kill mf in hosts
 
     // snippet to perform a preTAS survey
-    if (t == preTASSurveyTime) {
+    if (t == popln.preTASSurveyTime) {
 
-      preTAS_Pass = popln.PreTASSurvey(sc, outputEndgame, t, outputEndgameDate,
-                                       rep, folderName);
+      popln.preTAS_Pass = popln.PreTASSurvey(
+          sc, outputEndgame, t, outputEndgameDate, rep, folderName);
       if ((outputEndgame == 1) && (t >= outputEndgameDate)) {
         sc.writeNumberByAge(popln, t, rep, folderName, "PreTAS survey");
       }
 
       donePreTAS = 1;
-      if (preTAS_Pass == 1) {
+      if (popln.preTAS_Pass == 1) {
         // if we pass the preTAS survey then we set a time for the TASsurvey
         // we also stop doing MDA
-        TASSurveyTime = t;
-        DoMDA = 0;
+        popln.TASSurveyTime = t;
+        popln.DoMDA = false;
       } else {
-        preTASSurveyTime = t + popln.interSurveyPeriod;
-        DoMDA = 1;
+        popln.preTASSurveyTime = t + popln.interSurveyPeriod;
+        popln.DoMDA = true;
       }
     }
     // snippet to perform a TAS survey
 
-    if (t == TASSurveyTime) {
+    if (t == popln.TASSurveyTime) {
       int TAS_Pass_ind =
           popln.TASSurvey(sc, t, outputEndgameDate, rep, folderName);
       if ((outputEndgame == 1) && (t >= outputEndgameDate)) {
         sc.writeNumberByAge(popln, t, rep, folderName, "TAS survey");
       }
       doneTAS = 1;
-      TAS_Pass += TAS_Pass_ind;
+      popln.TAS_Pass += TAS_Pass_ind;
       if (TAS_Pass_ind == 0) {
         // if failed, then reset TAS_PAss to 0 and set a time to do another
         // preTAS survey also switch back on MDA's
-        TAS_Pass = 0;
-        preTASSurveyTime = t + popln.interSurveyPeriod;
-        TASSurveyTime = t + popln.interSurveyPeriod;
-        DoMDA = 1;
-      } else if (TAS_Pass == neededTASPass) {
+        popln.TAS_Pass = 0;
+        popln.preTASSurveyTime = t + popln.interSurveyPeriod;
+        popln.TASSurveyTime = t + popln.interSurveyPeriod;
+        popln.DoMDA = true;
+      } else if (popln.TAS_Pass == neededTASPass) {
         // if we have passed a sufficient number of times, then make it so we
         // won't do any more TAS surveys
-        TASSurveyTime = 99999999;
-      } else if (TAS_Pass < neededTASPass) {
+        popln.TASSurveyTime = 99999999;
+      } else if (popln.TAS_Pass < neededTASPass) {
         // if we have passed the survey, but need to pass more, then set a time
         // for the next TAS survey
-        TASSurveyTime = t + popln.interSurveyPeriod;
+        popln.TASSurveyTime = t + popln.interSurveyPeriod;
         if (vec_control == 0) {
           vec_control = 1;
         }
@@ -403,19 +394,19 @@ void Model::evolveAndSave(int y, Population &popln, Vector &vectors,
       double rho = applyMDA->getCompliance();
       // if we this is the first MDA, then we need to initialise the Probability
       // of treatment for each person
-      if (prevCov == -1) {
+      if (popln.prevCov == -1) {
         popln.initPTreat(cov, rho);
-        prevCov = cov;
-        prevRho = rho;
+        popln.prevCov = cov;
+        popln.prevRho = rho;
       }
       // if the MDA parameters have changed then we need to update the
       // probability of treatment for each person
-      if ((prevCov != applyMDA->getCoverage()) ||
-          (prevRho != applyMDA->getCompliance())) {
-        popln.checkForZeroPTreat(prevCov, prevRho);
+      if ((popln.prevCov != applyMDA->getCoverage()) ||
+          (popln.prevRho != applyMDA->getCompliance())) {
+        popln.checkForZeroPTreat(popln.prevCov, popln.prevRho);
         popln.editPTreat(cov, rho);
-        prevCov = cov;
-        prevRho = rho;
+        popln.prevCov = cov;
+        popln.prevRho = rho;
       }
       // check for anyone with 0 probability of treatment, as these will be
       // people who have not had this value initialised
@@ -426,13 +417,12 @@ void Model::evolveAndSave(int y, Population &popln, Vector &vectors,
       // then we will not begin MDA. If the indicator is not 1 then we will do
       // MDA even with low MF prevalence this uses the sampleSize input as this
       // would be assessed via a survey
-
       if (popln.totMDAs == 0) {
         if (popln.getNoMDALowMF() == 1) {
           mfprev = popln.getMFPrev(sc, 0, t, outputEndgameDate, rep, sampleSize,
                                    folderName);
           if (mfprev <= popln.MFThreshold) {
-            DoMDA = 0;
+            popln.DoMDA = false;
           }
         }
       }
@@ -446,10 +436,11 @@ void Model::evolveAndSave(int y, Population &popln, Vector &vectors,
       mfprev_aimp_old = popln.getMFPrev(sc, 0, t, outputEndgameDate, rep,
                                         popSize, folderName);
 
-      // apply the MDA. If DoMDA = 0, then we call this function, but don't do
-      // the MDA, we just write to a file showing that no people were treated.
+      // apply the MDA. If popln.DoMDA = false, then we call this function, but
+      // don't do the MDA, we just write to a file showing that no people were
+      // treated.
       popln.ApplyTreatmentUpdated(applyMDA, worms, sc, t, outputEndgameDate,
-                                  rep, DoMDA, outputEndgame, folderName);
+                                  rep, popln.DoMDA, outputEndgame, folderName);
       t_import_reduction = t + 6;
 
       popln.totMDAs += 1;
@@ -467,8 +458,8 @@ void Model::evolveAndSave(int y, Population &popln, Vector &vectors,
         // from now. We will set the time for the TAS survey if the pre TAS
         // survey is passed.
         int minNumberMonthsBeforeSurvey = 6;
-        preTASSurveyTime = std::max(popln.getSurveyStartDate(),
-                                    t + minNumberMonthsBeforeSurvey);
+        popln.preTASSurveyTime = std::max(popln.getSurveyStartDate(),
+                                          t + minNumberMonthsBeforeSurvey);
       }
     }
 
@@ -527,7 +518,6 @@ void Model::evolveAndSave(int y, Population &popln, Vector &vectors,
   popln.neverTreatToOriginal();
   // done
   currentMonth = targetMonth;
-
   if (y < (sc.getNumMonthsToSave() - 1)) { // not finished this scenario
     popln.saveCurrentState(
         currentMonth, sc.getName()); // worms and importation rate. Scenario

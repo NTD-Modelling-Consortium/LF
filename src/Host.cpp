@@ -194,7 +194,7 @@ Host::operator hostState() const {
   // save this object to the host state structure
   return {WM,        WF,         totalWorms, totalWormYears,
           M,         biteRisk,   age,        monthsSinceTreated,
-          hydroMult, lymphoMult, sex};
+          hydroMult, lymphoMult, sex,        pTreat};
 }
 
 void Host::restore(const hostState &state) {
@@ -211,4 +211,5 @@ void Host::restore(const hostState &state) {
   hydroMult = state.hydroMult;
   lymphoMult = state.lymphoMult;
   sex = state.sex;
+  pTreat = state.pTreat;
 }
