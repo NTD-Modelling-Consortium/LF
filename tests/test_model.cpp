@@ -1,39 +1,27 @@
 #include "Model.hpp"
 #include <catch2/catch_all.hpp>
 TEST_CASE("Model", "[classic]") {
-  SECTION("Model::reduceImportationViaPrevalenceCheck") {
+  SECTION("Model::shouldReduceImportationViaPrevalance") {
 
     Model model;
 
-    // test the model.reduceImportationViaPrevalenceCheck function
-    // this should return false if reduceImpViaXml = 1 and the time is below
-    // switchImportationReducingMethodTime. Otherwise this should be true
-    int reduceImpViaXml = 0;
-    int t = 0;
-    int switchImportationReducingMethodTime = 270;
+    SECTION("Importation not reduced via xml, so any time point should do "
+            "reduction via prevalence") {
+      REQUIRE(model.shouldReduceImportationViaPrevalance(0, 0, 270));
+      REQUIRE(model.shouldReduceImportationViaPrevalance(0, 270, 270));
+      REQUIRE(model.shouldReduceImportationViaPrevalance(0, 500, 270));
+    }
 
-    REQUIRE(model.reduceImportationViaPrevalenceCheck(
-        reduceImpViaXml, t, switchImportationReducingMethodTime));
+    SECTION("Importation reduced via xml, so any time point before switch time "
+            "should not do reduction via prevalence") {
+      REQUIRE_FALSE(model.shouldReduceImportationViaPrevalance(1, 0, 270));
+      REQUIRE_FALSE(model.shouldReduceImportationViaPrevalance(1, 269, 270));
+    }
 
-    t = 270;
-    REQUIRE(model.reduceImportationViaPrevalenceCheck(
-        reduceImpViaXml, t, switchImportationReducingMethodTime));
-
-    // the next two times the function is called should be false. This is
-    // because the reduceImpViaXml variable is set to 1 and the time is before
-    // switchImportationReducingMethodTime
-    reduceImpViaXml = 1;
-    t = 0;
-    REQUIRE(!model.reduceImportationViaPrevalenceCheck(
-        reduceImpViaXml, t, switchImportationReducingMethodTime));
-    t = 269;
-    REQUIRE(!model.reduceImportationViaPrevalenceCheck(
-        reduceImpViaXml, t, switchImportationReducingMethodTime));
-
-    t = 270;
-    // the next should be true as the time is now equal to
-    // switchImportationReducingMethodTime
-    REQUIRE(model.reduceImportationViaPrevalenceCheck(
-        reduceImpViaXml, t, switchImportationReducingMethodTime));
+    SECTION("Importation reduced via xml, but if at time point at or after "
+            "switch time, then should do reduction via prevalence") {
+      REQUIRE(model.shouldReduceImportationViaPrevalance(1, 270, 270));
+      REQUIRE(model.shouldReduceImportationViaPrevalance(1, 500, 270));
+    }
   }
 }
