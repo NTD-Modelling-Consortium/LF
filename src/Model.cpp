@@ -157,7 +157,9 @@ void Model::runScenarios(ScenariosList &scenarios, Population &popln,
 
 bool Model::reduceImportationViaPrevalenceCheck(
     int reduceImpViaXml, int t, int switchImportationReducingMethodTime) {
-
+  // function to check if we should reduce the importation rate via checking how
+  // the prevalence has changed over time. the alternative to this is via
+  // specification in the XML scenario files.
   if ((reduceImpViaXml == 0) || (t >= switchImportationReducingMethodTime)) {
     return true;
   } else {
