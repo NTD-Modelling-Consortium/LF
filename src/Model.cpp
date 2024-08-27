@@ -155,6 +155,16 @@ void Model::runScenarios(ScenariosList &scenarios, Population &popln,
   // finished
 }
 
+bool Model::reduceImportationViaPrevalenceCheck(
+    int reduceImpViaXml, int t, int switchImportationReducingMethodTime) {
+
+  if ((reduceImpViaXml == 0) || (t >= switchImportationReducingMethodTime)) {
+    return true;
+  } else {
+    return false;
+  }
+}
+
 void Model::burnIn(Population &popln, Vector &vectors, const Worm &worms,
                    Output &currentOutput, PrevalenceEvent *pe) {
 
@@ -328,8 +338,8 @@ void Model::evolveAndSave(int y, Population &popln, Vector &vectors,
     // calculation based on prevalence post an MDA. If not included in the XML
     // file for the scenario the time for this will be long after the end of the
     // simulation, so we will never switch to the other method.
-    if ((reduceImpViaXml == 1) &&
-        (t < popln.switchImportationReducingMethodTime)) {
+    if (!reduceImportationViaPrevalenceCheck(
+            reduceImpViaXml, t, popln.switchImportationReducingMethodTime)) {
       sc.updateImportationRate(popln, t);
     }
     sc.updateBedNetCoverage(popln, t);
@@ -484,8 +494,8 @@ void Model::evolveAndSave(int y, Population &popln, Vector &vectors,
     // is needed for when we are looking at the future, since the specification
     // within the xml file is based on map data of the progression of LF over
     // time and hence for the future, we will not have any data to use here.
-    if ((reduceImpViaXml == 0 ||
-         popln.switchImportationReducingMethodTime <= t) &&
+    if (reduceImportationViaPrevalenceCheck(
+            reduceImpViaXml, t, popln.switchImportationReducingMethodTime) &&
         t == t_import_reduction) {
       mfprev_aimp_new = popln.getMFPrev(sc, 0, t, outputEndgameDate, rep,
                                         popSize, folderName);
