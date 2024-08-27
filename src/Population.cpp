@@ -940,8 +940,8 @@ void Population::saveCurrentState(int month, std::string sname) {
 
   savedMonth currentState;
 
-  currentState.scenario = sname;  // debugging only
-  currentState.data.resize(size); 
+  currentState.scenario = sname; // debugging only
+  currentState.data.resize(size);
 
   for (int i = 0; i < size; i++)
     currentState.data[i] =
