@@ -401,6 +401,18 @@ void Population::initHosts(std::string distType, double k_val,
   bedNetCov = 0.0;
   aImp_factor = 1.0;
   mdaCoverage = 0.0;
+  numPreTASSurveys = 0;
+  numTASSurveys = 0;
+  // when initializing the hosts, also reset everything to do with surveys
+  totMDAs = 0;
+  post2020MDAs = 0;
+  time_TAS_Passes = -1;
+  preTASSurveyTime = -1000;
+  TASSurveyTime = -1000;
+  DoMDA = true;
+  preTAS_Pass = 0;
+  TAS_Pass = 0;
+  prevCov = -1;
 }
 
 void Population::updateKVal(double k_val) {
@@ -553,7 +565,7 @@ int Population::TASSurvey(Scenario &sc, int t, int outputEndgameDate, int rep,
   if ((icprev <= ICThreshold)) { // if the ic prevalence is below the threshold
                                  // and mf prev also below threshold
     TAS_Pass = 1;                // set TAS pass indicator to 1
-    t_TAS_Pass = t;              // store the time of passing TAS
+    time_TAS_Passes = t;         // store the time of passing TAS
   }
   return TAS_Pass;
 }
@@ -931,9 +943,7 @@ void Population::saveCurrentState(int month, std::string sname) {
   savedMonth currentState;
 
   currentState.scenario = sname; // debugging only
-  currentState.data.resize(size, {0, 0, 0, 0.0, 0.0, 0.0, 0,
-                                  0}); // WM, WF,totalWorms, totalWormYears,
-                                       // M,biteRisk,age,monthSinceTreated
+  currentState.data.resize(size);
 
   for (int i = 0; i < size; i++)
     currentState.data[i] =
@@ -948,7 +958,17 @@ void Population::saveCurrentState(int month, std::string sname) {
   currentState.u0bednets = u0CompBednets;
   currentState.mdaCov = mdaCoverage;
   currentState.bednetCov = bedNetCov;
-
+  // when saving data, also save everything to do with surveys
+  currentState.DoMDA = DoMDA;
+  currentState.totMDAs = totMDAs;
+  currentState.numPreTASSurveys = numPreTASSurveys;
+  currentState.numTASSurveys = numTASSurveys;
+  currentState.preTASSurveyTime = preTASSurveyTime;
+  currentState.TASSurveyTime = TASSurveyTime;
+  currentState.preTAS_Pass = preTAS_Pass;
+  currentState.TAS_Pass = TAS_Pass;
+  currentState.prevCov = prevCov;
+  currentState.prevRho = prevRho;
   savedMonths.push_back(currentState);
 }
 
@@ -973,7 +993,17 @@ void Population::resetToMonth(int month) {
       u0CompBednets = lastMonth.u0bednets;
       mdaCoverage = lastMonth.mdaCov;
       bedNetCov = lastMonth.bednetCov;
-
+      // when resetting time, also reset everything to do with surveys
+      DoMDA = lastMonth.DoMDA;
+      totMDAs = lastMonth.totMDAs;
+      numPreTASSurveys = lastMonth.numPreTASSurveys;
+      numTASSurveys = lastMonth.numTASSurveys;
+      preTASSurveyTime = lastMonth.preTASSurveyTime;
+      TASSurveyTime = lastMonth.TASSurveyTime;
+      preTAS_Pass = lastMonth.preTAS_Pass;
+      TAS_Pass = lastMonth.TAS_Pass;
+      prevCov = lastMonth.prevCov;
+      prevRho = lastMonth.prevRho;
       if (_DEBUG)
         std::cout << "Reset to month " << month << ", that was saved by "
                   << lastMonth.scenario << std::endl;
@@ -1215,7 +1245,7 @@ int Population::returnMaxAge() { return maxAge; }
 
 void Population::ApplyTreatmentUpdated(MDAEvent *mda, Worm &worms, Scenario &sc,
                                        int t, int outputEndgameDate, int rep,
-                                       int DoMDA, int outputEndgame,
+                                       bool DoMDA, int outputEndgame,
                                        std::string folderName) {
   int minAge = (mda->getMinAge() >= 0) ? mda->getMinAge() : minAgeMDA;
   int minAgeMDAinMonths = minAge * 12;
@@ -1234,7 +1264,7 @@ void Population::ApplyTreatmentUpdated(MDAEvent *mda, Worm &worms, Scenario &sc,
     float flooredAge = std::floor(host_pop[i].age / 12);
     int flooredAgeInt = std::min(static_cast<int>(flooredAge), maxAge - 1);
     numHostsByAge[flooredAgeInt] += 1;
-    if (DoMDA == 1) {
+    if (DoMDA) {
       if (host_pop[i].age >= minAgeMDAinMonths) {
         if (stats.uniform_dist() < host_pop[i].pTreat) {
           if (host_pop[i].neverTreat == 0) {

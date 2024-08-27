@@ -27,7 +27,6 @@ typedef struct {
   double hydroMult;
   double lymphoMult;
   int sex;
-  int neverTreat;
   double pTreat; // probability of treatment drawn from a beta distribution as
                  // defined in section 1.5.3 of supplement to
                  // https://www.ncbi.nlm.nih.gov/pmc/articles/PMC5340860/
