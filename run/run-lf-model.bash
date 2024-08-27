@@ -14,29 +14,52 @@ function run_ID () {
 	output_folder_name=${1}
 	id=${2}
 
-	PARAMS="${PARAMETER_ROOT}/RandomParamIU${id}.txt"
-	SCENARIO="${SCENARIO_ROOT}/scenariosNoImp${id}.xml"
+	PARAMS="${PARAMETER_ROOT}/${PARAMETER_FILE_STEM}${id}.txt"
+	SCENARIO="${SCENARIO_ROOT}/${SCENARIO_FILE_STEM}${id}.xml"
+	SEED="${SEED_ROOT}/${SEED_FILE_STEM}${id}.txt"
 	RESULTS="${RESULTS_ROOT}/${id}"
 	STARTING_YEAR="${STARTING_YEAR:=2020}"
+
+	if [[ "${USE_SEED_FILE}" = "true" ]] && [[ -n $( realpath "${SEED}" 2>/dev/null ) ]] ; then
+		echo "--> NOTE using seed file ${SEED}"
+		SEED_ARG="${SEED}"
+	else
+		echo "--> WARNING not using seed file ${SEED} as it doesn't exist"
+		# NB this is an empty string because transfil_N seems to fail on '' or "" in the -g arg
+		SEED_ARG=""
+	fi
+
+	# transfil_N wants 0 or 1 arguments for true/false
+	[[ "${OUTPUT_ENDGAME}" = "true" ]] && OUTPUT_ENDGAME_ARG=1 || OUTPUT_ENDGAME_ARG=0
+	[[ "${REDUCE_IMP_VIA_XML}" = "true" ]] && REDUCE_IMP_VIA_XML_ARG=1 || REDUCE_IMP_VIA_XML_ARG=0
 
 	echo "== making result directory ${RESULTS} for ID ${id}"
 
 	mkdir -p "${RESULTS}"
 
 	echo "== running ${NUM_SIMULATIONS} simulations of LF model starting in ${STARTING_YEAR} with ${PARAMS} ${SCENARIO}"
+
 	time ./transfil_N \
-		-p  "${PARAMS}" \
-		-s  "${SCENARIO}" \
+		-s "${SCENARIO}" \
+		-p "${PARAMS}" \
+		-t "${TIMESTEP}" \
+		-e "${OUTPUT_ENDGAME_ARG}" \
+		-x "${REDUCE_IMP_VIA_XML_ARG}" \
+		-g "${SEED_ARG}" \
 		-o "${RESULTS}" \
-		-n ./Pop_Distribution.csv \
+		-n "${POP_DISTRIBUTION_FILE}" \
 		-r "${NUM_SIMULATIONS}" \
 		-D "${STARTING_YEAR}"
 
 	echo "== combining output files for IHME & NTDMC using output folder ${output_folder_name}"
 	( time do_file_combinations "${id}" "${output_folder_name}" "${RESULTS}" ) 2>&1
 
-	echo "== clearing out model 'result' files"
-	rm -rf "${RESULTS}"
+	if [[ "${KEEP_INTERMEDIATE_RESULTS}" = "false" ]] ; then
+		echo "== clearing out model 'result' files"
+		rm -rf "${RESULTS}"
+	else
+		echo "== leaving model 'result' files in place in ${RESULTS}"
+	fi
 }
 
 function do_file_combinations () {
@@ -45,7 +68,7 @@ function do_file_combinations () {
 	output_folder_name=${2}
     result_folder_path=${3}
 
-	for scen_iu in $( xmllint --xpath "/Model/ScenarioList/scenario/@name" <( tail -n +2 ${SCENARIO_ROOT}/scenariosNoImp${id}.xml ) | sed 's/name="\([^"]*\)"/\1/g' ) ; do
+	for scen_iu in $( xmllint --xpath "/Model/ScenarioList/scenario/@name" <( tail -n +2 ${SCENARIO_ROOT}/${SCENARIO_FILE_STEM}${id}.xml ) | sed 's/name="\([^"]*\)"/\1/g' ) ; do
 
 		scen=$( echo $scen_iu | cut -f 1 -d _ )
 		iu=$( echo $scen_iu | cut -f 2 -d _ )
