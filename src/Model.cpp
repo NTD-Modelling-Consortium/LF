@@ -464,8 +464,6 @@ void Model::evolveAndSave(int y, Population &popln, Vector &vectors,
                                   rep, popln.DoMDA, outputEndgame, folderName);
       time_to_reduce_importation_rate = t + 6;
 
-
-
       popln.totMDAs += 1;
 
       if (popln.totMDAs == numMDADoSurvey) {
