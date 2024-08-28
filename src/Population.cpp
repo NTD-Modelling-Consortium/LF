@@ -141,6 +141,8 @@ Population::Population(TiXmlElement *xmlParameters) {
     } else if (name == "neverTreatChangeScen") {
       neverTreatChangeName.push_back(std::to_string(int(value)));
       neverTreatChangeCount = neverTreatChangeCount + 1;
+    } else if (name == "switchImportationReducingMethodTime") {
+      switchImportationReducingMethodTime = value;
     } else
       std::cout << "Unknown parameter " << name << " in Host parameter list."
                 << std::endl;

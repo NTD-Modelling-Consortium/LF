@@ -155,6 +155,18 @@ void Model::runScenarios(ScenariosList &scenarios, Population &popln,
   // finished
 }
 
+bool Model::shouldReduceImportationViaPrevalance(
+    int reduceImpViaXml, int t, int switchImportationReducingMethodTime) {
+  // function to check if we should reduce the importation rate via checking how
+  // the prevalence has changed over time. the alternative to this is via
+  // specification in the XML scenario files.
+  if ((reduceImpViaXml == 0) || (t >= switchImportationReducingMethodTime)) {
+    return true;
+  } else {
+    return false;
+  }
+}
+
 void Model::burnIn(Population &popln, Vector &vectors, const Worm &worms,
                    Output &currentOutput, PrevalenceEvent *pe) {
 
@@ -195,7 +207,11 @@ void Model::evolveAndSave(int y, Population &popln, Vector &vectors,
   // advance to the next target month
   std::string folderName = opDir;
   std::string MDAType;
-  int t_import_reduction = -1;
+
+  int time_to_reduce_importation_rate =
+      -1; // this is for when we want to reduce the importation rate via
+          // checking the prevalence post and MDA. This will be set to 6 months
+          // after the MDA occurs when the MDA is applied.
   int paramIndex = 0;
   int targetMonth = sc.getMonthToSave(y); // simulate to start of this month
   double mfprev = 1; // variable to check prevalence of mf for survey
@@ -314,8 +330,13 @@ void Model::evolveAndSave(int y, Population &popln, Vector &vectors,
       doneTAS = 0;
     }
     // if we give values externally to reduce the importation rate, then do so
-    // here
-    if (reduceImpViaXml == 1) {
+    // here. This will apply up until the time at which we want to switch the
+    // method for reducing the importation rate to use the within simulation
+    // calculation based on prevalence post an MDA. If not included in the XML
+    // file for the scenario the time for this will be long after the end of the
+    // simulation, so we will never switch to the other method.
+    if (!shouldReduceImportationViaPrevalance(
+            reduceImpViaXml, t, popln.switchImportationReducingMethodTime)) {
       sc.updateImportationRate(popln, t);
     }
     sc.updateBedNetCoverage(popln, t);
@@ -441,7 +462,7 @@ void Model::evolveAndSave(int y, Population &popln, Vector &vectors,
       // treated.
       popln.ApplyTreatmentUpdated(applyMDA, worms, sc, t, outputEndgameDate,
                                   rep, popln.DoMDA, outputEndgame, folderName);
-      t_import_reduction = t + 6;
+      time_to_reduce_importation_rate = t + 6;
 
       popln.totMDAs += 1;
 
@@ -465,17 +486,21 @@ void Model::evolveAndSave(int y, Population &popln, Vector &vectors,
 
     // if it is the time to potentially reduce importation using the simulation
     // rather than externally input values, then do so
-    if (reduceImpViaXml == 0) {
-      if (t == t_import_reduction) {
-
-        mfprev_aimp_new = popln.getMFPrev(sc, 0, t, outputEndgameDate, rep,
-                                          popSize, folderName);
-        if (mfprev_aimp_old > mfprev_aimp_new) {
-          popln.aImp = popln.aImp * mfprev_aimp_new / mfprev_aimp_old;
-        }
-        mfprev_aimp_old = popln.getMFPrev(sc, 0, t, outputEndgameDate, rep,
-                                          popSize, folderName);
+    // the popln.switchImportationReducingMethodTime value gives the time for
+    // which we will switch to this method rather than using the XML file. This
+    // is needed for when we are looking at the future, since the specification
+    // within the xml file is based on map data of the progression of LF over
+    // time and hence for the future, we will not have any data to use here.
+    if (shouldReduceImportationViaPrevalance(
+            reduceImpViaXml, t, popln.switchImportationReducingMethodTime) &&
+        t == time_to_reduce_importation_rate) {
+      mfprev_aimp_new = popln.getMFPrev(sc, 0, t, outputEndgameDate, rep,
+                                        popSize, folderName);
+      if (mfprev_aimp_old > mfprev_aimp_new) {
+        popln.aImp = popln.aImp * mfprev_aimp_new / mfprev_aimp_old;
       }
+      mfprev_aimp_old = popln.getMFPrev(sc, 0, t, outputEndgameDate, rep,
+                                        popSize, folderName);
     }
 
     if (t < popln.getNeverTreatChangeTime()) {
@@ -520,8 +545,9 @@ void Model::evolveAndSave(int y, Population &popln, Vector &vectors,
   currentMonth = targetMonth;
   if (y < (sc.getNumMonthsToSave() - 1)) { // not finished this scenario
     popln.saveCurrentState(
-        currentMonth, sc.getName()); // worms and importation rate. Scenario
-                                     // name just needed for debugging
+        currentMonth,
+        sc.getName()); // worms and importation rate. Scenario
+                       // name just needed for debugging
     vectors.saveCurrentState(currentMonth); // larval density
 
     if (_DEBUG)

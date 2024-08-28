@@ -31,6 +31,9 @@ public:
                     int outputEndgameDate, int reduceImpViaXml,
                     std::string randParamsfile, std::string RandomSeedFile,
                     std::string opDir);
+  bool
+  shouldReduceImportationViaPrevalance(int t, int reduceImpViaXml,
+                                       int switchImportationReducingMethodTime);
 
 protected:
   void burnIn(Population &popln, Vector &vectors, const Worm &worms,
@@ -56,6 +59,7 @@ protected:
                    std::vector<double> &v_to_h_vals,
                    std::vector<double> &aImp_vals,
                    std::vector<double> &wProp_vals);
+
   int currentMonth;
   double dt;
   std::vector<std::string> printSeedName() const;

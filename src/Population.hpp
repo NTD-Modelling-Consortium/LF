@@ -145,6 +145,10 @@ public:
   double aImp;
   int sensSpecChangeCount = 0;
   int neverTreatChangeCount = 0;
+  int switchImportationReducingMethodTime =
+      99999; // initialise the time to switch importation reduction to a large
+             // arbitrary value, so that if we don't specify a different value
+             // in the XML scenario file, then it will never be passed
   std::vector<std::string> sensSpecChangeName;
   std::vector<std::string> neverTreatChangeName;
 
