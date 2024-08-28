@@ -461,7 +461,7 @@ void Model::evolveAndSave(int y, Population &popln, Vector &vectors,
       // don't do the MDA, we just write to a file showing that no people were
       // treated.
       popln.ApplyTreatmentUpdated(applyMDA, worms, sc, t, outputEndgameDate,
-                                  rep, DoMDA, outputEndgame, folderName);
+                                  rep, popln.DoMDA, outputEndgame, folderName);
       time_to_reduce_importation_rate = t + 6;
 
 
