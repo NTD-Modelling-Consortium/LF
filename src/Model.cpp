@@ -336,7 +336,8 @@ void Model::evolveAndSave(int y, Population &popln, Vector &vectors,
     // file for the scenario the time for this will be long after the end of the
     // simulation, so we will never switch to the other method.
     if (!shouldReduceImportationViaPrevalance(
-            reduceImpViaXml, t, popln.switchImportationReducingMethodTime)) {
+            reduceImpViaXml, t, popln.switchImportationReducingMethodTime)&&
+        (t % 12 == 0)) {
       sc.updateImportationRate(popln, t);
     }
     sc.updateBedNetCoverage(popln, t);
