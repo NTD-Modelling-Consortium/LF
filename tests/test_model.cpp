@@ -24,7 +24,7 @@ TEST_CASE("Model", "[classic]") {
       REQUIRE(model.shouldReduceImportationViaPrevalance(1, 500, 270));
     }
 
-    t = 1;
+    int t = 1;
 
     SECTION("Reduce importation rate via xml, this means that the test should "
             "be true when we run !function we are testing") {
