@@ -29,14 +29,12 @@ TEST_CASE("Model", "[classic]") {
     SECTION("Reduce importation rate via xml, this means that the test should "
             "be true when we run !function we are testing") {
       REQUIRE(!model.shouldReduceImportationViaPrevalance(1, 0, 270));
-      REQUIRE_FALSE(!model.shouldReduceImportationViaPrevalance(1, t, 270) &&
-                    t % 12 == 0);
     }
 
     SECTION("Repeat previous test, but also test whether time is divisible by "
             "12, and as it isn't, this should be false") {
       REQUIRE_FALSE(!model.shouldReduceImportationViaPrevalance(1, t, 270) &&
-                    t % 12 == 0);
+                    (t % 12 == 0));
     }
   }
 }
