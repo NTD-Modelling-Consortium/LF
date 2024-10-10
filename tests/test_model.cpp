@@ -33,8 +33,8 @@ TEST_CASE("Model", "[classic]") {
 
     SECTION("Repeat previous test, but also test whether time is divisible by "
             "12, and as it isn't, this should be false") {
-      REQUIRE_FALSE(!model.shouldReduceImportationViaPrevalance(1, t, 270) &&
-                    (t % 12 == 0));
+      REQUIRE_FALSE((!model.shouldReduceImportationViaPrevalance(1, t, 270) &&
+                    (t % 12 == 0)));
     }
   }
 }
