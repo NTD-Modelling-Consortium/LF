@@ -53,5 +53,60 @@ TEST_CASE("Model", "[classic]") {
                                           graduallyRemoveCoverageReduction) ==
               0.6);
     }
+
+    SECTION("coverage multiplier should be 1 after removeCoverageReductionTime "
+            "when we remove "
+            "coverage reduction ") {
+      int removeCoverageReduction = 1;
+      int removeCoverageReductionTime = 276;
+      int graduallyRemoveCoverageReduction = 0;
+      double cov_prop = 0.6;
+      int t = 277;
+      REQUIRE(model.multiplierForCoverage(t, cov_prop, removeCoverageReduction,
+                                          removeCoverageReductionTime,
+                                          graduallyRemoveCoverageReduction) ==
+              1);
+      graduallyRemoveCoverageReduction = 1;
+      removeCoverageReduction  = 0;
+      REQUIRE(model.multiplierForCoverage(t, cov_prop, removeCoverageReduction,
+                                          removeCoverageReductionTime,
+                                          graduallyRemoveCoverageReduction) ==
+              1);
+    }
+
+    SECTION("coverage multiplier should be linearly changed up until removeCoverageReductionTime "
+            "when we gradually remove "
+            "coverage reduction ") {
+      int removeCoverageReduction = 0 ;
+      int removeCoverageReductionTime = 200;
+      int graduallyRemoveCoverageReduction = 1;
+      double cov_prop = 0.6;
+      int t = 0;
+      REQUIRE(model.multiplierForCoverage(t, cov_prop, removeCoverageReduction,
+                                          removeCoverageReductionTime,
+                                          graduallyRemoveCoverageReduction) ==
+              0.6);
+      graduallyRemoveCoverageReduction = 1;
+      t = 50;
+      REQUIRE(model.multiplierForCoverage(t, cov_prop, removeCoverageReduction,
+                                          removeCoverageReductionTime,
+                                          graduallyRemoveCoverageReduction) ==
+              0.7);
+      t = 100;
+      REQUIRE(model.multiplierForCoverage(t, cov_prop, removeCoverageReduction,
+                                          removeCoverageReductionTime,
+                                          graduallyRemoveCoverageReduction) ==
+              0.8);
+      t = 150;
+      REQUIRE(model.multiplierForCoverage(t, cov_prop, removeCoverageReduction,
+                                          removeCoverageReductionTime,
+                                          graduallyRemoveCoverageReduction) ==
+              0.9);
+      t = 200;
+      REQUIRE(model.multiplierForCoverage(t, cov_prop, removeCoverageReduction,
+                                          removeCoverageReductionTime,
+                                          graduallyRemoveCoverageReduction) ==
+              1);
+    }
   }
 }
