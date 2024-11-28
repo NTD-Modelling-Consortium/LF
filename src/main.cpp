@@ -194,7 +194,8 @@ int main(int argc, char **argv) {
   Model model;
   model.runScenarios(Scenarios, hostPopulation, vectors, worms, replicates, dt,
                      index, outputEndgame, outputEndgameDate, reduceImpViaXml,
-                     randParamsfile, RandomSeedFile, CoverageReductionFile, opDir);
+                     randParamsfile, RandomSeedFile, CoverageReductionFile,
+                     opDir);
 
   gettimeofday(&tv2, NULL);
   double timesofar = (double)(tv2.tv_usec - tv1.tv_usec) / 1000000.0 +
