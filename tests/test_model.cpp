@@ -67,17 +67,18 @@ TEST_CASE("Model", "[classic]") {
                                           graduallyRemoveCoverageReduction) ==
               1);
       graduallyRemoveCoverageReduction = 1;
-      removeCoverageReduction  = 0;
+      removeCoverageReduction = 0;
       REQUIRE(model.multiplierForCoverage(t, cov_prop, removeCoverageReduction,
                                           removeCoverageReductionTime,
                                           graduallyRemoveCoverageReduction) ==
               1);
     }
 
-    SECTION("coverage multiplier should be linearly changed up until removeCoverageReductionTime "
+    SECTION("coverage multiplier should be linearly changed up until "
+            "removeCoverageReductionTime "
             "when we gradually remove "
             "coverage reduction ") {
-      int removeCoverageReduction = 0 ;
+      int removeCoverageReduction = 0;
       int removeCoverageReductionTime = 200;
       int graduallyRemoveCoverageReduction = 1;
       double cov_prop = 0.6;
