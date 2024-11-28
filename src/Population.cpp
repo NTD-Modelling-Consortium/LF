@@ -143,6 +143,12 @@ Population::Population(TiXmlElement *xmlParameters) {
       neverTreatChangeCount = neverTreatChangeCount + 1;
     } else if (name == "switchImportationReducingMethodTime") {
       switchImportationReducingMethodTime = value;
+    } else if (name == "removeCoverageReduction") {
+      removeCoverageReduction = value;
+    } else if (name == "removeCoverageReductionTime") {
+      removeCoverageReductionTime = value;
+    } else if (name == "graduallyRemoveCoverageReduction") {
+      graduallyRemoveCoverageReduction = value;
     } else
       std::cout << "Unknown parameter " << name << " in Host parameter list."
                 << std::endl;

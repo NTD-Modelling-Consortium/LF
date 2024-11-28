@@ -90,7 +90,6 @@ public:
   void neverTreatToOriginal();
   void ICTestToOriginal();
   void updateKVal(double k_val);
-
   double getICTestChangeTime();
   void updateBedNetCoverage(BedNetEvent *bn);
   void updateImportationRate(double factor);
@@ -149,6 +148,16 @@ public:
       99999; // initialise the time to switch importation reduction to a large
              // arbitrary value, so that if we don't specify a different value
              // in the XML scenario file, then it will never be passed
+  int removeCoverageReduction =
+      0; // set to 0 meaning that if not read from file then we will not remove
+         // the reduction to MDA coverage
+  int removeCoverageReductionTime =
+      99999; // initialise the time to remove coverage reduction to a large
+             // arbitrary value, so that if we don't specify a different value
+             // in the XML scenario file, then it will never be passed
+  int graduallyRemoveCoverageReduction =
+      0; // set to 0 meaning that if not read from file then we will not
+         // gradually remove the reduction to MDA coverage
   std::vector<std::string> sensSpecChangeName;
   std::vector<std::string> neverTreatChangeName;
 

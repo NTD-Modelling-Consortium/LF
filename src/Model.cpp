@@ -29,7 +29,7 @@ void Model::runScenarios(ScenariosList &scenarios, Population &popln,
                          double timestep, int index, int outputEndgame,
                          int outputEndgameDate, int reduceImpViaXml,
                          std::string randParamsfile, std::string RandomSeedFile,
-                         std::string opDir) {
+                         std::string RandomCovPropFile, std::string opDir) {
 
   std::cout << std::endl
             << "Index " << index << " running " << scenarios.getName()
@@ -59,6 +59,11 @@ void Model::runScenarios(ScenariosList &scenarios, Population &popln,
   // used for each set of parameters
   readSeedsFromFile(seeds, unsigned(replicates), RandomSeedFile);
 
+  std::vector<double> cov_props;
+  // we read in the entries of the random cov_props file. a different value will
+  // be used for each set of parameters
+  readCovPropFromFile(cov_props, unsigned(replicates), RandomCovPropFile);
+
   for (int rep = 0; rep < replicates; rep++) {
     // Read the seed from the seeds vector if it has been generated
     // othewise we set a random seed
@@ -69,6 +74,14 @@ void Model::runScenarios(ScenariosList &scenarios, Population &popln,
     } else {
       rseed = std::chrono::system_clock::now().time_since_epoch().count();
       stats.set_seed(rseed);
+    }
+    // Read the value to multiply the MDA's by if this has been supplied
+    // othewise we set this to 1
+    double cov_prop;
+    if (cov_props.size() > 0) {
+      cov_prop = cov_props[rep];
+    } else {
+      cov_prop = 1.0;
     }
     getRandomParametersMultiplePerLine(rep + 1, k_vals, v_to_h_vals, aImp_vals,
                                        wPropMDA, unsigned(replicates),
@@ -135,7 +148,7 @@ void Model::runScenarios(ScenariosList &scenarios, Population &popln,
       for (int y = 0; y < sc.getNumMonthsToSave(); y++)
         evolveAndSave(y, popln, vectors, worms, sc, currentOutput, rep, k_vals,
                       v_to_h_vals, popln.getUpdateParams(), outputEndgame,
-                      outputEndgameDate, reduceImpViaXml, opDir);
+                      outputEndgameDate, reduceImpViaXml, opDir, cov_prop);
 
       // done for this scenario, save the prevalence values for this replicate
       if (!_DEBUG)
@@ -202,7 +215,8 @@ void Model::evolveAndSave(int y, Population &popln, Vector &vectors,
                           int rep, std::vector<double> &k_vals,
                           std::vector<double> &v_to_h_vals, int updateParams,
                           int outputEndgame, int outputEndgameDate,
-                          int reduceImpViaXml, std::string opDir) {
+                          int reduceImpViaXml, std::string opDir,
+                          double cov_prop) {
 
   // advance to the next target month
   std::string folderName = opDir;
@@ -408,11 +422,15 @@ void Model::evolveAndSave(int y, Population &popln, Vector &vectors,
       }
     }
 
-    // std::cout << applyMDA->getMonth() << std::endl;
+    // std::cout << applyMDA->getMonth() << std::xendl;
     if (applyMDA) {
       MDAType = popln.returnMDAType(applyMDA);
       minAge = popln.returnMinAgeMDA(applyMDA);
-      double cov = applyMDA->getCoverage();
+      double coverage_multiplier =
+          multiplierForCoverage(t, cov_prop, popln.removeCoverageReduction,
+                                popln.removeCoverageReductionTime,
+                                popln.graduallyRemoveCoverageReduction);
+      double cov = applyMDA->getCoverage() * coverage_multiplier;
       double rho = applyMDA->getCompliance();
       // if we this is the first MDA, then we need to initialise the Probability
       // of treatment for each person
@@ -423,7 +441,7 @@ void Model::evolveAndSave(int y, Population &popln, Vector &vectors,
       }
       // if the MDA parameters have changed then we need to update the
       // probability of treatment for each person
-      if ((popln.prevCov != applyMDA->getCoverage()) ||
+      if ((popln.prevCov != applyMDA->getCoverage() * coverage_multiplier) ||
           (popln.prevRho != applyMDA->getCompliance())) {
         popln.checkForZeroPTreat(popln.prevCov, popln.prevRho);
         popln.editPTreat(cov, rho);
@@ -603,6 +621,26 @@ void Model::getRandomParameters(int index, std::vector<double> &k_vals,
   }
 }
 
+double Model::multiplierForCoverage(int t, double cov_prop,
+                                    int removeCoverageReduction,
+                                    int removeCoverageReductionTime,
+                                    int graduallyRemoveCoverageReduction) {
+
+  if (graduallyRemoveCoverageReduction == 1) {
+    if (t < removeCoverageReductionTime)
+      return ((1 - cov_prop)) * (double(t) / removeCoverageReductionTime) +
+             cov_prop;
+    else
+      return 1;
+  } else if (removeCoverageReduction == 1) {
+    if (t < removeCoverageReductionTime)
+      return cov_prop;
+    else
+      return 1;
+  } else
+    return cov_prop;
+}
+
 void Model::ProcessLine(const std::string &line, std::vector<double> &k_vals,
                         std::vector<double> &v_to_h_vals,
                         std::vector<double> &aImp_vals,
@@ -695,6 +733,40 @@ void Model::readSeedsFromFile(std::vector<unsigned long int> &seeds,
     // then we will abort the run as at some point we will run out of seeds and
     // the simulations will crash.
     if (seeds.size() < replicates) {
+      std::cout << "Error in Model::runScenarios. " << fname
+                << " is too short for " << replicates << " replicates"
+                << std::endl;
+      exit(1);
+    }
+    infile.close();
+  }
+}
+
+void Model::readCovPropFromFile(std::vector<double> &cov_props,
+                                unsigned replicates, std::string fname) {
+  // We retrieve the random MDA shrinkage value from the input covproporation
+  // file. The line on which the value is on will correspond to the set of
+  // parameters on the same line of the input parameters file. If there is no
+  // covproporation file input we set it to 1.
+  //
+  if (fname.length() > 0) {
+    std::ifstream infile(fname, std::ios_base::in);
+    double cov_prop;
+    if (!infile.is_open()) {
+      std::cout << "Error in getting shrinkage. Cannot read file " << fname
+                << std::endl;
+      exit(1);
+    }
+    std::string line;
+    while (getline(infile, line)) {
+      std::istringstream linestream(line);
+      linestream >> cov_prop;
+      cov_props.push_back(cov_prop);
+    }
+    // if we haven't input enough values based on how many runs we want to make
+    // then we will abort the run as at some point we will run out of values and
+    // the simulations will crash.
+    if (cov_props.size() < replicates) {
       std::cout << "Error in Model::runScenarios. " << fname
                 << " is too short for " << replicates << " replicates"
                 << std::endl;
