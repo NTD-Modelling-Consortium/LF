@@ -66,6 +66,7 @@ int main(int argc, char **argv) {
   std::string scenariosFile("");
   std::string opDir("");
   std::string RandomSeedFile("");
+  std::string CoverageReductionFile("");
 
   // initialize random seed value, whether the endgame output will be done
   // and whether the reduction in importation rate should be done via the
@@ -105,6 +106,8 @@ int main(int argc, char **argv) {
       opDir = argv[i + 1];
     else if (!strcmp(argv[i], "-g"))
       RandomSeedFile = argv[i + 1];
+    else if (!strcmp(argv[i], "-c"))
+      CoverageReductionFile = argv[i + 1];
     else if (!strcmp(argv[i], "-e"))
       outputEndgame = atoi(argv[i + 1]);
     else if (!strcmp(argv[i], "-D"))
@@ -191,7 +194,7 @@ int main(int argc, char **argv) {
   Model model;
   model.runScenarios(Scenarios, hostPopulation, vectors, worms, replicates, dt,
                      index, outputEndgame, outputEndgameDate, reduceImpViaXml,
-                     randParamsfile, RandomSeedFile, opDir);
+                     randParamsfile, RandomSeedFile, CoverageReductionFile, opDir);
 
   gettimeofday(&tv2, NULL);
   double timesofar = (double)(tv2.tv_usec - tv1.tv_usec) / 1000000.0 +

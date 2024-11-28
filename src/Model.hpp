@@ -30,7 +30,7 @@ public:
                     double timestep, int index, int outputEndgame,
                     int outputEndgameDate, int reduceImpViaXml,
                     std::string randParamsfile, std::string RandomSeedFile,
-                    std::string opDir);
+                    std::string RandomCovPropFile, std::string opDir);
   bool
   shouldReduceImportationViaPrevalance(int t, int reduceImpViaXml,
                                        int switchImportationReducingMethodTime);
@@ -43,7 +43,8 @@ protected:
                      std::vector<double> &k_vals,
                      std::vector<double> &v_to_h_vals, int updateParams,
                      int outputEndgame, int outputEndgameDate,
-                     int reduceImpViaXml, std::string opDir);
+                     int reduceImpViaXml, std::string opDir,
+                     double cov_prop);
   void getRandomParameters(int index, std::vector<double> &k_vals,
                            std::vector<double> &v_to_h_vals,
                            std::vector<double> &aImp_vals,
@@ -55,6 +56,8 @@ protected:
       unsigned replicates, std::string fname);
   void readSeedsFromFile(std::vector<unsigned long int> &seeds,
                          unsigned replicates, std::string fname);
+  void readCovPropFromFile(std::vector<double> &cov_props,
+                           unsigned replicates, std::string fname);
   void ProcessLine(const std::string &line, std::vector<double> &k_vals,
                    std::vector<double> &v_to_h_vals,
                    std::vector<double> &aImp_vals,
