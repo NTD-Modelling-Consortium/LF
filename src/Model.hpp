@@ -35,6 +35,11 @@ public:
   shouldReduceImportationViaPrevalance(int t, int reduceImpViaXml,
                                        int switchImportationReducingMethodTime);
 
+  double multiplierForCoverage(int t, double cov_prop,
+                               int removeCoverageReduction,
+                               int removeCoverageReductionTime,
+                               int graduallyRemoveCoverageReduction);
+
 protected:
   void burnIn(Population &popln, Vector &vectors, const Worm &worms,
               Output &currentOutput, PrevalenceEvent *pe);

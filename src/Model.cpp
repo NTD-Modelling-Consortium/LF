@@ -83,7 +83,6 @@ void Model::runScenarios(ScenariosList &scenarios, Population &popln,
     } else {
       cov_prop = 1.0;
     }
-    std::cout << "cov prop = " << cov_prop << std::endl;
     getRandomParametersMultiplePerLine(rep + 1, k_vals, v_to_h_vals, aImp_vals,
                                        wPropMDA, unsigned(replicates),
                                        randParamsfile);
@@ -423,11 +422,15 @@ void Model::evolveAndSave(int y, Population &popln, Vector &vectors,
       }
     }
 
-    // std::cout << applyMDA->getMonth() << std::endl;
+    // std::cout << applyMDA->getMonth() << std::xendl;
     if (applyMDA) {
       MDAType = popln.returnMDAType(applyMDA);
       minAge = popln.returnMinAgeMDA(applyMDA);
-      double cov = applyMDA->getCoverage() * cov_prop;
+      double coverage_multiplier =
+          multiplierForCoverage(t, cov_prop, popln.removeCoverageReduction,
+                                popln.removeCoverageReductionTime,
+                                popln.graduallyRemoveCoverageReduction);
+      double cov = applyMDA->getCoverage() * coverage_multiplier;
       double rho = applyMDA->getCompliance();
       // if we this is the first MDA, then we need to initialise the Probability
       // of treatment for each person
@@ -438,7 +441,7 @@ void Model::evolveAndSave(int y, Population &popln, Vector &vectors,
       }
       // if the MDA parameters have changed then we need to update the
       // probability of treatment for each person
-      if ((popln.prevCov != applyMDA->getCoverage() * cov_prop) ||
+      if ((popln.prevCov != applyMDA->getCoverage() * coverage_multiplier) ||
           (popln.prevRho != applyMDA->getCompliance())) {
         popln.checkForZeroPTreat(popln.prevCov, popln.prevRho);
         popln.editPTreat(cov, rho);
@@ -616,6 +619,26 @@ void Model::getRandomParameters(int index, std::vector<double> &k_vals,
               << std::endl;
     exit(1);
   }
+}
+
+double Model::multiplierForCoverage(int t, double cov_prop,
+                                    int removeCoverageReduction,
+                                    int removeCoverageReductionTime,
+                                    int graduallyRemoveCoverageReduction) {
+
+  if (graduallyRemoveCoverageReduction == 1) {
+    if (t < removeCoverageReductionTime)
+      return ((1 - cov_prop)) * (double(t) / removeCoverageReductionTime) +
+             cov_prop;
+    else
+      return 1;
+  } else if (removeCoverageReduction == 1) {
+    if (t < removeCoverageReductionTime)
+      return cov_prop;
+    else
+      return 1;
+  } else
+    return cov_prop;
 }
 
 void Model::ProcessLine(const std::string &line, std::vector<double> &k_vals,
