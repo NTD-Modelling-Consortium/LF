@@ -37,4 +37,21 @@ TEST_CASE("Model", "[classic]") {
                      (t % 12 == 0)));
     }
   }
+
+  SECTION("Model::multiplierForCoverage") {
+
+    Model model;
+
+    SECTION("coverage multiplier should be unchanged when we don't remove "
+            "coverage reduction ") {
+      int removeCoverageReduction = 0;
+      int removeCoverageReductionTime = 276;
+      int graduallyRemoveCoverageReduction = 0;
+      double cov_prop = 0.6;
+      REQUIRE(model.multiplierForCoverage(0, cov_prop, removeCoverageReduction,
+                                          removeCoverageReductionTime,
+                                          graduallyRemoveCoverageReduction) ==
+              0.6);
+    }
+  }
 }
