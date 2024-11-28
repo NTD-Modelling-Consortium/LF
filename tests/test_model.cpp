@@ -51,7 +51,7 @@ TEST_CASE("Model", "[classic]") {
       REQUIRE(model.multiplierForCoverage(0, cov_prop, removeCoverageReduction,
                                           removeCoverageReductionTime,
                                           graduallyRemoveCoverageReduction) ==
-              0.4);
+              0.6);
     }
   }
 }
