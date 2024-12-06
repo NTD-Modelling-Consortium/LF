@@ -667,7 +667,7 @@ void Scenario::writeRoadmapTarget(Population &popln, int t, int rep, int DoMDA,
   float ICprevSample = popln.getICPrevForOutput(sample);
 
   sample = false;
-  float mfprevTrue = popln.getMFPrevByAge(5, maxAge, sample);
+
   float ICprevTrue = popln.getICPrevForOutput(sample);
 
   int roadmapTargetMet = mfprevSample <= 0.01 ? 1 : 0;
@@ -677,9 +677,6 @@ void Scenario::writeRoadmapTarget(Population &popln, int t, int rep, int DoMDA,
     outfile << name << "," << year << "," << 5 << "," << maxAge << ","
             << "sampled mf prevalence (all pop)"
             << "," << mfprevSample << "\n";
-    outfile << name << "," << year << "," << 5 << "," << maxAge << ","
-            << "true mf prevalence (all pop)"
-            << "," << mfprevTrue << "\n";
     outfile << name << "," << year << "," << 6 << "," << 7 << ","
             << "sampled IC prevalence (all pop)"
             << "," << ICprevSample << "\n";
@@ -705,7 +702,6 @@ void Scenario::writeRoadmapTarget(Population &popln, int t, int rep, int DoMDA,
             << "," << achieveEPHP << "\n";
   } else {
     outfile << mfprevSample << "\n";
-    outfile << mfprevTrue << "\n";
     outfile << ICprevSample << "\n";
     outfile << ICprevTrue << "\n";
     outfile << roadmapTargetMet << "\n";
