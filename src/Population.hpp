@@ -98,8 +98,9 @@ public:
   void ApplyTreatment(MDAEvent *mda, Worm &worms, Scenario &sc, int t, int rep,
                       std::string folderName);
   void ApplyTreatmentUpdated(MDAEvent *mda, Worm &worms, Scenario &sc, int t,
-                             int outputEndgameDate, int rep, bool DoMDA,
-                             int outputEndgame, std::string folderName);
+                             int roundNumber, int outputEndgameDate, int rep,
+                             bool DoMDA, int outputEndgame,
+                             std::string folderName);
   void saveCurrentState(int month, std::string sname);
   void resetToMonth(int month);
   void clearSavedMonths();

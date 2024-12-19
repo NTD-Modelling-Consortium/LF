@@ -274,7 +274,14 @@ void Model::evolveAndSave(int y, Population &popln, Vector &vectors,
   // output of MDA's constant so that we can combine different runs even if they
   // have different numbers of MDA's performed.
   popln.DoMDA = true;
-
+  int previousMDAyear =
+      -1; // we want to keep track of the number of MDA rounds per year, so keep
+          // track of the time of the last MDA. Initialize this at -1 as no
+          // MDA's will take place then, so we will update correctly for first
+          // MDA
+  int roundNumber =
+      1; // initialize an integer to track which round of MDA in a year is being
+         // done and will be recorded in the IHME output
   for (int q = 0; q < popln.sensSpecChangeCount; q++) {
     if (popln.sensSpecChangeName[q] == sc.getName()) {
       changeSensSpec = 1;
@@ -476,11 +483,19 @@ void Model::evolveAndSave(int y, Population &popln, Vector &vectors,
       mfprev_aimp_old = popln.getMFPrev(sc, 0, t, outputEndgameDate, rep,
                                         popSize, folderName);
 
+      int year = t / 12 + 2000;
+      if (year == previousMDAyear) {
+        roundNumber += 1;
+      } else {
+        roundNumber = 1;
+      }
+      previousMDAyear = year;
       // apply the MDA. If popln.DoMDA = false, then we call this function, but
       // don't do the MDA, we just write to a file showing that no people were
       // treated.
-      popln.ApplyTreatmentUpdated(applyMDA, worms, sc, t, outputEndgameDate,
-                                  rep, popln.DoMDA, outputEndgame, folderName);
+      popln.ApplyTreatmentUpdated(applyMDA, worms, sc, t, roundNumber,
+                                  outputEndgameDate, rep, popln.DoMDA,
+                                  outputEndgame, folderName);
       time_to_reduce_importation_rate = t + 6;
 
       popln.totMDAs += 1;
@@ -626,6 +641,8 @@ double Model::multiplierForCoverage(int t, double cov_prop,
                                     int removeCoverageReductionTime,
                                     int graduallyRemoveCoverageReduction) {
 
+  // if we want to gradually remove the reduction in coverage then
+  // return a scaled reduction parameter
   if (graduallyRemoveCoverageReduction == 1) {
     if (t < removeCoverageReductionTime)
       return ((1 - cov_prop)) * (double(t) / removeCoverageReductionTime) +
@@ -633,11 +650,15 @@ double Model::multiplierForCoverage(int t, double cov_prop,
     else
       return 1;
   } else if (removeCoverageReduction == 1) {
+    // if we will remove the coverage instantly, then return the
+    // coverage reduction parameter until the removeCoverageReductionTime
     if (t < removeCoverageReductionTime)
       return cov_prop;
     else
       return 1;
   } else
+    // if we don't want to do either of these, then just return the coverage
+    // reduction parameter
     return cov_prop;
 }
 

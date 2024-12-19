@@ -1250,7 +1250,8 @@ int Population::returnMinAgeMDA(MDAEvent *mda) {
 int Population::returnMaxAge() { return maxAge; }
 
 void Population::ApplyTreatmentUpdated(MDAEvent *mda, Worm &worms, Scenario &sc,
-                                       int t, int outputEndgameDate, int rep,
+                                       int t, int roundNumber,
+                                       int outputEndgameDate, int rep,
                                        bool DoMDA, int outputEndgame,
                                        std::string folderName) {
   int minAge = (mda->getMinAge() >= 0) ? mda->getMinAge() : minAgeMDA;
@@ -1282,8 +1283,8 @@ void Population::ApplyTreatmentUpdated(MDAEvent *mda, Worm &worms, Scenario &sc,
     }
   }
   if ((outputEndgame == 1) && (t >= outputEndgameDate))
-    sc.writeMDADataAllTreated(t, numTreatedByAge, numHostsByAge, maxAge, rep,
-                              MDAtype, folderName);
+    sc.writeMDADataAllTreated(t, roundNumber, numTreatedByAge, numHostsByAge,
+                              maxAge, rep, MDAtype, folderName);
 }
 
 double Population::getBedNetCoverage() const {

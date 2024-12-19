@@ -179,7 +179,8 @@ public:
   void writeSequelaeByAge(Population &popln, int t, int LymphodemaTotalWorms,
                           double LymphodemaShape, int HydroceleTotalWorms,
                           double HydroceleShape, int rep, std::string folder);
-  void writeMDADataAllTreated(int t, const std::vector<int> &numTreatedByAge,
+  void writeMDADataAllTreated(int t, int roundNumber,
+                              const std::vector<int> &numTreatedByAge,
                               const std::vector<int> &numHostsByAge, int maxAge,
                               int rep, std::string type, std::string folder);
   void writePreTAS(int t, int *numSurvey, int maxAge, int rep,

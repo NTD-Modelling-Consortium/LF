@@ -876,7 +876,7 @@ void Scenario::InitNTDMCData(int rep, std::string folder) {
   outfile.close();
 }
 
-void Scenario::writeMDADataAllTreated(int t,
+void Scenario::writeMDADataAllTreated(int t, int roundNumber,
                                       const std::vector<int> &numTreatedByAge,
                                       const std::vector<int> &numHostsByAge,
                                       int maxAge, int rep, std::string type,
@@ -906,7 +906,8 @@ void Scenario::writeMDADataAllTreated(int t,
   if (rep == 0) {
     for (int j = 0; j < maxAge; j++) {
       outfile << name << "," << year << "," << j << "," << j + 1 << ","
-              << "MDA (" << type << ")," << numTreatedByAge[j] << "\n";
+              << "MDA (" << type << ") Round " << roundNumber << ","
+              << numTreatedByAge[j] << "\n";
     }
   } else {
     for (int j = 0; j < maxAge; j++) {
@@ -919,7 +920,8 @@ void Scenario::writeMDADataAllTreated(int t,
   if (rep == 0) {
     for (int j = 0; j < maxAge; j++) {
       outfile << name << "," << year << "," << j << "," << j + 1 << ","
-              << "MDA (" << type << ") number," << numHostsByAge[j] << "\n";
+              << "MDA (" << type << ") number Round " << roundNumber << ","
+              << numHostsByAge[j] << "\n";
     }
   } else {
     for (int j = 0; j < maxAge; j++) {
