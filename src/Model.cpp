@@ -258,13 +258,15 @@ void Model::evolveAndSave(int y, Population &popln, Vector &vectors,
   int HydroceleTotalWorms = popln.getHydroceleTotalWorms();
   double LymphodemaShape = popln.getLymphodemaShape();
   double HydroceleShape = popln.getHydroceleShape();
-
+  // if y != 0, then this is a simulation of a scenario which has already
+  // started and hence, we don't want to reinitialise the outputs
   if ((outputEndgame == 1) && (y == 0)) {
     sc.InitIHMEData(rep, folderName);
     sc.InitPreTASData(rep, folderName);
     sc.InitTASData(rep, folderName);
   }
-
+  // if y != 0, then this is a simulation of a scenario which has already
+  // started and hence, we don't want to reinitialise the outputs
   if ((outputNTDMC == 1) && (y == 0)) {
     sc.InitNTDMCData(rep, folderName);
   }
