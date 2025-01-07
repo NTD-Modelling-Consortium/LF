@@ -853,6 +853,7 @@ void Scenario::InitNTDMCData(int rep, std::string folder) {
   if (stat(fname2.c_str(), &buffer) != 0) {
     fs::create_directories(fname2);
   }
+
   std::ofstream outfile;
   outfile.open(fname);
 

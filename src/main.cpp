@@ -73,6 +73,8 @@ int main(int argc, char **argv) {
   // xml file rather than impact of MDA on the prevalence
   int outputEndgame = 1;
   int outputEndgameDate = 2000;
+  int outputNTDMC = 1;
+  int outputNTDMCDate = 2000;
   int reduceImpViaXml = 0;
 
   int index = 0;
@@ -112,6 +114,10 @@ int main(int argc, char **argv) {
       outputEndgame = atoi(argv[i + 1]);
     else if (!strcmp(argv[i], "-D"))
       outputEndgameDate = atoi(argv[i + 1]);
+    else if (!strcmp(argv[i], "-m"))
+      outputNTDMC = atoi(argv[i + 1]);
+    else if (!strcmp(argv[i], "-N"))
+      outputNTDMCDate = atoi(argv[i + 1]);
     else if (!strcmp(argv[i], "-x"))
       reduceImpViaXml = atoi(argv[i + 1]);
     else {
@@ -193,9 +199,9 @@ int main(int argc, char **argv) {
   // Run
   Model model;
   model.runScenarios(Scenarios, hostPopulation, vectors, worms, replicates, dt,
-                     index, outputEndgame, outputEndgameDate, reduceImpViaXml,
-                     randParamsfile, RandomSeedFile, CoverageReductionFile,
-                     opDir);
+                     index, outputEndgame, outputEndgameDate, outputNTDMC,
+                     outputNTDMCDate, reduceImpViaXml, randParamsfile,
+                     RandomSeedFile, CoverageReductionFile, opDir);
 
   gettimeofday(&tv2, NULL);
   double timesofar = (double)(tv2.tv_usec - tv1.tv_usec) / 1000000.0 +

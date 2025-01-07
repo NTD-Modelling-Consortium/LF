@@ -27,7 +27,8 @@ extern Statistics stats;
 void Model::runScenarios(ScenariosList &scenarios, Population &popln,
                          Vector &vectors, Worm &worms, int replicates,
                          double timestep, int index, int outputEndgame,
-                         int outputEndgameDate, int reduceImpViaXml,
+                         int outputEndgameDate, int outputNTDMC,
+                         int outputNTDMCDate, int reduceImpViaXml,
                          std::string randParamsfile, std::string RandomSeedFile,
                          std::string RandomCovPropFile, std::string opDir) {
 
@@ -146,9 +147,11 @@ void Model::runScenarios(ScenariosList &scenarios, Population &popln,
 
       // evolve, saving any specified months along the way
       for (int y = 0; y < sc.getNumMonthsToSave(); y++)
+
         evolveAndSave(y, popln, vectors, worms, sc, currentOutput, rep, k_vals,
                       v_to_h_vals, popln.getUpdateParams(), outputEndgame,
-                      outputEndgameDate, reduceImpViaXml, opDir, cov_prop);
+                      outputEndgameDate, outputNTDMC, outputNTDMCDate,
+                      reduceImpViaXml, opDir, cov_prop);
 
       // done for this scenario, save the prevalence values for this replicate
       if (!_DEBUG)
@@ -215,6 +218,7 @@ void Model::evolveAndSave(int y, Population &popln, Vector &vectors,
                           int rep, std::vector<double> &k_vals,
                           std::vector<double> &v_to_h_vals, int updateParams,
                           int outputEndgame, int outputEndgameDate,
+                          int outputNTDMC, int outputNTDMCDate,
                           int reduceImpViaXml, std::string opDir,
                           double cov_prop) {
 
@@ -237,6 +241,7 @@ void Model::evolveAndSave(int y, Population &popln, Vector &vectors,
   // simulations from the scenario file.
   int BASEYEAR = 2000;
   outputEndgameDate = (outputEndgameDate - BASEYEAR) * 12;
+  outputNTDMCDate = (outputNTDMCDate - BASEYEAR) * 12;
   int popSize = popln.getSizeOfPop();
   double mfprev_aimp_old =
       popln.getMFPrev(sc, 0, 0, outputEndgameDate, rep, popSize, folderName);
@@ -254,11 +259,14 @@ void Model::evolveAndSave(int y, Population &popln, Vector &vectors,
   double LymphodemaShape = popln.getLymphodemaShape();
   double HydroceleShape = popln.getHydroceleShape();
 
-  if (outputEndgame == 1) {
+  if ((outputEndgame == 1) && (y == 0)) {
     sc.InitIHMEData(rep, folderName);
-    sc.InitNTDMCData(rep, folderName);
     sc.InitPreTASData(rep, folderName);
     sc.InitTASData(rep, folderName);
+  }
+
+  if ((outputNTDMC == 1) && (y == 0)) {
+    sc.InitNTDMCData(rep, folderName);
   }
 
   int vec_control = 0;
@@ -313,8 +321,7 @@ void Model::evolveAndSave(int y, Population &popln, Vector &vectors,
     // year we want to do the endgame output for, then don't do this.
     if ((t % 12 == 0) && (outputEndgame == 1) && (t >= outputEndgameDate)) {
       sc.writePrevByAge(popln, t, rep, folderName);
-      sc.writeRoadmapTarget(popln, t, rep, popln.DoMDA, popln.TAS_Pass,
-                            neededTASPass, folderName);
+
       sc.writeNumberByAge(popln, t, rep, folderName, "not survey");
       sc.writeSequelaeByAge(popln, t, LymphodemaTotalWorms, LymphodemaShape,
                             HydroceleTotalWorms, HydroceleShape, rep,
@@ -322,6 +329,11 @@ void Model::evolveAndSave(int y, Population &popln, Vector &vectors,
       popln.getIncidence(sc, t, rep, folderName);
       sc.writeSurveyByAge(popln, t, popln.preTAS_Pass, popln.TAS_Pass, rep,
                           folderName);
+    }
+
+    if ((t % 12 == 0) && (outputNTDMC == 1) && (t >= outputNTDMCDate)) {
+      sc.writeRoadmapTarget(popln, t, rep, popln.DoMDA, popln.TAS_Pass,
+                            neededTASPass, folderName);
     }
 
     // If we haven't done a survey this year we still want to output this fact
