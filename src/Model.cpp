@@ -27,7 +27,7 @@ extern Statistics stats;
 void Model::runScenarios(ScenariosList &scenarios, Population &popln,
                          Vector &vectors, Worm &worms, int replicates,
                          double timestep, int index, int outputEndgame,
-                         int outputEndgameDate, int outputNTDMC,
+                         int outputEndgameDate, bool outputNTDMC,
                          int outputNTDMCDate, int reduceImpViaXml,
                          std::string randParamsfile, std::string RandomSeedFile,
                          std::string RandomCovPropFile, std::string opDir) {
@@ -218,7 +218,7 @@ void Model::evolveAndSave(int y, Population &popln, Vector &vectors,
                           int rep, std::vector<double> &k_vals,
                           std::vector<double> &v_to_h_vals, int updateParams,
                           int outputEndgame, int outputEndgameDate,
-                          int outputNTDMC, int outputNTDMCDate,
+                          bool outputNTDMC, int outputNTDMCDate,
                           int reduceImpViaXml, std::string opDir,
                           double cov_prop) {
 
@@ -267,7 +267,7 @@ void Model::evolveAndSave(int y, Population &popln, Vector &vectors,
   }
   // if y != 0, then this is a simulation of a scenario which has already
   // started and hence, we don't want to reinitialise the outputs
-  if ((outputNTDMC == 1) && (y == 0)) {
+  if ((outputNTDMC == true) && (y == 0)) {
     sc.InitNTDMCData(rep, folderName);
   }
 
@@ -333,7 +333,7 @@ void Model::evolveAndSave(int y, Population &popln, Vector &vectors,
                           folderName);
     }
 
-    if ((t % 12 == 0) && (outputNTDMC == 1) && (t >= outputNTDMCDate)) {
+    if ((t % 12 == 0) && (outputNTDMC == true) && (t >= outputNTDMCDate)) {
       sc.writeRoadmapTarget(popln, t, rep, popln.DoMDA, popln.TAS_Pass,
                             neededTASPass, folderName);
     }

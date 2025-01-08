@@ -73,10 +73,10 @@ int main(int argc, char **argv) {
   // xml file rather than impact of MDA on the prevalence
   int outputEndgame = 1;
   int outputEndgameDate = 2000;
-  int outputNTDMC = 1;
+  bool outputNTDMC = true;
   int outputNTDMCDate = 2000;
   int reduceImpViaXml = 0;
-
+  int NTDMC = 1;
   int index = 0;
   if (!strcmp(argv[1], "DEBUG")) {
     _DEBUG = true;
@@ -115,7 +115,7 @@ int main(int argc, char **argv) {
     else if (!strcmp(argv[i], "-D"))
       outputEndgameDate = atoi(argv[i + 1]);
     else if (!strcmp(argv[i], "-m"))
-      outputNTDMC = atoi(argv[i + 1]);
+      NTDMC = atoi(argv[i + 1]);
     else if (!strcmp(argv[i], "-N"))
       outputNTDMCDate = atoi(argv[i + 1]);
     else if (!strcmp(argv[i], "-x"))
@@ -126,7 +126,10 @@ int main(int argc, char **argv) {
       return 1;
     }
   }
-
+  if (NTDMC == 0) {
+    outputNTDMC = false;
+  }
+  std::cout << "outputNTDMC = " << outputNTDMC << std::endl;
   for (int i = 0; i < argc; i++)
     std::cout << argv[i] << " ";
   std::cout << std::endl << std::endl;
