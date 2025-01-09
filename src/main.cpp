@@ -126,6 +126,8 @@ int main(int argc, char **argv) {
       return 1;
     }
   }
+  // input "-m 0" when running from command line if we don't want to
+  // output NTDMC data.
   if (NTDMC == 0) {
     outputNTDMC = false;
   }
