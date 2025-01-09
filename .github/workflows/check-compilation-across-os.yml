@@ -18,7 +18,7 @@ jobs:
   Macos-latest:
     strategy:
       matrix:
-        os: [macos-12, macos-13, macos-latest]
+        os: [macos-13, macos-latest]
     runs-on: ${{ matrix.os }}
     steps:
       - name: Check out repository code
