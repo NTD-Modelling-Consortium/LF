@@ -78,12 +78,12 @@ To run simulations from the root directory:
 	* -o sample_results: folder in which to save the outputs of the simulation. This folder must be created inside the `src` folder.
 
 	* -t 1: the simulation time step, in months
-
-There are several optional inputs when running the model:
-
+	
+	There are several optional inputs when running the model:
+	
 	* -x 1 or 0 (0 is default): set to 1 is we will reduce importation via the input xml file, the reduction will be replaced on map data
-
- 	* -g seeds.csv: input a file containing integer seeds for the simulations. There must be at least as many seeds as runs to complete if any are provided.
+	
+	* -g seeds.csv: input a file containing integer seeds for the simulations. There must be at least as many seeds as runs to complete if any are provided.
 
   	* -c coverageReductionFile.csv: file which gives the proportion to which we will reduce the historical MDA coverage by, e.g. a 0.5 will half the historical MDA coverages
 
