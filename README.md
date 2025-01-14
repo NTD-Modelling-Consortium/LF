@@ -61,7 +61,7 @@ To run simulations from the root directory:
 
 * random_parameters.txt: file with the fitted 200 parameter sets for IU 4629. Change to whichever parameter sets we want to run.
 
-3) run the executable with the file input and other required parameters
+3) run the executable with the file input and other required parameters. The basic running of the model is done as follows:
 
 	`src/transfil\_N -s sample_inputs/scenario.xml -n sample_inputs/population_distribution.csv -p sample_inputs/random_parameters.txt -r 200 -t 1 -o sample_results`
 
@@ -78,6 +78,23 @@ To run simulations from the root directory:
 	* -o sample_results: folder in which to save the outputs of the simulation. This folder must be created inside the `src` folder.
 
 	* -t 1: the simulation time step, in months
+
+There are several optional inputs when running the model:
+
+	* -x 1 or 0 (0 is default): set to 1 is we will reduce importation via the input xml file, the reduction will be replaced on map data
+
+ 	* -g seeds.csv: input a file containing integer seeds for the simulations. There must be at least as many seeds as runs to complete if any are provided.
+
+  	* -c coverageReductionFile.csv: file which gives the proportion to which we will reduce the historical MDA coverage by, e.g. a 0.5 will half the historical MDA coverages
+
+   	* -e 1 or 0 (0 is default): set to 1 if we want to output data for IHME.
+
+     	* -D 2026: year from which to output IHME data from. Change to whatever year we want to do this from. Default is 2000.
+
+      	* -m 0 : indicator for outputting NTDMC data. If this is omitted it will be output. If set to 0, this will not be done. Any other integer input will lead to it being output. 
+
+       	* -N 2000: year from which to output NTDMC data from. Change to whatever year we want to do this from. Default is 2000
+
 
 ### Setting the seed for simulations
 
