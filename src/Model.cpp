@@ -28,9 +28,8 @@ void Model::runScenarios(ScenariosList &scenarios, Population &popln,
                          Vector &vectors, Worm &worms, int replicates,
                          double timestep, int index, int outputEndgame,
                          int outputEndgameDate, bool outputNTDMC,
-                         int outputNTDMCDate,
-                         int reduceImpViaXml, std::string randParamsfile,
-                         std::string RandomSeedFile,
+                         int outputNTDMCDate, int reduceImpViaXml,
+                         std::string randParamsfile, std::string RandomSeedFile,
                          std::string RandomCovPropFile, std::string opDir) {
 
   std::cout << std::endl
@@ -244,7 +243,7 @@ void Model::evolveAndSave(int y, Population &popln, Vector &vectors,
   outputEndgameDate = (outputEndgameDate - BASEYEAR) * 12;
 
   int outputNTDMCDateFromYear = (outputNTDMCDate - BASEYEAR) * 12;
-  
+
   int popSize = popln.getSizeOfPop();
   double mfprev_aimp_old =
       popln.getMFPrev(sc, 0, 0, outputEndgameDate, rep, popSize, folderName);
