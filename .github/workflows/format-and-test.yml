@@ -22,7 +22,8 @@ jobs:
           cmake -B build -S . -DBUILD_TESTING=OFF
           sudo cmake --build build/ --target install
           cd ..
-
+          
+          sudo apt install gsl-bin libgsl-dev
           mkdir build && cd build/
           cmake ..
           cmake --build .
