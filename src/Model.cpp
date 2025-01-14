@@ -28,8 +28,9 @@ void Model::runScenarios(ScenariosList &scenarios, Population &popln,
                          Vector &vectors, Worm &worms, int replicates,
                          double timestep, int index, int outputEndgame,
                          int outputEndgameDate, bool outputNTDMC,
-                         std::optional<int> outputNTDMCDate, int reduceImpViaXml,
-                         std::string randParamsfile, std::string RandomSeedFile,
+                         int outputNTDMCDate,
+                         int reduceImpViaXml, std::string randParamsfile,
+                         std::string RandomSeedFile,
                          std::string RandomCovPropFile, std::string opDir) {
 
   std::cout << std::endl
@@ -146,13 +147,13 @@ void Model::runScenarios(ScenariosList &scenarios, Population &popln,
       }
 
       // evolve, saving any specified months along the way
-      for (int y = 0; y < sc.getNumMonthsToSave(); y++){
+      for (int y = 0; y < sc.getNumMonthsToSave(); y++) {
         evolveAndSave(y, popln, vectors, worms, sc, currentOutput, rep, k_vals,
                       v_to_h_vals, popln.getUpdateParams(), outputEndgame,
                       outputEndgameDate, outputNTDMC, outputNTDMCDate,
                       reduceImpViaXml, opDir, cov_prop);
       }
-        
+
       // done for this scenario, save the prevalence values for this replicate
       if (!_DEBUG)
         sc.printResults(rep, currentOutput, popln);
@@ -218,7 +219,7 @@ void Model::evolveAndSave(int y, Population &popln, Vector &vectors,
                           int rep, std::vector<double> &k_vals,
                           std::vector<double> &v_to_h_vals, int updateParams,
                           int outputEndgame, int outputEndgameDate,
-                          bool outputNTDMC, std::optional<int> outputNTDMCDate,
+                          bool outputNTDMC, int outputNTDMCDate,
                           int reduceImpViaXml, std::string opDir,
                           double cov_prop) {
 
@@ -241,9 +242,9 @@ void Model::evolveAndSave(int y, Population &popln, Vector &vectors,
   // simulations from the scenario file.
   int BASEYEAR = 2000;
   outputEndgameDate = (outputEndgameDate - BASEYEAR) * 12;
-  if(outputNTDMCDate.hasValue()){
-    outputNTDMCDateFromYear = (outputNTDMCDate.value - BASEYEAR) * 12;
-  }
+
+  int outputNTDMCDateFromYear = (outputNTDMCDate - BASEYEAR) * 12;
+  
   int popSize = popln.getSizeOfPop();
   double mfprev_aimp_old =
       popln.getMFPrev(sc, 0, 0, outputEndgameDate, rep, popSize, folderName);
@@ -260,15 +261,15 @@ void Model::evolveAndSave(int y, Population &popln, Vector &vectors,
   int HydroceleTotalWorms = popln.getHydroceleTotalWorms();
   double LymphodemaShape = popln.getLymphodemaShape();
   double HydroceleShape = popln.getHydroceleShape();
-  
-  // Only initalize outputs if we are at the start of a simulation, when y==0 
+
+  // Only initalize outputs if we are at the start of a simulation, when y==0
   // (rather than reinitializing for a scenario that has already started)
   if ((outputEndgame == 1) && (y == 0)) {
     sc.InitIHMEData(rep, folderName);
     sc.InitPreTASData(rep, folderName);
     sc.InitTASData(rep, folderName);
   }
-  // Only initalize outputs if we are at the start of a simulation, when y==0 
+  // Only initalize outputs if we are at the start of a simulation, when y==0
   // (rather than reinitializing for a scenario that has already started)
   if ((outputNTDMC == true) && (y == 0)) {
     sc.InitNTDMCData(rep, folderName);
@@ -335,8 +336,9 @@ void Model::evolveAndSave(int y, Population &popln, Vector &vectors,
       sc.writeSurveyByAge(popln, t, popln.preTAS_Pass, popln.TAS_Pass, rep,
                           folderName);
     }
-    
-    if ((t % 12 == 0) && (outputNTDMC == true) && (t >= outputNTDMCDateFromYear)) {
+
+    if ((t % 12 == 0) && (outputNTDMC == true) &&
+        (t >= outputNTDMCDateFromYear)) {
       sc.writeRoadmapTarget(popln, t, rep, popln.DoMDA, popln.TAS_Pass,
                             neededTASPass, folderName);
     }
