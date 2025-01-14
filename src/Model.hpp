@@ -29,7 +29,7 @@ public:
                     Vector &vectors, Worm &worms, int replicates,
                     double timestep, int index, int outputEndgame,
                     int outputEndgameDate, bool outputNTDMC,
-                    int outputNTDMCDate, int reduceImpViaXml,
+                    std::optional<int> outputNTDMCDate, int reduceImpViaXml,
                     std::string randParamsfile, std::string RandomSeedFile,
                     std::string RandomCovPropFile, std::string opDir);
   bool
