@@ -91,7 +91,7 @@ To run simulations from the root directory:
 
     * -D 2026: year from which to output IHME data from. Change to whatever year we want to do this from. Default is 2000.
 
-    * -m 0 : indicator for outputting NTDMC data. If this is omitted it will be output. If set to 0, this will not be done. Any other integer input will lead to it being output. 
+    * -m 1 or 0 (1 is default): set to 0 if we want don't want to output the NTDMC data.
 
     * -N 2000: year from which to output NTDMC data from. Change to whatever year we want to do this from. Default is 2000
 
