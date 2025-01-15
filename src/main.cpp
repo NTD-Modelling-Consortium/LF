@@ -73,8 +73,10 @@ int main(int argc, char **argv) {
   // xml file rather than impact of MDA on the prevalence
   int outputEndgame = 1;
   int outputEndgameDate = 2000;
+  bool outputNTDMC = true;
+  int outputNTDMCDate = 2000;
   int reduceImpViaXml = 0;
-
+  int NTDMC = 1;
   int index = 0;
   if (!strcmp(argv[1], "DEBUG")) {
     _DEBUG = true;
@@ -112,6 +114,10 @@ int main(int argc, char **argv) {
       outputEndgame = atoi(argv[i + 1]);
     else if (!strcmp(argv[i], "-D"))
       outputEndgameDate = atoi(argv[i + 1]);
+    else if (!strcmp(argv[i], "-m"))
+      NTDMC = atoi(argv[i + 1]);
+    else if (!strcmp(argv[i], "-N"))
+      outputNTDMCDate = atoi(argv[i + 1]);
     else if (!strcmp(argv[i], "-x"))
       reduceImpViaXml = atoi(argv[i + 1]);
     else {
@@ -120,7 +126,12 @@ int main(int argc, char **argv) {
       return 1;
     }
   }
-
+  // input "-m 0" when running from command line if we don't want to
+  // output NTDMC data.
+  if (NTDMC == 0) {
+    outputNTDMC = false;
+  }
+  std::cout << "outputNTDMC = " << outputNTDMC << std::endl;
   for (int i = 0; i < argc; i++)
     std::cout << argv[i] << " ";
   std::cout << std::endl << std::endl;
@@ -193,9 +204,9 @@ int main(int argc, char **argv) {
   // Run
   Model model;
   model.runScenarios(Scenarios, hostPopulation, vectors, worms, replicates, dt,
-                     index, outputEndgame, outputEndgameDate, reduceImpViaXml,
-                     randParamsfile, RandomSeedFile, CoverageReductionFile,
-                     opDir);
+                     index, outputEndgame, outputEndgameDate, outputNTDMC,
+                     outputNTDMCDate, reduceImpViaXml, randParamsfile,
+                     RandomSeedFile, CoverageReductionFile, opDir);
 
   gettimeofday(&tv2, NULL);
   double timesofar = (double)(tv2.tv_usec - tv1.tv_usec) / 1000000.0 +
