@@ -31,6 +31,7 @@ function run_ID () {
 
 	# transfil_N wants 0 or 1 arguments for true/false
 	[[ "${OUTPUT_ENDGAME}" = "true" ]] && OUTPUT_ENDGAME_ARG=1 || OUTPUT_ENDGAME_ARG=0
+	[[ "${OUTPUT_NTDMC}" = "true" ]] && OUTPUT_NTDMC_ARG=1 || OUTPUT_NTDMC_ARG=0
 	[[ "${REDUCE_IMP_VIA_XML}" = "true" ]] && REDUCE_IMP_VIA_XML_ARG=1 || REDUCE_IMP_VIA_XML_ARG=0
 
 	echo "== making result directory ${RESULTS} for ID ${id}"
@@ -39,11 +40,13 @@ function run_ID () {
 
 	echo "== running ${NUM_SIMULATIONS} simulations of LF model starting in ${STARTING_YEAR} with ${PARAMS} ${SCENARIO}"
 
-	time ./transfil_N \
+	time ./transfil_N 0 \
 		-s "${SCENARIO}" \
 		-p "${PARAMS}" \
 		-t "${TIMESTEP}" \
 		-e "${OUTPUT_ENDGAME_ARG}" \
+		-m "${OUTPUT_NTDMC_ARG}" \
+		-N "${OUTPUT_NTDMC_DATE}" \
 		-x "${REDUCE_IMP_VIA_XML_ARG}" \
 		-g "${SEED_ARG}" \
 		-o "${RESULTS}" \
@@ -55,8 +58,11 @@ function run_ID () {
 	( time do_file_combinations "${id}" "${output_folder_name}" "${RESULTS}" ) 2>&1
 
 	if [[ "${KEEP_INTERMEDIATE_RESULTS}" = "false" ]] ; then
-		echo "== clearing out model 'result' files"
-		rm -rf "${RESULTS}"
+		echo "== clearing out model 'result' files in ${RESULTS}"
+		echo rm -rf "${RESULTS}/IHME_scen*"
+		rm -rf "${RESULTS}"/IHME_scen*
+		echo rm -rf "${RESULTS}/NTDMC_scen*"
+		rm -rf "${RESULTS}"/NTDMC_scen*
 	else
 		echo "== leaving model 'result' files in place in ${RESULTS}"
 	fi
