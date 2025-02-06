@@ -25,7 +25,8 @@ function usage () {
 		\t[-r <results-dir>] [-k <keep-intermediate-results(true|=false)>] \\ \n
 		\t[-O <output-dir>] [-o <output-subdir>] \\ \n
 		\t[-Y <starting-year(=2020)>] [-t <timestep(=1)>] \\ \n
-		\t[-x <reduce-imp-via-xml(true|=false)>] [-e <output_endgame(=true|false)>]"
+		\t[-x <reduce-imp-via-xml(true|=false)>] [-e <output_endgame(=true|false)>] \\ \n
+		\t[-m <output-ntdmc>] [-N <output-ntdmc-start-date>]"
 	exit 1
 }
 
@@ -78,11 +79,13 @@ STARTING_YEAR="${STARTING_YEAR:=2020}"
 TIMESTEP="${TIMESTEP:=1}"
 REDUCE_IMP_VIA_XML="${REDUCE_IMP_VIA_XML:=false}"
 
+OUTPUT_NTDMC="${OUTPUT_NTDMC:=true}"
+OUTPUT_NTDMC_DATE="${OUTPUT_NTDMC_DATE:=2000}"
 OUTPUT_ENDGAME="${OUTPUT_ENDGAME:=true}"
 KEEP_INTERMEDIATE_RESULTS="${KEEP_INTERMEDIATE_RESULTS:=false}"
 
 # read CLI options
-while getopts "n:f:D:o:j:s:S:p:P:u:U:V:r:O:Y:e:t:x:k:" opts ; do
+while getopts "n:f:D:o:j:s:S:p:P:u:U:V:r:O:Y:m:N:e:t:x:k:" opts ; do
 
 	case "${opts}" in
 
@@ -167,6 +170,15 @@ while getopts "n:f:D:o:j:s:S:p:P:u:U:V:r:O:Y:e:t:x:k:" opts ; do
 		x)
 			check_true_false "${OPTARG}" reduce-imp-via-xml
 			REDUCE_IMP_VIA_XML=${OPTARG}
+			;;
+
+		m)
+			check_true_false "${OPTARG}" output-ntdmc
+			OUTPUT_NTDMC=${OPTARG}
+			;;
+
+		N)
+			OUTPUT_NTDMC_DATE=${OPTARG}
 			;;
 
 		k)
@@ -268,6 +280,7 @@ fi
 echo "- start from year ${STARTING_YEAR}"
 display_true_false "${OUTPUT_ENDGAME}" "output endgame"
 display_true_false "${REDUCE_IMP_VIA_XML}" "reduce IMP via XML"
+display_true_false "${OUTPUT_NTDMC}" "output ntdmc from ${OUTPUT_NTDMC_DATE}"
 echo "- use timestep ${TIMESTEP}"
 
 echo "- write intermediate results in directory ${RESULTS_ROOT}"
@@ -309,6 +322,8 @@ select CHOICE in yes no ; do
 					USE_SEED_FILE="${USE_SEED_FILE}" \
 					KEEP_INTERMEDIATE_RESULTS="${KEEP_INTERMEDIATE_RESULTS}" \
 					OUTPUT_ENDGAME="${OUTPUT_ENDGAME}" \
+					OUTPUT_NTDMC="${OUTPUT_NTDMC}" \
+					OUTPUT_NTDMC_DATE="${OUTPUT_NTDMC_DATE}" \
 					REDUCE_IMP_VIA_XML="${REDUCE_IMP_VIA_XML}" \
 					TIMESTEP="${TIMESTEP}" \
 					POP_DISTRIBUTION_FILE="${POP_DISTRIBUTION_FILE}" \
