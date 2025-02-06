@@ -40,19 +40,31 @@ function run_ID () {
 
 	echo "== running ${NUM_SIMULATIONS} simulations of LF model starting in ${STARTING_YEAR} with ${PARAMS} ${SCENARIO}"
 
+#	transfil index
+#		-s <scenarios_file>
+#		-n <pop_file>
+#		-p <random_parameters_file>
+#		-r <replicates=1000>
+#		-t <timestep=1>
+#		-o <output_directory="./">
+#		-g <random_seed=1>
+#		-e <output_endgame=1>
+#		-x <reduce_imp_via-xml=0>
+#		-D <outputEndgameDate=2000>
+
 	time ./transfil_N 0 \
 		-s "${SCENARIO}" \
-		-p "${PARAMS}" \
-		-t "${TIMESTEP}" \
-		-e "${OUTPUT_ENDGAME_ARG}" \
-		-m "${OUTPUT_NTDMC_ARG}" \
-		-N "${OUTPUT_NTDMC_DATE}" \
-		-x "${REDUCE_IMP_VIA_XML_ARG}" \
-		-g "${SEED_ARG}" \
-		-o "${RESULTS}" \
 		-n "${POP_DISTRIBUTION_FILE}" \
+		-p "${PARAMS}" \
 		-r "${NUM_SIMULATIONS}" \
-		-D "${STARTING_YEAR}"
+		-t "${TIMESTEP}" \
+		-o "${RESULTS}" \
+		-g "${SEED_ARG}" \
+		-e "${OUTPUT_ENDGAME_ARG}" \
+		-x "${REDUCE_IMP_VIA_XML_ARG}" \
+		-D "${STARTING_YEAR}" \
+		-m "${OUTPUT_NTDMC_ARG}" \
+		-N "${OUTPUT_NTDMC_DATE}"
 
 	echo "== combining output files for IHME & NTDMC using output folder ${output_folder_name}"
 	( time do_file_combinations "${id}" "${output_folder_name}" "${RESULTS}" ) 2>&1
@@ -72,14 +84,14 @@ function do_file_combinations () {
 
 	id=${1}
 	output_folder_name=${2}
-    result_folder_path=${3}
+	result_folder_path=${3}
 
 	for scen_iu in $( xmllint --xpath "/Model/ScenarioList/scenario/@name" <( tail -n +2 ${SCENARIO_ROOT}/${SCENARIO_FILE_STEM}${id}.xml ) | sed 's/name="\([^"]*\)"/\1/g' ) ; do
 
 		scen=$( echo $scen_iu | cut -f 1 -d _ )
 		iu=$( echo $scen_iu | cut -f 2 -d _ )
 
-        echo "  -- running file combinations for scenario ${scen} in IU ${iu}"
+		echo "  -- running file combinations for scenario ${scen} in IU ${iu}"
 
 		combine_output_files "${scen}" "${iu}" IHME "${output_folder_name}" "${result_folder_path}"
 		combine_output_files "${scen}" "${iu}" NTDMC "${output_folder_name}" "${result_folder_path}"
@@ -95,7 +107,7 @@ function combine_output_files () {
 	iu=${2}
 	inst=${3^^}
 	output_folder_name=${4}
-    result_folder_path=${5}
+	result_folder_path=${5}
 
 	echo "== combining ${inst} files for IU ${iu} scenario ${scen}"
 
