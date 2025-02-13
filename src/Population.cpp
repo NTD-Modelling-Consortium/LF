@@ -1250,16 +1250,16 @@ int Population::returnMinAgeMDA(MDAEvent *mda) {
 int Population::returnMaxAge() { return maxAge; }
 
 int Population::ApplyTreatmentUpdated(MDAEvent *mda, Worm &worms, Scenario &sc,
-                                       int t, int roundNumber,
-                                       int outputEndgameDate, int rep,
-                                       bool DoMDA, int outputEndgame,
-                                       std::string folderName) {
+                                      int t, int roundNumber,
+                                      int outputEndgameDate, int rep,
+                                      bool DoMDA, int outputEndgame,
+                                      std::string folderName) {
   int minAge = (mda->getMinAge() >= 0) ? mda->getMinAge() : minAgeMDA;
   int minAgeMDAinMonths = minAge * 12;
 
   if (maxAge <= 0 || size <= 0) {
     std::cerr << "Invalid maxAge or size" << std::endl;
-    return;
+    return 0;
   }
 
   std::vector<int> numTreatedByAge(maxAge, 0);
