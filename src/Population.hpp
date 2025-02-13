@@ -97,7 +97,7 @@ public:
   void evolve(double dt, const Vector &vectors, const Worm &worms);
   void ApplyTreatment(MDAEvent *mda, Worm &worms, Scenario &sc, int t, int rep,
                       std::string folderName);
-  void ApplyTreatmentUpdated(MDAEvent *mda, Worm &worms, Scenario &sc, int t,
+  int ApplyTreatmentUpdated(MDAEvent *mda, Worm &worms, Scenario &sc, int t,
                              int roundNumber, int outputEndgameDate, int rep,
                              bool DoMDA, int outputEndgame,
                              std::string folderName);

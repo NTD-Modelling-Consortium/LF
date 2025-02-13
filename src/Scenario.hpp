@@ -173,7 +173,8 @@ public:
   void InitTASData(int rep, std::string folder);
   void writePrevByAge(Population &popln, int t, int rep, std::string folder);
   void writeRoadmapTarget(Population &popln, int t, int rep, int DoMDA,
-                          int TAS_Pass, int neededTASPass, std::string folder);
+                          int TAS_Pass, int totalTreatmentsThisYear,
+                          int neededTASPass, std::string folder);
   void writeNumberByAge(Population &popln, int t, int rep, std::string folder,
                         std::string surveyType);
   void writeSequelaeByAge(Population &popln, int t, int LymphodemaTotalWorms,
