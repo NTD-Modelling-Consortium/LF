@@ -295,6 +295,10 @@ void Model::evolveAndSave(int y, Population &popln, Vector &vectors,
   int roundNumber =
       1; // initialize an integer to track which round of MDA in a year is being
          // done and will be recorded in the IHME output
+  int totalTreatmentsThisYear =
+      0; // track how many treatments are done each year, to be output in NTDMC
+         // data set intialize a variable to track this, which will be reset to
+         // 0 each year if we are outputting this data set.
   for (int q = 0; q < popln.sensSpecChangeCount; q++) {
     if (popln.sensSpecChangeName[q] == sc.getName()) {
       changeSensSpec = 1;
@@ -339,7 +343,8 @@ void Model::evolveAndSave(int y, Population &popln, Vector &vectors,
     if ((t % 12 == 0) && (outputNTDMC == true) &&
         (t >= outputNTDMCDateFromYear)) {
       sc.writeRoadmapTarget(popln, t, rep, popln.DoMDA, popln.TAS_Pass,
-                            neededTASPass, folderName);
+                            totalTreatmentsThisYear, neededTASPass, folderName);
+      totalTreatmentsThisYear = 0;
     }
 
     // If we haven't done a survey this year we still want to output this fact
@@ -511,9 +516,9 @@ void Model::evolveAndSave(int y, Population &popln, Vector &vectors,
       // apply the MDA. If popln.DoMDA = false, then we call this function, but
       // don't do the MDA, we just write to a file showing that no people were
       // treated.
-      popln.ApplyTreatmentUpdated(applyMDA, worms, sc, t, roundNumber,
-                                  outputEndgameDate, rep, popln.DoMDA,
-                                  outputEndgame, folderName);
+      totalTreatmentsThisYear += popln.ApplyTreatmentUpdated(
+          applyMDA, worms, sc, t, roundNumber, outputEndgameDate, rep,
+          popln.DoMDA, outputEndgame, folderName);
       time_to_reduce_importation_rate = t + 6;
 
       popln.totMDAs += 1;

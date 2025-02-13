@@ -643,8 +643,8 @@ void Scenario::writePrevByAge(Population &popln, int t, int rep,
 }
 
 void Scenario::writeRoadmapTarget(Population &popln, int t, int rep, int DoMDA,
-                                  int TAS_Pass, int neededTASPass,
-                                  std::string folder) {
+                                  int TAS_Pass, int totalTreatmentsThisYear,
+                                  int neededTASPass, std::string folder) {
   // we want to write whether the population has reached the 2030 roadmap target
   // for each year for LF this is to have microfilaria prevalence below 1% in
   // people 5 years and older we also write the mf prevalence for people 5 years
@@ -686,6 +686,9 @@ void Scenario::writeRoadmapTarget(Population &popln, int t, int rep, int DoMDA,
     outfile << name << "," << year << "," << 5 << "," << maxAge << ","
             << "metRoadmapTarget"
             << "," << roadmapTargetMet << "\n";
+    outfile << name << "," << year << "," << "None" << "," << "None" << ","
+            << "MDA doses"
+            << "," << totalTreatmentsThisYear << "\n";
     outfile << name << "," << year << ","
             << "None"
             << ","
@@ -705,6 +708,7 @@ void Scenario::writeRoadmapTarget(Population &popln, int t, int rep, int DoMDA,
     outfile << ICprevSample << "\n";
     outfile << ICprevTrue << "\n";
     outfile << roadmapTargetMet << "\n";
+    outfile << totalTreatmentsThisYear << "\n";
     outfile << 1 - DoMDA << "\n";
     outfile << achieveEPHP << "\n";
   }
