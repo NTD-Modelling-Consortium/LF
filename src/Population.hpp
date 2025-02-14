@@ -55,10 +55,11 @@ public:
   double getNeverTreatChangeTime();
   void initHosts(std::string distType, double k_val, double aImp_val);
   double selectPopSizeFromDistribution();
-  int PreTASSurvey(Scenario &sc, int forPreTass, int t, int outputEndgameDate,
-                   int rep, std::string folderName);
-  int TASSurvey(Scenario &sc, int t, int outputEndgameDate, int rep,
-                std::string folderName);
+  std::vector<int> PreTASSurvey(Scenario &sc, int forPreTass, int t,
+                                int outputEndgameDate, int rep,
+                                std::string folderName);
+  std::vector<int> TASSurvey(Scenario &sc, int t, int outputEndgameDate,
+                             int rep, std::string folderName);
   RecordedPrevalence getPrevalence(PrevalenceEvent *outputPrev) const;
 
   double getLarvalUptakebyVector(double r1, double kappas1,
@@ -68,8 +69,9 @@ public:
   double getImportationRateFactor() const;
   int getSizeOfPop() const;
 
-  double getMFPrev(Scenario &sc, int forPreTass, int t, int outputEndgameDate,
-                   int rep, int sampleSize, std::string folderName);
+  std::vector<double> getMFPrev(Scenario &sc, int forPreTass, int t,
+                                int outputEndgameDate, int rep, int sampleSize,
+                                std::string folderName);
   bool test_for_infection(bool is_infected, float ICsensitivity,
                           float ICspecificity);
   void getIncidence(Scenario &sc, int t, int rep, std::string folderName);
@@ -82,8 +84,8 @@ public:
   void initPTreat(double cov, double rho);
   void editPTreat(double cov, double rho);
   void checkForZeroPTreat(double cov, double rho);
-  double getICPrev(Scenario &sc, int t, int outputEndgameDate, int rep,
-                   std::string folderName);
+  std::vector<double> getICPrev(Scenario &sc, int t, int outputEndgameDate,
+                                int rep, std::string folderName);
   double getICPrevForOutput(bool sample);
   void changeNeverTreat();
   void changeICTest();

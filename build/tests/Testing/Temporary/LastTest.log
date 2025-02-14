@@ -1,0 +1,63 @@
+Start testing: Feb 13 14:44 +08
+----------------------------------------------------------
+1/3 Testing: Host
+1/3 Test: Host
+Command: "/Users/matthew/Dropbox/Github/LF/build/tests/tests" "Host"
+Directory: /Users/matthew/Dropbox/Github/LF/build/tests
+"Host" start time: Feb 13 14:44 +08
+Output:
+----------------------------------------------------------
+Filters: "Host"
+Randomness seeded to: 1550591381
+===============================================================================
+All tests passed (12 assertions in 1 test case)
+
+<end of output>
+Test time =   0.40 sec
+----------------------------------------------------------
+Test Passed.
+"Host" end time: Feb 13 14:44 +08
+"Host" time elapsed: 00:00:00
+----------------------------------------------------------
+
+2/3 Testing: Test positives
+2/3 Test: Test positives
+Command: "/Users/matthew/Dropbox/Github/LF/build/tests/tests" "Test positives"
+Directory: /Users/matthew/Dropbox/Github/LF/build/tests
+"Test positives" start time: Feb 13 14:44 +08
+Output:
+----------------------------------------------------------
+Filters: "Test positives"
+Randomness seeded to: 237095330
+===============================================================================
+All tests passed (1 assertion in 1 test case)
+
+<end of output>
+Test time =   0.03 sec
+----------------------------------------------------------
+Test Passed.
+"Test positives" end time: Feb 13 14:44 +08
+"Test positives" time elapsed: 00:00:00
+----------------------------------------------------------
+
+3/3 Testing: Model
+3/3 Test: Model
+Command: "/Users/matthew/Dropbox/Github/LF/build/tests/tests" "Model"
+Directory: /Users/matthew/Dropbox/Github/LF/build/tests
+"Model" start time: Feb 13 14:44 +08
+Output:
+----------------------------------------------------------
+Filters: "Model"
+Randomness seeded to: 142701297
+===============================================================================
+All tests passed (17 assertions in 1 test case)
+
+<end of output>
+Test time =   0.03 sec
+----------------------------------------------------------
+Test Passed.
+"Model" end time: Feb 13 14:44 +08
+"Model" time elapsed: 00:00:00
+----------------------------------------------------------
+
+End testing: Feb 13 14:44 +08

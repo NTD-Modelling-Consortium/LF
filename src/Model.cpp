@@ -243,10 +243,18 @@ void Model::evolveAndSave(int y, Population &popln, Vector &vectors,
   outputEndgameDate = (outputEndgameDate - BASEYEAR) * 12;
 
   int outputNTDMCDateFromYear = (outputNTDMCDate - BASEYEAR) * 12;
-
+  std::vector<int> PreTASOutput; // declare vector to contain the Pre-TAS output
+  std::vector<int> TASOutput;    // declare vector to contain the TAS output
+  std::vector<double>
+      mfPrevOutput;     // declare vector to contain the mf prevalence output
+  int numMFSamples = 0; // declare int to store the number of MF samples which
+                        // are taken when doing Pre-TAS
+  int numICSamples = 0; // declare int to store the number of IC samples which
+                        // are taken when doing TAS
   int popSize = popln.getSizeOfPop();
-  double mfprev_aimp_old =
+  mfPrevOutput =
       popln.getMFPrev(sc, 0, 0, outputEndgameDate, rep, popSize, folderName);
+  double mfprev_aimp_old = mfPrevOutput.at(0);
   double mfprev_aimp_new = 0;
   int changeSensSpec = 0;
   int changeNeverTreat = 0;
@@ -339,7 +347,10 @@ void Model::evolveAndSave(int y, Population &popln, Vector &vectors,
     if ((t % 12 == 0) && (outputNTDMC == true) &&
         (t >= outputNTDMCDateFromYear)) {
       sc.writeRoadmapTarget(popln, t, rep, popln.DoMDA, popln.TAS_Pass,
-                            neededTASPass, folderName);
+                            neededTASPass, numMFSamples, numICSamples,
+                            folderName);
+      numMFSamples = 0;
+      numICSamples = 0;
     }
 
     // If we haven't done a survey this year we still want to output this fact
@@ -399,8 +410,10 @@ void Model::evolveAndSave(int y, Population &popln, Vector &vectors,
     // snippet to perform a preTAS survey
     if (t == popln.preTASSurveyTime) {
 
-      popln.preTAS_Pass = popln.PreTASSurvey(
-          sc, outputEndgame, t, outputEndgameDate, rep, folderName);
+      PreTASOutput = popln.PreTASSurvey(sc, outputEndgame, t, outputEndgameDate,
+                                        rep, folderName);
+      popln.preTAS_Pass = PreTASOutput.at(0);
+      numMFSamples += PreTASOutput.at(1);
       if ((outputEndgame == 1) && (t >= outputEndgameDate)) {
         sc.writeNumberByAge(popln, t, rep, folderName, "PreTAS survey");
       }
@@ -419,11 +432,13 @@ void Model::evolveAndSave(int y, Population &popln, Vector &vectors,
     // snippet to perform a TAS survey
 
     if (t == popln.TASSurveyTime) {
-      int TAS_Pass_ind =
-          popln.TASSurvey(sc, t, outputEndgameDate, rep, folderName);
+
+      TASOutput = popln.TASSurvey(sc, t, outputEndgameDate, rep, folderName);
       if ((outputEndgame == 1) && (t >= outputEndgameDate)) {
         sc.writeNumberByAge(popln, t, rep, folderName, "TAS survey");
       }
+      int TAS_Pass_ind = TASOutput.at(0);
+      numICSamples = TASOutput.at(1);
       doneTAS = 1;
       popln.TAS_Pass += TAS_Pass_ind;
       if (TAS_Pass_ind == 0) {
@@ -484,8 +499,9 @@ void Model::evolveAndSave(int y, Population &popln, Vector &vectors,
       // would be assessed via a survey
       if (popln.totMDAs == 0) {
         if (popln.getNoMDALowMF() == 1) {
-          mfprev = popln.getMFPrev(sc, 0, t, outputEndgameDate, rep, sampleSize,
-                                   folderName);
+          mfPrevOutput = popln.getMFPrev(sc, 0, t, outputEndgameDate, rep,
+                                         sampleSize, folderName);
+          mfprev = mfPrevOutput.at(0);
           if (mfprev <= popln.MFThreshold) {
             popln.DoMDA = false;
           }
@@ -498,9 +514,9 @@ void Model::evolveAndSave(int y, Population &popln, Vector &vectors,
 
       // this uses the whole population to get its value as it is used for an
       // intrinsic property of the population
-      mfprev_aimp_old = popln.getMFPrev(sc, 0, t, outputEndgameDate, rep,
-                                        popSize, folderName);
-
+      mfPrevOutput = popln.getMFPrev(sc, 0, t, outputEndgameDate, rep, popSize,
+                                     folderName);
+      mfprev_aimp_old = mfPrevOutput.at(0);
       int year = t / 12 + 2000;
       if (year == previousMDAyear) {
         roundNumber += 1;
@@ -546,13 +562,13 @@ void Model::evolveAndSave(int y, Population &popln, Vector &vectors,
     if (shouldReduceImportationViaPrevalance(
             reduceImpViaXml, t, popln.switchImportationReducingMethodTime) &&
         t == time_to_reduce_importation_rate) {
-      mfprev_aimp_new = popln.getMFPrev(sc, 0, t, outputEndgameDate, rep,
-                                        popSize, folderName);
+      mfPrevOutput = popln.getMFPrev(sc, 0, t, outputEndgameDate, rep, popSize,
+                                     folderName);
+      mfprev_aimp_new = mfPrevOutput.at(0);
       if (mfprev_aimp_old > mfprev_aimp_new) {
         popln.aImp = popln.aImp * mfprev_aimp_new / mfprev_aimp_old;
       }
-      mfprev_aimp_old = popln.getMFPrev(sc, 0, t, outputEndgameDate, rep,
-                                        popSize, folderName);
+      mfprev_aimp_old = mfprev_aimp_new;
     }
 
     if (t < popln.getNeverTreatChangeTime()) {

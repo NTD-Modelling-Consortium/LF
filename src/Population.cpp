@@ -544,47 +544,54 @@ Population::getPrevalence(PrevalenceEvent *outputPrev) const {
   return prevalence;
 }
 
-int Population::PreTASSurvey(Scenario &sc, int forPreTass, int t,
-                             int outputEndgameDate, int rep,
-                             std::string folderName) {
+std::vector<int> Population::PreTASSurvey(Scenario &sc, int forPreTass, int t,
+                                          int outputEndgameDate, int rep,
+                                          std::string folderName) {
   int preTAS_Pass = 0;
   // get the mfprevalence via a survey with sample size specified by sampleSize
   // variable this is set to 250 by default, but can be changed via inputting a
   // variable in the xml file
-  double mfprev = getMFPrev(sc, forPreTass, t, outputEndgameDate, rep,
-                            sampleSize, folderName); // find the mf prevalence
+  std::vector<double> mfprevOutput =
+      getMFPrev(sc, forPreTass, t, outputEndgameDate, rep, sampleSize,
+                folderName); // find the mf prevalence
+  double mfprev = mfprevOutput.at(0);
+  int numHostsSampled = static_cast<int>(mfprevOutput.at(1));
   numPreTASSurveys += 1;       // increment number of pre-TAS tests by 1
   if (mfprev <= MFThreshold) { // if the mf prevalence is below threshold
     preTAS_Pass = 1;           // set pre-TAS pass indicator to 1
   }
-  return preTAS_Pass;
+  return {preTAS_Pass, numHostsSampled};
 }
 
-int Population::TASSurvey(Scenario &sc, int t, int outputEndgameDate, int rep,
-                          std::string folderName) {
+std::vector<int> Population::TASSurvey(Scenario &sc, int t,
+                                       int outputEndgameDate, int rep,
+                                       std::string folderName) {
   int TAS_Pass = 0;
 
-  double icprev =
+  std::vector<double> ICOutput =
       getICPrev(sc, t, outputEndgameDate, rep,
-                folderName);     // find ic prevalence in specified age group
+                folderName); // find ic prevalence in specified age group
+  double icprev = ICOutput.at(0);
+  int numHostsSampled = static_cast<int>(ICOutput.at(1));
   numTASSurveys += 1;            // increment number of TAS surveys by 1
   if ((icprev <= ICThreshold)) { // if the ic prevalence is below the threshold
                                  // and mf prev also below threshold
     TAS_Pass = 1;                // set TAS pass indicator to 1
     time_TAS_Passes = t;         // store the time of passing TAS
   }
-  return TAS_Pass;
+  return {TAS_Pass, numHostsSampled};
 }
 
-double Population::getMFPrev(Scenario &sc, int forPreTass, int t,
-                             int outputEndgameDate, int rep, int sampleSize,
-                             std::string folderName) {
+std::vector<double> Population::getMFPrev(Scenario &sc, int forPreTass, int t,
+                                          int outputEndgameDate, int rep,
+                                          int sampleSize,
+                                          std::string folderName) {
   // get mf prevalence
   // we also store the number of people who are surveyed in each age group
   // as this may be output for IHME to use
 
-  double MFpos = 0;           // number of people mf positive
-  double numHostsSampled = 0; // total number of hosts sampled so far
+  double MFpos = 0;        // number of people mf positive
+  int numHostsSampled = 0; // total number of hosts sampled so far
   int maxAgeMonths = maxAgeMF * 12;
   int minAgeMonths = minAgeMF * 12;
 
@@ -631,10 +638,11 @@ double Population::getMFPrev(Scenario &sc, int forPreTass, int t,
   }
 
   if (numHostsSampled > 0) {
-    return MFpos /
-           numHostsSampled; // convert to prevalence of mf positive hosts
+    return {MFpos / numHostsSampled,
+            static_cast<double>(
+                numHostsSampled)}; // convert to prevalence of mf positive hosts
   } else {
-    return 0.0;
+    return {0.0, 0.0};
   }
 }
 
@@ -792,14 +800,15 @@ bool Population::test_for_infection(bool is_infected, float ICsensitivity,
   }
 }
 
-double Population::getICPrev(Scenario &sc, int t, int outputEndgameDate,
-                             int rep, std::string folderName) {
+std::vector<double> Population::getICPrev(Scenario &sc, int t,
+                                          int outputEndgameDate, int rep,
+                                          std::string folderName) {
   // get IC prevalence. This is modelled by sensing the presence of any adult
   // worms we also store the number of people who are surveyed in each age group
   // as this may be output for IHME to use
 
-  double ICpos = 0;           // number of people ic positive
-  double numHostsSampled = 0; // total number of hosts
+  double ICpos = 0;        // number of people ic positive
+  int numHostsSampled = 0; // total number of hosts
   int maxAgeMonths = maxAgeIC * 12;
   int minAgeMonths = minAgeIC * 12;
   int numSurvey[maxAge];
@@ -827,10 +836,12 @@ double Population::getICPrev(Scenario &sc, int t, int outputEndgameDate,
     sc.writeTAS(t, numSurvey, maxAge, rep, folderName);
   }
   if (numHostsSampled > 0) {
-    return ICpos / numHostsSampled; // convert to prevalence rather than number
-                                    // of infected
+    return {
+        ICpos / numHostsSampled,
+        static_cast<double>(numHostsSampled)}; // convert to prevalence rather
+                                               // than number of infected
   } else {
-    return 0.0;
+    return {0.0, 0.0};
   }
 }
 
